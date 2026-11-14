@@ -1,4 +1,4 @@
-import { validateState, SAVE_VERSION } from '../models/state.js';
+import { validateState, SAVE_VERSION, LIMITS } from '../models/state.js';
 
 export class SaveRepository {
   constructor(storage, { events, tools }, key = 'last-light-outpost.save.v1') {
@@ -30,7 +30,7 @@ export class SaveRepository {
       const savedAt = typeof record?.savedAt === 'string' && Number.isFinite(Date.parse(record.savedAt))
         ? new Date(record.savedAt).toISOString() : null;
       if (state?.version === 1) {
-        state.version = SAVE_VERSION;
+        state.version = 2;
         state.weather = 'clear'; state.lightsOn = true;
         state.plantStage = ['seed','sprout','growing'][state.growth];
         state.daySummary = []; state.previousDaySummary = [];
@@ -39,6 +39,10 @@ export class SaveRepository {
         const event = this.events.find(item => item.id === state.currentEventId);
         const choice = event?.choices.find(item => item.id === state.choiceId);
         if (choice) state.daySummary.push(choice.summaryLine ?? event.summaryLine);
+      }
+      if (state?.version === 2 && Number.isInteger(state.energy) && state.energy >= 0 && state.energy <= 20) {
+        state.energy = Math.min(state.energy,LIMITS.energy);
+        state.version = SAVE_VERSION;
       }
       if (!validateState(state,this.eventIds,this.toolIds)) throw new Error('存档版本或内容无效');
       const event = this.events.find(item => item.id === state.currentEventId);

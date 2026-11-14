@@ -2,6 +2,8 @@ import { ACTIONS, unavailableReason } from '../models/ActionRules.js';
 import { escapeHtml } from './dom.js';
 import { Typewriter } from './Typewriter.js';
 import { i18n } from '../services/I18n.js';
+import { LIMITS } from '../models/state.js';
+import { BatterySlotView } from './BatterySlotView.js';
 
 function choice(action,id,label,description='',disabled=false) {
   label = i18n.t(label); description = i18n.t(description);
@@ -12,6 +14,7 @@ export class TerminalView {
   constructor(tools) {
     this.tools = tools; this.dialog = document.querySelector('#terminal'); this.content = document.querySelector('#terminal-content');
     this.writer = new Typewriter(); this.animation = null;
+    this.batterySlot = new BatterySlotView();
     // Start at 90% opacity; evaluate inside/outside only once the mouse actually moves.
     window.addEventListener('pointermove',event => {
       if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
@@ -63,6 +66,7 @@ export class TerminalView {
   }
   render(state,event) {
     this.writer.cancel();
+    this.batterySlot.render(state);
     const title = state ? `SOL ${String(state.sol).padStart(2,'0')}` : 'OUTPOST / LINK';
     document.querySelector('#terminal-title').setAttribute('aria-label',title);
     document.querySelector('#restart').hidden = !state;
@@ -84,7 +88,7 @@ export class TerminalView {
       } else if (state.phase === 'end') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('terminal.dayComplete'))}</p>${choice('next','',state.sol === 14 ? 'terminal.finishMission' : 'terminal.endDay')}`;
       }
-      if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy === 20));
+      if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy >= LIMITS.energy));
     }
     document.querySelector('#terminal-scroll').scrollTop = 0;
     this.jobs = [{node:document.querySelector('#terminal-title'),text:title},...Array.from(this.content.querySelectorAll('[data-copy]'),node => ({node,text:node.dataset.copy}))];

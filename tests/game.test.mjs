@@ -14,17 +14,17 @@ function memory() { const data = new Map(); return { get length() { return data.
 
 test('开局先发电再支付生命维持；状态副本不能修改 Model',() => {
   const game = model();
-  assert.equal(game.snapshot.energy,13);
+  assert.equal(game.snapshot.energy,9);
   const external = game.snapshot; external.energy = 999;
-  assert.equal(game.snapshot.energy,13);
+  assert.equal(game.snapshot.energy,9);
   assert.throws(() => game.start(['battery','battery']));
 });
 
 test('事件和工作不可重复结算，一次性电池不可重复使用',() => {
   const game = model(); game.choose('grow');
-  assert.equal(game.snapshot.growth,1); assert.equal(game.snapshot.energy,10);
+  assert.equal(game.snapshot.growth,1); assert.equal(game.snapshot.energy,6);
   assert.throws(() => game.choose('grow')); assert.throws(() => game.work('research'));
-  game.useBattery(); assert.equal(game.snapshot.energy,16);
+  game.useBattery(); assert.equal(game.snapshot.energy,12);
   assert.throws(() => game.useBattery());
 });
 
@@ -121,7 +121,7 @@ test('旧存档升级，不凭空编造昨日简报',() => {
   for (const key of ['weather','lightsOn','plantStage','daySummary','previousDaySummary','summarySol']) delete old[key];
   storage.setItem(repo.key,JSON.stringify(old));
   const restored = repo.load().state;
-  assert.equal(restored.version,2); assert.deepEqual(restored.previousDaySummary,[]);
+  assert.equal(restored.version,3); assert.deepEqual(restored.previousDaySummary,[]);
   assert.equal(repo.save(restored,repo.key).ok,true);
   assert.deepEqual(repo.load(repo.key).state,restored); assert.equal(repo.list().saves.length,1);
 });

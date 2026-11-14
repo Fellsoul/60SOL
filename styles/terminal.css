@@ -6,11 +6,15 @@
 }
 #terminal::backdrop { background: #03070438; }
 .console-frame { display: none; }
+.terminal-battery-slot { position: absolute; left: 96%; top: 20%; width: 36%; aspect-ratio: 3 / 2; pointer-events: none; }
+.terminal-battery-slot svg { display: block; width: 100%; height: 100%; }
+#terminal:not(.is-console) .terminal-battery-slot { display: none; }
+#terminal-toggle { overflow: visible; }
 /* Game console: one image coordinate plane, 10% exposed when collapsed and 80% when open. */
 #terminal.is-console {
   inset: auto auto 0 20vw;
   width: 60vw; height: auto; aspect-ratio: 1672 / 941;
-  border: 0; background: transparent; box-shadow: none; overflow: hidden;
+  border: 0; background: transparent; box-shadow: none; overflow: visible;
   transform: translateY(20%);
   opacity: .95; transition: opacity 500ms ease-in-out;
 }

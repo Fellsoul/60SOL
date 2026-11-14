@@ -59,6 +59,12 @@ try:
         assert abs((900-collapsed['y'])/collapsed['height'] - .1) < .01
         terminal()
         expanded = page.locator('#terminal').bounding_box()
+        slot = page.locator('#terminal .terminal-battery-slot')
+        assert slot.get_attribute('data-energy') == '9'
+        assert slot.locator('[data-lit=true]').count() == 9
+        slot_bounds = slot.bounding_box()
+        assert slot_bounds['x'] > expanded['x'] + expanded['width']*.9
+        assert slot_bounds['x']+slot_bounds['width'] <= 1440
         assert abs((900-expanded['y'])/expanded['height'] - .8) < .01
         screen = page.locator('.is-console .terminal-shell').bounding_box()
         assert screen['y'] >= expanded['y'] and screen['y']+screen['height'] <= 900
@@ -67,9 +73,11 @@ try:
         terminal()
         assert page.locator('#terminal-title').inner_text() == 'SOL 01'
         decide('[data-action=choose][data-id=grow]')
+        assert page.locator('#terminal-toggle .terminal-battery-slot').get_attribute('data-energy') == '6'
         assert page.locator('[data-layer=plants]').get_attribute('data-state') == 'sprout'
         terminal()
         decide('[data-action=battery]')
+        assert page.locator('#terminal-toggle .terminal-battery-slot [data-lit=true]').count() == 12
         assert page.locator('[data-layer=tool-battery]').is_hidden()
         terminal()
         decide('[data-action=next]')
