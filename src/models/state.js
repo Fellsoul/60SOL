@@ -13,6 +13,7 @@ export function createState(toolIds, seed = 20261113) {
     history: {}, queue: [], log: [], outcome: null,
     weather: 'clear', lightsOn: true, plantStage: 'seed',
     daySummary: [], previousDaySummary: [], summarySol: 0,
+    resourceLog: [], previousResourceLog: [],
   };
 }
 
@@ -26,6 +27,16 @@ export function validateState(s, eventIds, toolIds) {
   if (!['clear','sandstorm'].includes(s.weather) || typeof s.lightsOn !== 'boolean' || !['seed','sprout','growing','mature'].includes(s.plantStage)) return false;
   if (!Number.isInteger(s.summarySol) || s.summarySol < 0 || s.summarySol > s.sol) return false;
   if (![s.daySummary,s.previousDaySummary].every(lines => Array.isArray(lines) && lines.length <= 30 && lines.every(line => typeof line === 'string' && line.length <= 2000))) return false;
+  for (const entries of [s.resourceLog,s.previousResourceLog]) {
+    if (entries === undefined) continue; // Older v3 saves have narrative summaries only.
+    if (!Array.isArray(entries) || entries.length > 50 || !entries.every(entry => entry &&
+      typeof entry.source === 'string' && entry.source.length <= 200 &&
+      Number.isInteger(entry.variant) && entry.variant >= 0 && entry.variant < 100 &&
+      typeof entry.fallback === 'string' && entry.fallback.length <= 2000 &&
+      entry.changes && typeof entry.changes === 'object' && !Array.isArray(entry.changes) &&
+      Object.keys(entry.changes).length <= 20 && Object.entries(entry.changes).every(([key,value]) =>
+        /^[a-zA-Z]+(?:\.[a-zA-Z]+)?$/.test(key) && Number.isInteger(value) && Math.abs(value) <= 10000))) return false;
+  }
   const ranges = { sol: [1,14], energy: [0,LIMITS.energy], food: [0,32], health: [0,100], localData: [0,10000], sentData: [0,10000], pendingData: [0,30], growth: [0,2], powerFailures: [0,14], generation: [0,6], rng: [0,4294967295] };
   if (!Object.entries(ranges).every(([key,[min,max]]) => Number.isInteger(s[key]) && s[key] >= min && s[key] <= max)) return false;
   if (s.eventDone !== undefined && (typeof s.eventDone !== 'boolean' || (s.eventDone !== (s.choiceId !== null)))) return false;

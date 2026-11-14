@@ -1,0 +1,41 @@
+{
+  "sources": {
+    "generation": {"descriptions": {"en": ["The solar panels supplied the base with power.", "The batteries received today's solar charge."], "zh-CN": ["太阳能板为基地补充了电力。", "电池已接收今日的太阳能充电。"]}},
+    "lifeSupport": {"descriptions": {"en": ["Life support is running normally.", "Life support completed its checks without a problem."], "zh-CN": ["维生系统正在正常运行。", "维生系统没有出现问题，已完成今日检查。"]}},
+    "lifeSupportPartial": {"descriptions": {"en": ["Life support used the remaining power, but its supply was insufficient.", "The batteries could not fully power life support."], "zh-CN": ["维生系统耗尽了剩余电量，但供电仍然不足。", "电池余量无法满足维生系统的需求。"]}},
+    "lighting": {"descriptions": {"en": ["The cabin lights stayed on through the day.", "Cabin lighting drew power from the batteries."], "zh-CN": ["舱内照明维持了一天的运行。", "舱内灯光消耗了电池中的电量。"]}},
+    "meals": {"descriptions": {"en": ["The crew used food from storage for their daily meals.", "Today's rations were taken from the food supply."], "zh-CN": ["成员们从库存中取用了今日的食物。", "今日口粮已从食物储备中扣除。"]}},
+    "hunger": {"descriptions": {"en": ["Insufficient food affected the crew's condition.", "The crew went without enough food today."], "zh-CN": ["食物供应不足，影响了成员的身体状态。", "今日口粮不足，成员们没能吃饱。"]}},
+    "supportDamage": {"descriptions": {"en": ["A life-support power shortage harmed the crew.", "Insufficient life support affected crew health."], "zh-CN": ["维生系统供电不足，成员健康受到影响。", "维生保障不足，成员的身体状态下降。"]}},
+    "powerFailures": {"descriptions": {"en": ["The consecutive life-support failure count was updated."], "zh-CN": ["连续维生供电故障记录已更新。"]}},
+    "transmissionConfirmed": {"descriptions": {"en": ["Earth confirmed receipt of the transmitted research.", "Our research transmission reached Earth successfully."], "zh-CN": ["地球已确认收到传送的科研数据。", "科研数据已成功抵达地球。"]}},
+    "battery": {"descriptions": {"en": ["The spare battery supplied additional power.", "We connected the backup battery to the base."], "zh-CN": ["备用电池为基地补充了电力。", "我们将备用电池接入了基地。"]}},
+    "work.grow": {"descriptions": {"en": ["We tended the greenhouse crops.", "The crew checked and cared for the planting trays."], "zh-CN": ["我们照料了温室里的作物。", "成员们检查并照料了种植槽。"]}},
+    "work.research": {"descriptions": {"en": ["We completed today's laboratory research.", "New research results were stored locally."], "zh-CN": ["我们完成了今日的实验研究。", "新的实验结果已保存在本地。"]}},
+    "work.transmit": {"descriptions": {"en": ["We sent local research and are awaiting confirmation.", "Research records were queued for Earth to confirm."], "zh-CN": ["我们发出了本地科研数据，等待地球确认。", "科研记录已发送，正在等待接收确认。"]}},
+    "work.clean": {"descriptions": {"en": ["We cleared dust from the solar panels.", "The crew cleaned the solar array."], "zh-CN": ["我们清除了太阳能板上的积尘。", "成员们完成了太阳能阵列的清洁。"]}},
+    "work.repair": {"descriptions": {"en": ["We repaired the power equipment.", "The crew restored the solar equipment."], "zh-CN": ["我们维修了供电设备。", "成员们修复了太阳能设备。"]}},
+    "work.rest": {"descriptions": {"en": ["The crew took time to rest and recover.", "A quiet rest helped the crew recover."], "zh-CN": ["成员们休息了一段时间，恢复了状态。", "安静的休整帮助成员们恢复了体力。"]}},
+    "work.robot": {"descriptions": {"en": ["The robot completed its research task.", "The robot returned with new research data."], "zh-CN": ["机器人完成了科研任务。", "机器人带回了新的研究数据。"]}},
+    "work.monitor": {"descriptions": {"en": ["The monitor collected new scientific readings.", "We saved a new set of monitoring data."], "zh-CN": ["监测仪采集了新的科研读数。", "我们保存了新一组监测数据。"]}}
+  },
+  "resources": {
+    "energy": {"en": "Power", "zh-CN": "电力"},
+    "food": {"en": "Food", "zh-CN": "食物"},
+    "health": {"en": "Health", "zh-CN": "健康"},
+    "localData": {"en": "Local data", "zh-CN": "本地数据"},
+    "pendingData": {"en": "Awaiting confirmation", "zh-CN": "待确认数据"},
+    "sentData": {"en": "Confirmed data", "zh-CN": "已确认数据"},
+    "growth": {"en": "Crop growth", "zh-CN": "作物生长进度"},
+    "powerFailures": {"en": "Consecutive support failures", "zh-CN": "连续维生故障"},
+    "generation": {"en": "Daily generation", "zh-CN": "每日发电量"},
+    "systems.spares": {"en": "Spares", "zh-CN": "备件"},
+    "systems.generationCap": {"en": "Generation cap", "zh-CN": "发电上限"},
+    "systems.trackingCap": {"en": "Tracking cap", "zh-CN": "追踪发电上限"},
+    "systems.supportExtra": {"en": "Extra support cost", "zh-CN": "额外维生耗电"},
+    "systems.careCost": {"en": "Crop care cost", "zh-CN": "作物照料耗电"},
+    "systems.harvestFood": {"en": "Harvest yield", "zh-CN": "收获产量"},
+    "systems.labUntil": {"en": "Lab resumes on Sol", "zh-CN": "实验室恢复日期"},
+    "systems.antennaLimit": {"en": "Transmission limit", "zh-CN": "传输上限"}
+  }
+}

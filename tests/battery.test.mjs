@@ -15,7 +15,7 @@ test('12 lamps represent every energy value, emptying each battery right to left
 });
 
 test('generation and backup batteries respect 12E capacity',() => {
-  const game = new GameModel({events,tools}); game.start(['battery','toolkit']);
+  const game = new GameModel({events:events.filter(event => !event.dailySol),tools}); game.start(['battery','toolkit']);
   assert.equal(game.snapshot.energy,9);
   game.useBattery(); assert.equal(game.snapshot.energy,12);
   const full = game.snapshot; full.tools.battery='ready'; game.restore(full);

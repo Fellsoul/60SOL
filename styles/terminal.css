@@ -49,6 +49,9 @@ body.console-open #terminal-toggle { visibility: hidden; }
 #terminal-content h2 { font-size: 1rem; font-weight: 500; letter-spacing: .1em; margin: 28px 0 12px; color: #e2e9d8; }
 #terminal-content h2:first-child { margin-top: 0; }
 .terminal-copy { white-space: pre-wrap; margin: 0 0 20px; }
+.summary-resource-changes { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; white-space: normal; }
+.summary-resource-change { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; font-size: .8em; }
+.summary-battery-icon { width: 12px; height: 18px; object-fit: contain; transform: rotate(20deg); }
 .typing::after { content: '▌'; color: #d4e7b9; }
 .terminal-choices { display: grid; gap: 10px; margin: 24px 0; }
 .terminal-choice { width: 100%; text-align: left; display: grid; gap: 6px; padding: 14px 16px; border: 1px solid #607358; border-radius: 3px; background: #1d2c2080; min-height: 48px; }

@@ -1,0 +1,67 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { GameModel } from '../src/models/GameModel.js';
+import { finishSol } from '../src/models/TurnEngine.js';
+import { resourceSnapshot } from '../src/models/ResourceLog.js';
+import { SaveRepository } from '../src/repositories/SaveRepository.js';
+import { choiceReason } from '../src/models/DailyEventRules.js';
+const read = async name => JSON.parse(await readFile(new URL(`../data/${name}.json`,import.meta.url),'utf8'));
+const content = {events:await read('events'),tools:await read('tools'),resource_log:await read('resource_log')};
+function game() { const model = new GameModel(content); model.start(['toolkit','battery']); return model; }
+test('morning records actual capped charging and the full life-support cost',() => {
+  const model = game();
+  assert.equal(model.snapshot.resourceLog.find(entry => entry.source === 'generation').changes.energy,2);
+  assert.equal(model.snapshot.resourceLog.find(entry => entry.source === 'lifeSupport').changes.energy,-3);
+});
+test('every available event response records exactly its numeric effects',() => {
+  let checked=0;
+  for (const event of content.events) for (const choice of event.choices) {
+    const model=game(),state=model.snapshot;
+    Object.assign(state,{currentEventId:event.id,sol:5,phase:'event',energy:12,food:20,health:90,localData:20,growth:1,weather:'clear',resourceLog:[]});
+    model.restore(state);
+    const before=resourceSnapshot(state);
+    if (choiceReason(state,choice)) continue;
+    model.choose(choice.id);
+    const after=resourceSnapshot(model.snapshot);
+    const expected=Object.fromEntries(Object.entries(after).map(([key,value])=>[key,value-before[key]]).filter(([,value])=>value));
+    const logs=model.snapshot.resourceLog;
+    assert.deepEqual(logs[0]?.changes ?? {},expected,`${event.id}/${choice.id}`);
+    if(logs.length) assert.equal(logs[0].fallback,choice.summaryLine);
+    checked++;
+  }
+  assert.ok(checked>40);
+});
+test('harvest, backup battery and day-end costs keep their actual capped values',() => {
+  const model=game(),state=model.snapshot;
+  Object.assign(state,{currentEventId:'arrival',phase:'work',choiceId:'plan',eventDone:true,growth:2,food:30,health:100});
+  model.restore(state); model.work('grow'); model.useBattery();
+  assert.equal(model.snapshot.resourceLog.find(entry=>entry.source==='work.grow').changes.food,2);
+  assert.equal(model.snapshot.resourceLog.find(entry=>entry.source==='battery').changes.energy,6);
+  model.nextSol();
+  const log=model.snapshot.previousResourceLog;
+  assert.equal(log.find(entry=>entry.source==='meals').changes.food,-2);
+  assert.equal(log.find(entry=>entry.source==='lighting').changes.energy,-1);
+  assert.notDeepEqual(model.snapshot.resourceLog,log);
+});
+test('shortages and transmission confirmation log real deltas without double counting',() => {
+  const state=game().snapshot;
+  Object.assign(state,{food:1,health:20,lifeSupportPaid:false,pendingData:7,resourceLog:[],lightsOn:false});
+  finishSol(state,content.resource_log);
+  assert.equal(state.previousResourceLog.find(entry=>entry.source==='meals').changes.food,-1);
+  assert.equal(state.previousResourceLog.find(entry=>entry.source==='hunger').changes.health,-12);
+  assert.equal(state.previousResourceLog.find(entry=>entry.source==='supportDamage').changes.health,-8);
+  assert.deepEqual(state.previousResourceLog.find(entry=>entry.source==='transmissionConfirmed').changes,{pendingData:-7,sentData:7});
+});
+test('descriptions are bilingual; selected variants survive saving and leave event RNG alone',() => {
+  for(const source of Object.values(content.resource_log.sources)) {
+    assert.equal(source.descriptions.en.length,source.descriptions['zh-CN'].length);
+    assert.ok(source.descriptions.en.length);
+  }
+  const model=game(),before=model.snapshot;
+  model.useBattery();assert.equal(model.snapshot.rng,before.rng);
+  const records=new Map();
+  const repo=new SaveRepository({getItem:key=>records.get(key),setItem:(key,value)=>records.set(key,value)},content);
+  const saved=repo.save(model.snapshot);
+  assert.deepEqual(repo.load(saved.id).state,model.snapshot);
+});
