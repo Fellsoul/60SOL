@@ -519,13 +519,13 @@ try:
         motion_page.locator('#tasks .is-complete').wait_for()
         motion_key=motion_page.evaluate("() => Object.keys(localStorage).find(key=>key.includes('.slot.'))")
         committed=motion_page.evaluate('(key)=>localStorage.getItem(key)',motion_key)
-        motion_page.locator('#tasks .motion-skip:visible').click()
-        motion_page.locator('#tasks .motion-card[data-checkpoint=complete]').wait_for()
+        assert motion_page.locator('.motion-card').count() == 0
+        motion_page.keyboard.press('Escape')
         assert motion_page.evaluate('(key)=>localStorage.getItem(key)',motion_key)==committed
-        assert motion_page.locator('#tasks .motion-skip').is_hidden()
+        assert motion_page.locator('.motion-card').count() == 0
         motion_page.reload();motion_page.locator('[data-menu=continue]').click()
         motion_page.locator('#terminal-toggle:enabled').wait_for()
-        assert motion_page.locator('.motion-stage[data-checkpoint=complete]').is_visible()
+        assert motion_page.locator('.motion-card').count() == 0
         assert motion_page.evaluate('(key)=>localStorage.getItem(key)',motion_key)==committed
         browser.close()
         print('Browser smoke passed: terminal, summaries, PNG states, dust parallax, reduced motion, missing assets, 3 viewport sizes.')
