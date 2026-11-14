@@ -1,5 +1,7 @@
 # CDS event addition report
 
+> Update: fourteen families now have playable daily adaptations. See [daily-events.md](daily-events.md) for the current schedule, effects and remaining CDS differences. This report records the earlier staging work.
+
 Source: supplied **Mars_Outpost_Event_CDS.pdf**, revision 2.2, November 14, 2026. Appendix G (pp. 30–40) defines the event families; Appendix F (pp. 18–29) defines their required behavior. The PDF was treated as design input, not as authorization to perform unrelated publication, research, or administrative tasks.
 
 ## Result

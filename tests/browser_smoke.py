@@ -5,6 +5,7 @@ PNG 响应使用内存中的单像素测试样本，不向素材文件夹写入�
 """
 import base64
 import io
+import json
 import wave
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -28,7 +29,10 @@ url = f'http://127.0.0.1:{server.server_port}'
 try:
     with sync_playwright() as p:
         browser = p.chromium.launch(channel='msedge', headless=True)
+        # Preserve legacy UI regressions alongside a separate daily-event playthrough.
+        legacy_events=[event for event in json.loads((ROOT/'data/events.json').read_text()) if not event.get('dailySol')]
         context = browser.new_context(viewport={'width': 1440, 'height': 900}, reduced_motion='reduce')
+        context.route('**/data/events.json',lambda route:route.fulfill(content_type='application/json',body=json.dumps(legacy_events)))
         context.route('**/assets/scene/**/*.png', lambda route: route.continue_() if route.request.url.endswith(('/outpost_console.png', '/outpost_baseMain.png', '/outpost_baseRight.png')) else route.fulfill(status=200, content_type='image/png', body=PIXEL))
         page = context.new_page()
         errors = []
@@ -108,7 +112,7 @@ try:
         assert abs((900-collapsed['y'])/collapsed['height'] - .1) < .01
         clipboard()
         assert page.locator('#tasks [data-action=choose][data-id=grow]').is_enabled()
-        assert page.locator('#tasks [data-action=work][data-id=research]').is_disabled()
+        assert page.locator('#tasks [data-action=work][data-id=research]').is_enabled()
         page.keyboard.press('Escape')
         assert page.locator('#tasks-toggle').evaluate('(node) => node === document.activeElement')
         terminal()
@@ -436,6 +440,67 @@ try:
         assert any(0 < item['veil'] < 1 for item in samples), 'Scene fade was not observed'
         assert any(0 < item['title'] < 1 and item['veil'] == 1 for item in samples), 'Title fade on full black was not observed'
         assert all(item['title'] == 0 for item in samples if item['veil'] < 1), 'Title appeared during a scene fade'
+        # Reproduce the missing-toolkit lab issue: unrelated work and a fallback remain usable.
+        dependency_context=browser.new_context(reduced_motion='reduce')
+        dependency_page=dependency_context.new_page();dependency_page.goto(url)
+        dependency_page.locator('[data-menu=new]').click()
+        dependency_page.locator('[value=robot]').check();dependency_page.locator('[value=battery]').check()
+        dependency_page.locator('#loadout-form button').click()
+        dependency_page.locator('#terminal-toggle:enabled').wait_for()
+        dependency_page.evaluate("""() => {
+          const key=Object.keys(localStorage).find(key=>key.includes('.slot.'));
+          const record=JSON.parse(localStorage.getItem(key));
+          Object.assign(record.state,{sol:4,currentEventId:'E07',energy:3,phase:'event',choiceId:null,workId:null,eventDone:false});
+          localStorage.setItem(key,JSON.stringify(record));
+        }""")
+        dependency_page.reload();dependency_page.locator('[data-menu=continue]').click()
+        dependency_page.locator('#terminal-toggle:enabled').wait_for();dependency_page.locator('#tasks-toggle').click()
+        assert dependency_page.locator('[data-action=choose][data-id=repair]').is_disabled()
+        assert dependency_page.locator('[data-action=choose][data-id=close]').is_enabled()
+        assert dependency_page.locator('[data-action=work][data-id=grow]').is_enabled()
+        assert dependency_page.locator('[data-action=work][data-id=research]').is_disabled()
+        dependency_page.locator('[data-action=work][data-id=rest]').click()
+        dependency_page.locator('#tasks [data-id=rest].is-complete').wait_for()
+        dependency_page.locator('[data-action=choose][data-id=close]').click()
+        dependency_page.locator('#tasks [data-id=close].is-complete').wait_for()
+        assert dependency_page.locator('[data-action=work][data-id=grow]').is_disabled()
+        dependency_page.keyboard.press('Escape');dependency_page.locator('#terminal-toggle').click()
+        assert dependency_page.locator('[data-action=next]').is_enabled()
+        daily_context=browser.new_context(reduced_motion='reduce')
+        daily_page=daily_context.new_page();daily_page.goto(url)
+        daily_page.locator('[data-menu=new]').click()
+        daily_page.locator('[value=toolkit]').check();daily_page.locator('[value=battery]').check()
+        daily_page.locator('#loadout-form button').click()
+        for sol in range(1,15):
+            daily_page.locator('#terminal-toggle:enabled').wait_for()
+            daily_page.locator('#terminal-toggle').click()
+            if sol==1:
+                daily_page.locator('[data-action=lights][data-id=lights_off]').click()
+                daily_page.locator('[data-action=lights][data-id=lights_on]').wait_for()
+            assert daily_page.locator('#terminal [data-action=next]').count()==0
+            daily_page.keyboard.press('Escape')
+            daily_page.wait_for_function("!document.querySelector('#terminal').open")
+            # E19 has only work responses; its zero-E response is on the clipboard.
+            events=json.loads((ROOT/'data/events.json').read_text())
+            state=daily_page.evaluate("() => JSON.parse(Object.entries(localStorage).find(([key])=>key.includes('.slot.'))[1]).state")
+            event=next(event for event in events if event['id']==state['currentEventId'])
+            response=next(choice for choice in event['choices'] if choice['energy']==0)
+            daily_page.locator('#tasks-toggle' if response.get('work') else '#terminal-toggle').click()
+            daily_page.locator(f"[data-action=choose][data-id={response['id']}]").click()
+            daily_page.wait_for_function("() => JSON.parse(Object.entries(localStorage).find(([key])=>key.includes('.slot.'))[1]).state.eventDone===true")
+            if response.get('work'):
+                daily_page.keyboard.press('Escape')
+            else:
+                daily_page.keyboard.press('Escape');daily_page.wait_for_function("!document.querySelector('#terminal').open")
+                daily_page.locator('#tasks-toggle').click()
+                state=daily_page.evaluate("() => JSON.parse(Object.entries(localStorage).find(([key])=>key.includes('.slot.'))[1]).state")
+                work='clean' if state['dusty'] and state['weather']!='sandstorm' and state['energy']>=2 else 'grow' if state['food']<=8 and state['energy']>=state['dailySystems']['careCost']+2 and not state['dailySystems']['greenhouseDisabled'] else 'standby'
+                daily_page.locator(f'[data-action=work][data-id={work}]').click()
+                daily_page.locator('#tasks .is-complete').wait_for();daily_page.keyboard.press('Escape')
+            daily_page.locator('#terminal-toggle').click();daily_page.locator('[data-action=next]').click()
+        daily_page.locator('#terminal-toggle:enabled').wait_for()
+        daily_page.locator('#terminal-toggle').click()
+        assert daily_page.locator('#terminal [data-action=next]').count()==0
         browser.close()
         print('Browser smoke passed: terminal, summaries, PNG states, dust parallax, reduced motion, missing assets, 3 viewport sizes.')
 finally:

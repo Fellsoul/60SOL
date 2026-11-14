@@ -1,3 +1,4 @@
+import { dailyState, choiceReason } from './DailyEventRules.js';
 import { LIMITS, logEntry } from './state.js';
 
 // 规则保留数值，终端只使用 narrative 和 summaryLine。
@@ -33,14 +34,22 @@ export const LIGHT_ACTIONS = Object.freeze([
   {id:'lights_on',label:'action.lights_on.label',narrative:'action.lights_on.narrative',summaryLine:'summary.lightsSwitchedOn'},
 ]);
 
-export function unavailableReason(state, action) {
-  if (state.phase === 'event') return 'error.eventFirst';
+export function unavailableReason(state, action, event = null) {
   if (state.phase === 'finished') return 'error.missionFinished';
-  if (state.phase !== 'work') return 'error.workUsed';
+  if (state.workId || !['event','work'].includes(state.phase)) return 'error.workUsed';
   if (action.tool && state.tools[action.tool] !== 'ready') return 'error.toolUnavailable';
-  if (state.energy < action.energy) return 'error.powerInsufficient';
+  if (state.phase === 'event') {
+    if (event?.blockedWork?.includes(action.id)) return event.blockReason;
+    const response = event?.choices.find(choice => choice.id === event.workResolutions?.[action.id]);
+    if (response) return choiceReason(state,response);
+  }
+  const systems = dailyState(state);
+  if (action.id === 'grow' && systems.greenhouseDisabled) return 'error.facilityUnavailable';
+  if (action.id === 'research' && state.sol < systems.labUntil) return 'error.facilityUnavailable';
+  if (state.energy < (action.id === 'grow' ? systems.careCost : action.energy)) return 'error.powerInsufficient';
+  if (action.id === 'transmit' && systems.antennaLimit === 0) return 'error.facilityUnavailable';
   if (action.id === 'transmit' && state.localData === 0) return 'error.noLocalData';
-  if (['clean','repair'].includes(action.id) && !state.dusty) return 'error.panelsClean';
+  if (['clean','repair'].includes(action.id) && !state.dusty && systems.generationCap === 6 && (action.id !== 'repair' || systems.trackingCap === 6)) return 'error.panelsClean';
   if (state.weather === 'sandstorm' && ['clean','repair','robot'].includes(action.id)) return 'error.stormOutside';
   return '';
 }
@@ -51,7 +60,7 @@ const effects = {
     s.plantStage = ['seed','sprout','growing','mature'][s.growth];
     if (s.growth === 3) {
       s.growth = 0;
-      const gain = Math.min(8,LIMITS.food-s.food); s.food += gain;
+      const gain = Math.min(dailyState(s).harvestFood,LIMITS.food-s.food); s.food += gain;
       s.daySummary.push('summary.harvest');
       logEntry(s,`温室完成收获，实际入库 ${gain} F。`);
     }
@@ -59,9 +68,9 @@ const effects = {
   research(s) { s.localData += 12; },
   robot(s) { s.localData += 12; },
   monitor(s) { s.localData += 6; },
-  transmit(s) { const amount = Math.min(30,s.localData); s.localData -= amount; s.pendingData += amount; },
-  clean(s) { s.dusty = false; },
-  repair(s) { s.dusty = false; },
+  transmit(s) { const amount = Math.min(dailyState(s).antennaLimit,s.localData); s.localData -= amount; s.pendingData += amount; },
+  clean(s) { s.dusty = false; dailyState(s).generationCap=6; },
+  repair(s) { s.dusty = false; dailyState(s).generationCap=6; dailyState(s).trackingCap=6; },
   dust(s) { s.dusty = true; },
   rest(s) { s.health = Math.min(LIMITS.health,s.health+8); },
   shield(s) { s.shielded = true; s.tools.shield = 'consumed'; },

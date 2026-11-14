@@ -83,7 +83,7 @@ export class GameController {
       else if (action === 'choose') {
         const state = this.model.snapshot;
         const choice = this.model.events.get(state.currentEventId).choices.find(choice => choice.id === id);
-        if (choice?.work) void this.commit(() => this.model.choose(id),{keepTasksOpen:true});
+        if (choice) void this.commit(() => this.model.choose(id),{keepTasksOpen:true});
       }
     });
     const handleDecision = event => {

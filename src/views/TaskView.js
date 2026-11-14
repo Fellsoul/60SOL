@@ -1,3 +1,4 @@
+import { choiceReason, dailyState } from '../models/DailyEventRules.js';
 import { ACTIONS, unavailableReason } from '../models/ActionRules.js';
 import { i18n } from '../services/I18n.js';
 import { escapeHtml } from './dom.js';
@@ -6,15 +7,16 @@ const text = key => escapeHtml(i18n.t(key));
 
 // Derive rows from saved state so completed and unfinished work survive reopening/reload.
 export function clipboardTasks(state,event) {
-  const eventChoices = (event?.choices ?? []).filter(choice => choice.work &&
-    (state.phase === 'event' || state.workId === `event:${choice.id}`));
+  const eventChoices = (event?.choices ?? []).filter(choice => state.phase === 'event' || state.choiceId === choice.id);
   const rows = eventChoices.map(choice => ({...choice,command:'choose',
-    done:state.workId === `event:${choice.id}`,
-    reason:state.phase !== 'event' ? 'error.workUsed' : state.energy < choice.energy ? 'error.powerInsufficient' : ''}));
+    done:state.choiceId === choice.id,
+    reason:state.phase !== 'event' ? 'error.workUsed' : choiceReason(state,choice)}));
   return rows.concat(ACTIONS.filter(action => (!action.tool || state.tools[action.tool]) &&
-    !eventChoices.some(choice => choice.action === action.id)).map(action => ({...action,
+    !eventChoices.some(choice => choice.action === action.id) &&
+    !(state.phase === 'event' && event?.workResolutions?.[action.id])).map(action => ({...action,
+    energy:action.id === 'grow' ? dailyState(state).careCost : action.energy,
     description:action.narrative,command:'work',done:state.workId === action.id,
-    reason:unavailableReason(state,action)})));
+    reason:unavailableReason(state,action,event)})));
 }
 
 export class TaskView {
@@ -56,8 +58,8 @@ export class TaskView {
     const completed = tasks.some(task => task.done);
     this.content.innerHTML = `<div class="task-list">${tasks.map(task => {
       const {done,reason} = task;
-      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${task.energy} E · ${text('tasks.work')}</span></span></button>`;
-    }).join('')}</div><p class="clipboard-note" role="status">${text(state.phase === 'event' ? (tasks.some(task => task.command === 'choose') ? 'tasks.eventOptions' : 'tasks.eventFirst') : completed ? 'tasks.checked' : state.phase === 'end' ? 'tasks.eventWork' : state.phase === 'finished' ? 'tasks.finished' : 'tasks.choose')}</p>`;
+      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${task.energy} E · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></button>`;
+    }).join('')}</div><p class="clipboard-note" role="status">${text(state.phase === 'event' ? (event?.blockedWork?.length === ACTIONS.length ? event.blockReason : 'tasks.pendingIndependent') : completed ? 'tasks.checked' : state.phase === 'end' ? 'tasks.eventWork' : state.phase === 'finished' ? 'tasks.finished' : 'tasks.choose')}</p>`;
     if (this.dialog.open && completed) document.querySelector('#tasks-close').focus({preventScroll:true});
   }
 }

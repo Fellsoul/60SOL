@@ -159,18 +159,42 @@
     "id": "E01",
     "title": "event.E01.title",
     "text": "event.E01.text",
-    "summaryLine": "event.E01.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E01.daily.summaryLine",
+    "minSol": 1,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "secure",
+        "energy": 2,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "spare",
+            "amount": 1
+          }
+        ],
+        "label": "event.E01.daily.secure.label",
+        "description": "event.E01.daily.secure.description",
+        "summaryLine": "event.E01.daily.secure.summaryLine"
+      },
+      {
+        "id": "abandon",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [],
+        "label": "event.E01.daily.abandon.label",
+        "description": "event.E01.daily.abandon.description",
+        "summaryLine": "event.E01.daily.abandon.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 31,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": false,
       "category": "technical",
       "clock": "warningAge",
@@ -304,25 +328,62 @@
       },
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 1,
+    "dailyRequires": {}
   },
   {
     "id": "E02",
     "title": "event.E02.title",
     "text": "event.E02.text",
-    "summaryLine": "event.E02.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E02.daily.summaryLine",
+    "minSol": 8,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "repair",
+        "energy": 3,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "trackingCap",
+            "value": 6
+          }
+        ],
+        "tool": "toolkit",
+        "costQ": 1,
+        "outside": true,
+        "label": "event.E02.daily.repair.label",
+        "description": "event.E02.daily.repair.description",
+        "summaryLine": "event.E02.daily.repair.summaryLine"
+      },
+      {
+        "id": "lock",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "trackingCap",
+            "value": 4
+          }
+        ],
+        "label": "event.E02.daily.lock.label",
+        "description": "event.E02.daily.lock.description",
+        "summaryLine": "event.E02.daily.lock.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 31,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": true,
       "category": "technical",
       "clock": "warningAge",
@@ -458,7 +519,13 @@
       },
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 8,
+    "dailyRequires": {},
+    "workResolutions": {
+      "repair": "repair"
     }
   },
   {
@@ -616,18 +683,50 @@
     "id": "E04",
     "title": "event.E04.title",
     "text": "event.E04.text",
-    "summaryLine": "event.E04.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E04.daily.summaryLine",
+    "minSol": 3,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "calibrate",
+        "energy": 3,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "careCost",
+            "value": 3
+          }
+        ],
+        "tool": "toolkit",
+        "label": "event.E04.daily.calibrate.label",
+        "description": "event.E04.daily.calibrate.description",
+        "summaryLine": "event.E04.daily.calibrate.summaryLine"
+      },
+      {
+        "id": "manual",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "careCost",
+            "value": 4
+          }
+        ],
+        "label": "event.E04.daily.manual.label",
+        "description": "event.E04.daily.manual.description",
+        "summaryLine": "event.E04.daily.manual.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 32,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": true,
       "category": "technical",
       "clock": "warningAge",
@@ -766,8 +865,15 @@
         "10"
       ],
       "scienceRelation": "background context with fictional gameplay assumptions",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 3,
+    "dailyRequires": {},
+    "blockedWork": [
+      "grow"
+    ],
+    "blockReason": "dependency.wateringSensor"
   },
   {
     "id": "E05",
@@ -1083,18 +1189,51 @@
     "id": "E07",
     "title": "event.E07.title",
     "text": "event.E07.text",
-    "summaryLine": "event.E07.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E07.daily.summaryLine",
+    "minSol": 4,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "repair",
+        "energy": 3,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "labUntil",
+            "value": 0
+          }
+        ],
+        "tool": "toolkit",
+        "costQ": 1,
+        "label": "event.E07.daily.repair.label",
+        "description": "event.E07.daily.repair.description",
+        "summaryLine": "event.E07.daily.repair.summaryLine"
+      },
+      {
+        "id": "close",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "labUntil",
+            "value": 15
+          }
+        ],
+        "label": "event.E07.daily.close.label",
+        "description": "event.E07.daily.close.description",
+        "summaryLine": "event.E07.daily.close.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 34,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": false,
       "category": "technical",
       "clock": "warningAge",
@@ -1227,25 +1366,64 @@
       },
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 4,
+    "dailyRequires": {},
+    "blockedWork": [
+      "research"
+    ],
+    "blockReason": "dependency.labThermal"
   },
   {
     "id": "E08",
     "title": "event.E08.title",
     "text": "event.E08.text",
-    "summaryLine": "event.E08.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E08.daily.summaryLine",
+    "minSol": 9,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "replace",
+        "energy": 3,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "supportExtra",
+            "value": 0
+          }
+        ],
+        "costQ": 1,
+        "label": "event.E08.daily.replace.label",
+        "description": "event.E08.daily.replace.description",
+        "summaryLine": "event.E08.daily.replace.summaryLine"
+      },
+      {
+        "id": "standby",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "supportExtra",
+            "value": 1
+          }
+        ],
+        "label": "event.E08.daily.standby.label",
+        "description": "event.E08.daily.standby.description",
+        "summaryLine": "event.E08.daily.standby.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 34,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": false,
       "category": "technical",
       "clock": "warningAge",
@@ -1377,25 +1555,60 @@
       },
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 9,
+    "dailyRequires": {}
   },
   {
     "id": "E09",
     "title": "event.E09.title",
     "text": "event.E09.text",
-    "summaryLine": "event.E09.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E09.daily.summaryLine",
+    "minSol": 13,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "clear",
+        "energy": 3,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "harvestFood",
+            "value": 8
+          }
+        ],
+        "tool": "toolkit",
+        "label": "event.E09.daily.clear.label",
+        "description": "event.E09.daily.clear.description",
+        "summaryLine": "event.E09.daily.clear.summaryLine"
+      },
+      {
+        "id": "isolate",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "harvestFood",
+            "value": 6
+          }
+        ],
+        "label": "event.E09.daily.isolate.label",
+        "description": "event.E09.daily.isolate.description",
+        "summaryLine": "event.E09.daily.isolate.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 35,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": false,
       "category": "technical",
       "clock": "warningAge",
@@ -1534,8 +1747,15 @@
         "10"
       ],
       "scienceRelation": "background context with fictional gameplay assumptions",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 13,
+    "dailyRequires": {},
+    "blockedWork": [
+      "grow"
+    ],
+    "blockReason": "dependency.wateringLine"
   },
   {
     "id": "E10",
@@ -1768,18 +1988,73 @@
     "id": "E11",
     "title": "event.E11.title",
     "text": "event.E11.text",
-    "summaryLine": "event.E11.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E11.daily.summaryLine",
+    "minSol": 12,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "harvest",
+        "energy": 1,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "add",
+            "resource": "food",
+            "amount": 8
+          },
+          {
+            "op": "cropReset"
+          }
+        ],
+        "label": "event.E11.daily.harvest.label",
+        "description": "event.E11.daily.harvest.description",
+        "summaryLine": "event.E11.daily.harvest.summaryLine"
+      },
+      {
+        "id": "split",
+        "energy": 2,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "add",
+            "resource": "food",
+            "amount": 4
+          },
+          {
+            "op": "add",
+            "resource": "localData",
+            "amount": 6
+          },
+          {
+            "op": "cropReset"
+          }
+        ],
+        "label": "event.E11.daily.split.label",
+        "description": "event.E11.daily.split.description",
+        "summaryLine": "event.E11.daily.split.summaryLine"
+      },
+      {
+        "id": "abandon",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [
+          {
+            "op": "cropReset"
+          }
+        ],
+        "label": "event.E11.daily.abandon.label",
+        "description": "event.E11.daily.abandon.description",
+        "summaryLine": "event.E11.daily.abandon.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 36,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": true,
       "category": "situational",
       "clock": "missionAge",
@@ -1902,25 +2177,64 @@
         "10"
       ],
       "scienceRelation": "background context with fictional gameplay assumptions",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 12,
+    "dailyRequires": {
+      "growth": 2,
+      "greenhouse": true
+    },
+    "blockedWork": [
+      "grow"
+    ],
+    "blockReason": "dependency.cropAllocation"
   },
   {
     "id": "E12",
     "title": "event.E12.title",
     "text": "event.E12.text",
-    "summaryLine": "event.E12.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E12.daily.summaryLine",
+    "minSol": 7,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "restore",
+        "energy": 2,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "labPause",
+            "days": 1
+          }
+        ],
+        "label": "event.E12.daily.restore.label",
+        "description": "event.E12.daily.restore.description",
+        "summaryLine": "event.E12.daily.restore.summaryLine"
+      },
+      {
+        "id": "ask",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [
+          {
+            "op": "labPause",
+            "days": 2
+          }
+        ],
+        "label": "event.E12.daily.ask.label",
+        "description": "event.E12.daily.ask.description",
+        "summaryLine": "event.E12.daily.ask.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 36,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": true,
       "category": "situational",
       "clock": "missionAge",
@@ -2038,8 +2352,15 @@
         "9"
       ],
       "scienceRelation": "background context with fictional gameplay assumptions",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 7,
+    "dailyRequires": {},
+    "blockedWork": [
+      "research"
+    ],
+    "blockReason": "dependency.labGuidance"
   },
   {
     "id": "E13",
@@ -2199,18 +2520,63 @@
     "id": "E14",
     "title": "event.E14.title",
     "text": "event.E14.text",
-    "summaryLine": "event.E14.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E14.daily.summaryLine",
+    "minSol": 5,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "rest",
+        "energy": 1,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "add",
+            "resource": "health",
+            "amount": 8
+          }
+        ],
+        "label": "event.E14.daily.rest.label",
+        "description": "event.E14.daily.rest.description",
+        "summaryLine": "event.E14.daily.rest.summaryLine"
+      },
+      {
+        "id": "short",
+        "energy": 2,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "add",
+            "resource": "localData",
+            "amount": 6
+          },
+          {
+            "op": "add",
+            "resource": "health",
+            "amount": 3
+          }
+        ],
+        "label": "event.E14.daily.short.label",
+        "description": "event.E14.daily.short.description",
+        "summaryLine": "event.E14.daily.short.summaryLine"
+      },
+      {
+        "id": "forgo",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [],
+        "label": "event.E14.daily.forgo.label",
+        "description": "event.E14.daily.forgo.description",
+        "summaryLine": "event.E14.daily.forgo.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 37,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": false,
       "category": "situational",
       "clock": "missionAge",
@@ -2326,25 +2692,69 @@
       },
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 5,
+    "dailyRequires": {}
   },
   {
     "id": "E15",
     "title": "event.E15.title",
     "text": "event.E15.text",
-    "summaryLine": "event.E15.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E15.daily.summaryLine",
+    "minSol": 6,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "replace",
+        "energy": 3,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "add",
+            "resource": "localData",
+            "amount": 12
+          }
+        ],
+        "costH": 2,
+        "label": "event.E15.daily.replace.label",
+        "description": "event.E15.daily.replace.description",
+        "summaryLine": "event.E15.daily.replace.summaryLine"
+      },
+      {
+        "id": "composition",
+        "energy": 2,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "add",
+            "resource": "localData",
+            "amount": 4
+          }
+        ],
+        "label": "event.E15.daily.composition.label",
+        "description": "event.E15.daily.composition.description",
+        "summaryLine": "event.E15.daily.composition.summaryLine"
+      },
+      {
+        "id": "forgo",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [],
+        "label": "event.E15.daily.forgo.label",
+        "description": "event.E15.daily.forgo.description",
+        "summaryLine": "event.E15.daily.forgo.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 38,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": false,
       "category": "situational",
       "clock": "missionAge",
@@ -2459,25 +2869,63 @@
       },
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 6,
+    "dailyRequires": {}
   },
   {
     "id": "E16",
     "title": "event.E16.title",
     "text": "event.E16.text",
-    "summaryLine": "event.E16.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E16.daily.summaryLine",
+    "minSol": 14,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "borrow",
+        "energy": 3,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "greenhouseDisabled",
+            "value": true
+          },
+          {
+            "op": "transfer",
+            "limit": 30
+          }
+        ],
+        "label": "event.E16.daily.borrow.label",
+        "description": "event.E16.daily.borrow.description",
+        "summaryLine": "event.E16.daily.borrow.summaryLine"
+      },
+      {
+        "id": "preserve",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "antennaLimit",
+            "value": 0
+          }
+        ],
+        "label": "event.E16.daily.preserve.label",
+        "description": "event.E16.daily.preserve.description",
+        "summaryLine": "event.E16.daily.preserve.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 38,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": false,
       "category": "situational",
       "clock": "missionAge",
@@ -2599,25 +3047,63 @@
       },
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 14,
+    "dailyRequires": {
+      "data": 12
+    },
+    "blockedWork": [
+      "transmit"
+    ],
+    "blockReason": "dependency.antennaFault"
   },
   {
     "id": "E17",
     "title": "event.E17.title",
     "text": "event.E17.text",
-    "summaryLine": "event.E17.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E17.daily.summaryLine",
+    "minSol": 10,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "clean",
+        "energy": 1,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "labPause",
+            "days": 1
+          }
+        ],
+        "label": "event.E17.daily.clean.label",
+        "description": "event.E17.daily.clean.description",
+        "summaryLine": "event.E17.daily.clean.summaryLine"
+      },
+      {
+        "id": "isolate",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [
+          {
+            "op": "labPause",
+            "days": 1
+          }
+        ],
+        "label": "event.E17.daily.isolate.label",
+        "description": "event.E17.daily.isolate.description",
+        "summaryLine": "event.E17.daily.isolate.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 39,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": false,
       "category": "situational",
       "clock": "missionAge",
@@ -2736,8 +3222,15 @@
       },
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 10,
+    "dailyRequires": {},
+    "blockedWork": [
+      "research"
+    ],
+    "blockReason": "dependency.labSpill"
   },
   {
     "id": "E18",
@@ -2866,18 +3359,41 @@
     "id": "E19",
     "title": "event.E19.title",
     "text": "event.E19.text",
-    "summaryLine": "event.E19.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E19.daily.summaryLine",
+    "minSol": 11,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "shelter",
+        "energy": 1,
+        "work": true,
+        "dailyEffects": [],
+        "label": "event.E19.daily.shelter.label",
+        "description": "event.E19.daily.shelter.description",
+        "summaryLine": "event.E19.daily.shelter.summaryLine"
+      },
+      {
+        "id": "minimum",
+        "energy": 0,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "cramped"
+          }
+        ],
+        "label": "event.E19.daily.minimum.label",
+        "description": "event.E19.daily.minimum.description",
+        "summaryLine": "event.E19.daily.minimum.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 40,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": true,
       "category": "environmental",
       "clock": "missionAge",
@@ -2998,25 +3514,70 @@
         "unit": "microgray",
         "limitation": "Historical observation from CDS; not a fictional habitat dose, live forecast or radiation-to-health conversion."
       },
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
-    }
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 11,
+    "dailyRequires": {},
+    "blockedWork": [
+      "grow",
+      "research",
+      "transmit",
+      "clean",
+      "repair",
+      "rest",
+      "robot",
+      "monitor",
+      "shield",
+      "standby"
+    ],
+    "blockReason": "dependency.shelter"
   },
   {
     "id": "E20",
     "title": "event.E20.title",
     "text": "event.E20.text",
-    "summaryLine": "event.E20.summaryLine",
-    "minSol": 15,
+    "summaryLine": "event.E20.daily.summaryLine",
+    "minSol": 2,
     "weight": 0,
-    "choices": [],
+    "choices": [
+      {
+        "id": "inspect_clean",
+        "energy": 3,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "clean"
+          }
+        ],
+        "outside": true,
+        "label": "event.E20.daily.inspect_clean.label",
+        "description": "event.E20.daily.inspect_clean.description",
+        "summaryLine": "event.E20.daily.inspect_clean.summaryLine"
+      },
+      {
+        "id": "restrict",
+        "energy": 0,
+        "work": false,
+        "dailyEffects": [
+          {
+            "op": "generation",
+            "value": 4
+          }
+        ],
+        "label": "event.E20.daily.restrict.label",
+        "description": "event.E20.daily.restrict.description",
+        "summaryLine": "event.E20.daily.restrict.summaryLine"
+      }
+    ],
     "cds": {
       "revision": "2.2",
       "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
       "sourceSection": "Appendix G; normative rules Appendix F",
       "sourcePage": 40,
-      "implementationStatus": "content_only",
-      "enabled": false,
-      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "implementationStatus": "daily_adaptation",
+      "enabled": true,
+      "blockingReason": null,
       "demoFamily": true,
       "category": "environmental",
       "clock": "warningAge",
@@ -3165,7 +3726,14 @@
         "unit": "Wh/Sol",
         "limitation": "Approximate multi-year contrast quoted by CDS; not daily degradation or human habitat output."
       },
-      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations.",
+      "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
+    },
+    "dailySol": 2,
+    "dailyRequires": {},
+    "workResolutions": {
+      "clean": "inspect_clean",
+      "repair": "inspect_clean"
     }
   }
 ]

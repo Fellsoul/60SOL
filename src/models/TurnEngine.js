@@ -1,18 +1,22 @@
+import { dailyState } from './DailyEventRules.js';
 import { LIMITS, logEntry } from './state.js';
 
 export function beginSol(state, events, environment = {}) {
   state.weather = environment.days?.[String(state.sol)] ?? environment.default ?? 'clear';
   if (state.weather === 'sandstorm') state.dusty = true;
   state.daySummary = [];
-  state.generation = state.dusty ? 3 : 6;
+  state.eventDone = false;
+  const systems = dailyState(state);
+  state.generation = Math.min(systems.generationCap,systems.trackingCap,state.dusty ? 3 : 6);
   state.energy = Math.min(LIMITS.energy,state.energy + state.generation);
-  state.lifeSupportPaid = state.energy >= 3;
-  state.energy = Math.max(0,state.energy - 3);
+  const support = 3 + systems.supportExtra;
+  state.lifeSupportPaid = state.energy >= support;
+  state.energy = Math.max(0,state.energy - support);
   state.choiceId = null;
   state.workId = null;
   state.currentEventId = events.select(state);
   state.phase = 'event';
-  logEntry(state,`晨报：发电 ${state.generation} E，生命维持${state.lifeSupportPaid ? '已支付 3 E' : '供电不足'}，可用 ${state.energy} E。`);
+  logEntry(state,`晨报：发电 ${state.generation} E，生命维持${state.lifeSupportPaid ? '已支付 '+support+' E' : '供电不足'}，可用 ${state.energy} E。`);
 }
 
 export function finishSol(state) {
