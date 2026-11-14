@@ -333,7 +333,12 @@
       "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
     },
     "dailySol": 1,
-    "dailyRequires": {}
+    "dailyRequires": {},
+    "sceneCue": {
+      "kind": "sound",
+      "anchor": "hatch",
+      "text": "scene.cue.E01"
+    }
   },
   {
     "id": "E02",
@@ -527,6 +532,11 @@
     "dailyRequires": {},
     "workResolutions": {
       "repair": "repair"
+    },
+    "sceneCue": {
+      "kind": "sound",
+      "anchor": "panels",
+      "text": "scene.cue.E02"
     }
   },
   {
@@ -678,6 +688,11 @@
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
       "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    },
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E03"
     }
   },
   {
@@ -874,7 +889,12 @@
     "blockedWork": [
       "grow"
     ],
-    "blockReason": "dependency.wateringSensor"
+    "blockReason": "dependency.wateringSensor",
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E04"
+    }
   },
   {
     "id": "E05",
@@ -1027,6 +1047,11 @@
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
       "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    },
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E05"
     }
   },
   {
@@ -1184,6 +1209,11 @@
       ],
       "scienceRelation": "background context with fictional gameplay assumptions",
       "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    },
+    "sceneCue": {
+      "kind": "sound",
+      "anchor": "antenna",
+      "text": "scene.cue.E06"
     }
   },
   {
@@ -1375,7 +1405,12 @@
     "blockedWork": [
       "research"
     ],
-    "blockReason": "dependency.labThermal"
+    "blockReason": "dependency.labThermal",
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E07"
+    }
   },
   {
     "id": "E08",
@@ -1560,7 +1595,12 @@
       "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
     },
     "dailySol": 9,
-    "dailyRequires": {}
+    "dailyRequires": {},
+    "sceneCue": {
+      "kind": "sound",
+      "anchor": "vent",
+      "text": "scene.cue.E08"
+    }
   },
   {
     "id": "E09",
@@ -1756,7 +1796,12 @@
     "blockedWork": [
       "grow"
     ],
-    "blockReason": "dependency.wateringLine"
+    "blockReason": "dependency.wateringLine",
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E09"
+    }
   },
   {
     "id": "E10",
@@ -1983,6 +2028,11 @@
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
       "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    },
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E10"
     }
   },
   {
@@ -2189,7 +2239,12 @@
     "blockedWork": [
       "grow"
     ],
-    "blockReason": "dependency.cropAllocation"
+    "blockReason": "dependency.cropAllocation",
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E11"
+    }
   },
   {
     "id": "E12",
@@ -2361,7 +2416,12 @@
     "blockedWork": [
       "research"
     ],
-    "blockReason": "dependency.labGuidance"
+    "blockReason": "dependency.labGuidance",
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "terminal",
+      "text": "scene.cue.E12"
+    }
   },
   {
     "id": "E13",
@@ -2515,6 +2575,11 @@
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
       "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    },
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E13"
     }
   },
   {
@@ -2697,7 +2762,12 @@
       "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
     },
     "dailySol": 5,
-    "dailyRequires": {}
+    "dailyRequires": {},
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E14"
+    }
   },
   {
     "id": "E15",
@@ -2875,7 +2945,12 @@
       "dailyAdaptation": "Deterministic daily prototype. Combined inspection/response uses one work action; stochastic escalation and multi-day diagnosis chains are not implemented. The original CDS contract below is preserved."
     },
     "dailySol": 6,
-    "dailyRequires": {}
+    "dailyRequires": {},
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E15"
+    }
   },
   {
     "id": "E16",
@@ -3059,7 +3134,12 @@
     "blockedWork": [
       "transmit"
     ],
-    "blockReason": "dependency.antennaFault"
+    "blockReason": "dependency.antennaFault",
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "terminal",
+      "text": "scene.cue.E16"
+    }
   },
   {
     "id": "E17",
@@ -3232,7 +3312,12 @@
     "blockedWork": [
       "research"
     ],
-    "blockReason": "dependency.labSpill"
+    "blockReason": "dependency.labSpill",
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E17"
+    }
   },
   {
     "id": "E18",
@@ -3355,6 +3440,11 @@
       "sourceRefs": [],
       "scienceRelation": "fictional engineering scenario",
       "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    },
+    "sceneCue": {
+      "kind": "sound",
+      "anchor": "panels",
+      "text": "scene.cue.E18"
     }
   },
   {
@@ -3533,7 +3623,12 @@
       "shield",
       "standby"
     ],
-    "blockReason": "dependency.shelter"
+    "blockReason": "dependency.shelter",
+    "sceneCue": {
+      "kind": "sound",
+      "anchor": "terminal",
+      "text": "scene.cue.E19"
+    }
   },
   {
     "id": "E20",
@@ -3736,6 +3831,11 @@
     "workResolutions": {
       "clean": "inspect_clean",
       "repair": "inspect_clean"
+    },
+    "sceneCue": {
+      "kind": "speech",
+      "anchor": "crew",
+      "text": "scene.cue.E20"
     }
   },
   {
