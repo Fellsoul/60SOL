@@ -155,5 +155,3018 @@
         "action": "lights_on"
       }
     ]
+  },
+  {
+    "id": "E01",
+    "title": "event.E01.title",
+    "text": "event.E01.text",
+    "summaryLine": "event.E01.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 31,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "technical",
+      "clock": "warningAge",
+      "warning": "A tapping sound repeats at the hatch. A supply case hangs outside; its strap looks uneven.",
+      "diagnosis": "A frayed securing strap lets the case touch the outer hatch.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal fixed cause; do not repair or remove penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Abandon the case",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Close with loss; permanently forgo 1 Q.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional change",
+            "Recovery costs 1 extra E",
+            "Case detaches; reward lost; close with loss"
+          ],
+          "requires": [
+            "affected equipment not fully failed"
+          ],
+          "timing": "capacity immediately; generation/demand next morning; response due next Sol"
+        },
+        {
+          "id": "secure",
+          "label": "Secure the case",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "case not lost"
+          ],
+          "effect": "Receive 1 Q once; recovery costs 1 extra E after moderate damage.",
+          "timing": "next morning restoration; day-end reward"
+        }
+      ],
+      "sourceContract": "E01 Three Knocks Warning: A tapping sound repeats at the hatch. A supply case hangs outside; its strap looks uneven. Investigation reveals: A frayed securing strap lets the case touch the outer hatch. Eligibility: No active external hazard; supply case not previously recovered. Clock: warningAge. Repair / diagnosed response: Secure the case: 2 E + W, no Q/toolkit required. Receive 1 Q if the case has not been lost. Restriction: Abandon the case: 0 E/W; close with loss and permanently forgo its 1 Q reward. Continue: 1 E for monitoring; R outcomes (easy / moderate / severe): No additional change / case slips farther: recovery costs 1 extra E / case detaches: reward lost, close with loss. Learning: Maintenance versus immediate mission work. Science label: Fictional scenario.",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "No active external hazard; supply case not previously recovered.",
+      "conflicts": [],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E01:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E02",
+    "title": "event.E02.title",
+    "text": "event.E02.text",
+    "summaryLine": "event.E02.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 31,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": true,
+      "category": "technical",
+      "clock": "warningAge",
+      "warning": "The panel clicks when it turns. Today it stopped short of its usual position.",
+      "diagnosis": "A crack has formed in the repeatedly loaded hinge bracket. Explain fatigue as damage from repeated stressing.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal fixed cause; do not repair or remove penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Lock at a usable fixed angle",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Generation min(current,4) until repaired.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional loss",
+            "Generation -2",
+            "Generation -4; tracking fails"
+          ],
+          "requires": [
+            "affected equipment not fully failed"
+          ],
+          "timing": "capacity immediately; generation/demand next morning; response due next Sol"
+        },
+        {
+          "id": "repair",
+          "label": "Repair diagnosed fault",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 1,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "toolkit ready"
+          ],
+          "timing": "next morning"
+        }
+      ],
+      "sourceContract": "E02 Clicking Solar Panel Warning: The panel clicks when it turns. Today it stopped short of its usual position. Investigation reveals: A crack has formed in the repeatedly loaded hinge bracket. Explain fatigue as damage from repeated stressing. Eligibility: Panel not owned by E18 or E20. Clock: warningAge. Repair / diagnosed response: Standard repair. Restriction: Lock at a usable fixed angle: 0 E/W; generation reduced to min(current,4) per Sol until repaired. Continue: 1 E for monitoring; R outcomes (easy / moderate / severe): No additional loss / generation -2 / tracking fails: generation -4. Learning: Maintenance versus available power and research time. Science label: Fictional mechanism; not an InSight failure claim.",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "Panel not owned by E18 or E20.",
+      "conflicts": [
+        "E18",
+        "E20"
+      ],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E02:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E03",
+    "title": "event.E03.title",
+    "text": "event.E03.text",
+    "summaryLine": "event.E03.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 32,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "technical",
+      "clock": "warningAge",
+      "warning": "The battery reads full, but the low-power warning comes earlier despite similar use.",
+      "diagnosis": "A capacity check finds an aging module stores less energy.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal fixed cause; do not repair or remove penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Retire weak module",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Capacity min(current,12); clamp energy and log overflow loss.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional loss",
+            "Capacity 16",
+            "Capacity 10"
+          ],
+          "requires": [
+            "affected equipment not fully failed"
+          ],
+          "timing": "capacity immediately; generation/demand next morning; response due next Sol"
+        },
+        {
+          "id": "repair",
+          "label": "Repair diagnosed fault",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 1,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "toolkit ready"
+          ],
+          "timing": "next morning"
+        }
+      ],
+      "sourceContract": "E03 The Shorter Night Warning: The battery reads full, but the low-power warning comes earlier despite similar use. Investigation reveals: A capacity check finds an aging module stores less energy. Eligibility: Battery capacity not already modified by another event. Clock: warningAge. Repair / diagnosed response: Standard repair. Restriction: Retire weak module: 0 E/W; capacity becomes min(current,12) until repaired. Clamp excess E and log loss. Continue: 1 E for monitoring; R outcomes (easy / moderate / severe): No additional loss / capacity becomes 16 / capacity becomes 10. Learning: Replacement supplies versus usable reserve capacity. Science label: Fictional aging scenario, not a battery lifetime prediction.",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "Battery capacity not already modified by another event.",
+      "conflicts": [],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E03:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E04",
+    "title": "event.E04.title",
+    "text": "event.E04.text",
+    "summaryLine": "event.E04.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 32,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": true,
+      "category": "technical",
+      "clock": "warningAge",
+      "warning": "The display asks for more water, but the growing medium looks damp.",
+      "diagnosis": "An independent moisture check reveals sensor drift. No alternate hidden cause in the first build.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal fixed cause; do not repair or remove penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Disable automation",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Care costs 4 E instead of 3 until calibrated; retain existing crop loss.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional loss",
+            "Crop progress -1, minimum 0",
+            "Crop progress reset to 0"
+          ],
+          "requires": [
+            "affected equipment not fully failed"
+          ],
+          "timing": "capacity immediately; generation/demand next morning; response due next Sol"
+        },
+        {
+          "id": "repair",
+          "label": "Recalibrate",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "toolkit ready"
+          ],
+          "timing": "next morning"
+        }
+      ],
+      "sourceContract": "E04 The Thirsty Greenhouse Warning: The display asks for more water, but the growing medium looks damp. Investigation reveals: An independent moisture check reveals sensor drift. No alternate hidden cause in the first build. Eligibility: Greenhouse active; crop progress >=1; excludes E09/E10/E16. Clock: warningAge. Repair / diagnosed response: Recalibrate: 2 E + W, toolkit required, no Q. Restriction: Disable automation: 0 E/W now; greenhouse remains available, but each future care action costs 4 E instead of 3 until calibrated. Extra E abstracts support for manual operation. Continue: 1 E for monitoring; R outcomes (easy / moderate / severe): No additional loss / current crop progress decreases by 1, minimum 0 / current crop progress resets to 0. Learning: Cost of trustworthy information and manual operation. Science label: Fictional sensor fault; ISS watering context [10].",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "Greenhouse active; crop progress >=1; excludes E09/E10/E16.",
+      "conflicts": [
+        "E09",
+        "E10",
+        "E16"
+      ],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E04:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [
+        "10"
+      ],
+      "scienceRelation": "background context with fictional gameplay assumptions",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E05",
+    "title": "event.E05.title",
+    "text": "event.E05.text",
+    "summaryLine": "event.E05.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 33,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "technical",
+      "clock": "warningAge",
+      "warning": "The robot returns with fewer samples. Its camera shows a rock slipping from its grasp.",
+      "diagnosis": "Gripping pads are worn.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal fixed cause; do not repair or remove penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Photography only",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Replace sampling with independent-camera photography: 2 E + W for 6 D.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional change",
+            "Sampling yields 6 D",
+            "Gripper unusable; disable sampling"
+          ],
+          "requires": [
+            "affected equipment not fully failed"
+          ],
+          "timing": "capacity immediately; generation/demand next morning; response due next Sol"
+        },
+        {
+          "id": "repair",
+          "label": "Repair diagnosed fault",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 1,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "toolkit ready"
+          ],
+          "timing": "next morning"
+        }
+      ],
+      "sourceContract": "E05 The Robot Drops Things Warning: The robot returns with fewer samples. Its camera shows a rock slipping from its grasp. Investigation reveals: Gripping pads are worn. Eligibility: Working owned robot; exclude E13. Robot task is an optional normal-work action. Clock: warningAge. Repair / diagnosed response: Standard repair; robot available again next morning. Restriction: Photography only: 0 E/W now; replace robot sample task with photo task until repaired. Photo costs 2 E + W for 6 D; sample task costs 2 E + W for 10 D. Continue: 1 E for monitoring; R outcomes (easy / moderate / severe): No additional change / robot sample task yields 6 D / gripper unusable: disable sampling. Learning: Equipment capability versus repair supplies. Science label: Fictional wear scenario.",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "Working owned robot; exclude E13. Robot task is an optional normal-work action.",
+      "conflicts": [
+        "E13"
+      ],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E05:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E06",
+    "title": "event.E06.title",
+    "text": "event.E06.text",
+    "summaryLine": "event.E06.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 33,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "technical",
+      "clock": "warningAge",
+      "warning": "The signal cuts out whenever the antenna moves, then returns when it stops.",
+      "diagnosis": "A cable is damaged near a repeatedly bending section.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal fixed cause; do not repair or remove penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Fix antenna position",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Transmission limit min(current,15); unavailable antenna remains unavailable.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional loss",
+            "Transmission limit 20",
+            "Antenna unavailable"
+          ],
+          "requires": [
+            "affected equipment not fully failed"
+          ],
+          "timing": "capacity immediately; generation/demand next morning; response due next Sol"
+        },
+        {
+          "id": "repair",
+          "label": "Repair diagnosed fault",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 1,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "toolkit ready"
+          ],
+          "timing": "next morning"
+        }
+      ],
+      "sourceContract": "E06 The Flickering Antenna Warning: The signal cuts out whenever the antenna moves, then returns when it stops. Investigation reveals: A cable is damaged near a repeatedly bending section. Eligibility: Antenna normal; D>=12; exclude E10/E16/E18. Clock: warningAge. Repair / diagnosed response: Standard repair. Restriction: Fix antenna position: 0 E/W; transmission limit becomes min(current,15) D per action until repaired; a failed antenna remains unavailable. Continue: 1 E for monitoring; R outcomes (easy / moderate / severe): No additional loss / transmission limit 20 / antenna unavailable. Learning: Data delivery versus maintenance and communication capacity. Science label: Fictional hardware fault; communication context [9].",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "Antenna normal; D>=12; exclude E10/E16/E18.",
+      "conflicts": [
+        "E10",
+        "E16",
+        "E18"
+      ],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E06:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [
+        "9"
+      ],
+      "scienceRelation": "background context with fictional gameplay assumptions",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E07",
+    "title": "event.E07.title",
+    "text": "event.E07.text",
+    "summaryLine": "event.E07.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 34,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "technical",
+      "clock": "warningAge",
+      "warning": "One room warms slowly. The heater runs more often than yesterday.",
+      "diagnosis": "Inspection finds a gap in insulation around a service opening.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal fixed cause; do not repair or remove penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Close the laboratory room",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Lab unavailable; remove this event’s additional heating demand.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional loss",
+            "Life-support demand +1 E/Sol",
+            "Life-support demand +2 E/Sol"
+          ],
+          "requires": [
+            "affected equipment not fully failed"
+          ],
+          "timing": "capacity immediately; generation/demand next morning; response due next Sol"
+        },
+        {
+          "id": "repair",
+          "label": "Repair diagnosed fault",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 1,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "toolkit ready"
+          ],
+          "timing": "next morning"
+        }
+      ],
+      "sourceContract": "E07 The Longer Warm Up Warning: One room warms slowly. The heater runs more often than yesterday. Investigation reveals: Inspection finds a gap in insulation around a service opening. Eligibility: Lab active; no other event owns thermal demand. Clock: warningAge. Repair / diagnosed response: Standard repair. Restriction: Close the laboratory room: 0 E/W; lab experiments unavailable until repair. Remove this event's additional heating demand. Continue: 1 E for monitoring; R outcomes (easy / moderate / severe): No additional loss / life-support demand +1 E per Sol / demand +2 E per Sol. Learning: Heating energy versus access to experiments. Science label: Fictional insulation damage.",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "Lab active; no other event owns thermal demand.",
+      "conflicts": [],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E07:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E08",
+    "title": "event.E08.title",
+    "text": "event.E08.text",
+    "summaryLine": "event.E08.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 34,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "technical",
+      "clock": "warningAge",
+      "warning": "A vent whistles and the airflow feels weaker.",
+      "diagnosis": "A loaded filter restricts airflow.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal fixed cause; do not repair or remove penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Use independent standby ventilation",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Life-support demand +1 E/Sol from next morning until replacement.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional loss",
+            "Life-support demand +1 E/Sol",
+            "Life-support demand +2 E/Sol"
+          ],
+          "requires": [
+            "affected equipment not fully failed"
+          ],
+          "timing": "capacity immediately; generation/demand next morning; response due next Sol"
+        },
+        {
+          "id": "replace",
+          "label": "Replace filter",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 1,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known"
+          ],
+          "timing": "next morning"
+        }
+      ],
+      "sourceContract": "E08 The Whistling Vent Warning: A vent whistles and the airflow feels weaker. Investigation reveals: A loaded filter restricts airflow. Eligibility: Ventilation normal; no other event owns ventilation demand. Clock: warningAge. Repair / diagnosed response: Replace filter: 2 E + W + 1 Q; no toolkit required. Restriction: Use independent standby ventilation: 0 E/W now; life-support demand +1 E per Sol until replacement. Continue: 1 E for monitoring; R outcomes (easy / moderate / severe): No additional loss / life-support demand +1 / demand +2. Learning: Consumable replacement versus continuing energy expense. Science label: Fictional filter loading; no real operating procedure implied.",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "Ventilation normal; no other event owns ventilation demand.",
+      "conflicts": [],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E08:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E09",
+    "title": "event.E09.title",
+    "text": "event.E09.text",
+    "summaryLine": "event.E09.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 35,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "technical",
+      "clock": "warningAge",
+      "warning": "Water arrives at one growing tray later than it used to. The pump keeps running.",
+      "diagnosis": "A partially blocked line restricts delivery.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal fixed cause; do not repair or remove penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Isolate affected tray",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Future harvests yield 6 F instead of 8 until repaired.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional loss",
+            "Crop progress -1, minimum 0",
+            "Crop progress reset to 0"
+          ],
+          "requires": [
+            "affected equipment not fully failed"
+          ],
+          "timing": "capacity immediately; generation/demand next morning; response due next Sol"
+        },
+        {
+          "id": "repair",
+          "label": "Clear line",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "toolkit ready"
+          ],
+          "timing": "next morning"
+        }
+      ],
+      "sourceContract": "E09 The Sluggish Watering System Warning: Water arrives at one growing tray later than it used to. The pump keeps running. Investigation reveals: A partially blocked line restricts delivery. Eligibility: Greenhouse active with progress >=1; excludes E04/E10/E16. Clock: warningAge. Repair / diagnosed response: Clear line: 2 E + W; toolkit required; no Q. Restriction: Isolate affected tray: 0 E/W; each future normal harvest gives 6 F instead of 8 until repaired. Continue: 1 E for monitoring; R outcomes (easy / moderate / severe): No additional loss / current progress -1, minimum 0 / current progress reset to 0. Learning: Repair time versus future harvest size. Science label: Fictional plumbing; plant-care context [10].",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "Greenhouse active with progress >=1; excludes E04/E10/E16.",
+      "conflicts": [
+        "E04",
+        "E10",
+        "E16"
+      ],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E09:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [
+        "10"
+      ],
+      "scienceRelation": "background context with fictional gameplay assumptions",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E10",
+    "title": "event.E10.title",
+    "text": "event.E10.text",
+    "summaryLine": "event.E10.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 35,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "technical",
+      "clock": "warningAge",
+      "warning": "The greenhouse pump flickers. The antenna sometimes refuses to move.",
+      "diagnosis": "Tests find two faulty compatible connectors; there is one dedicated replacement in the event kit.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal fixed cause; do not repair or remove penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Suspend both affected systems",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Greenhouse and antenna unavailable; preserve dedicated connector.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional change",
+            "Greenhouse unavailable",
+            "Greenhouse and antenna unavailable"
+          ],
+          "requires": [
+            "affected equipment not fully failed"
+          ],
+          "timing": "capacity immediately; generation/demand next morning; response due next Sol"
+        },
+        {
+          "id": "greenhouse",
+          "label": "Repair greenhouse only",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "dedicated connector"
+          ],
+          "effect": "Consume connector; antenna remains unavailable."
+        },
+        {
+          "id": "antenna",
+          "label": "Repair antenna only",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "dedicated connector"
+          ],
+          "effect": "Consume connector; greenhouse remains unavailable."
+        },
+        {
+          "id": "both",
+          "label": "Repair both",
+          "knownCost": {
+            "E": 3,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "dedicated connector",
+            "working robot"
+          ],
+          "effect": "Consume connector; permanently salvage robot."
+        },
+        {
+          "id": "remaining_robot",
+          "label": "Repair remaining system by salvage",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "connector already consumed",
+            "working robot"
+          ],
+          "effect": "Permanently salvage robot; restore only remaining component."
+        },
+        {
+          "id": "remaining_spare",
+          "label": "Repair remaining system using spare",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 1,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "connector already consumed",
+            "toolkit ready"
+          ],
+          "effect": "Restore only remaining component."
+        }
+      ],
+      "sourceContract": "E10 One Spare Two Failures Warning: The greenhouse pump flickers. The antenna sometimes refuses to move. Investigation reveals: Tests find two faulty compatible connectors; there is one dedicated replacement in the event kit. Eligibility: Both systems initially normal; no conflicting fault. Dedicated connector is event-local, not Q. Clock: warningAge. Repair / diagnosed response: Choose after diagnosis: greenhouse only (2 E + W), antenna only (2 E + W), or both (3 E + W and permanently salvage a working robot). Each initial repair consumes the dedicated connector once. The other faulty system stays unavailable after a single repair; F11 defines its later replacement recipe. Restriction: Suspend both affected systems: 0 E/W; greenhouse and antenna unavailable until the post-diagnosis repairs are paid. Investigation remains available later from work menu. Continue: 1 E for monitoring; R outcomes (easy / moderate / severe): No additional change / greenhouse unavailable / greenhouse and antenna unavailable. Learning: Shared spares and cannibalization. Science label: Fictional common-part scenario.",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "Both systems initially normal; no conflicting fault. Dedicated connector is event-local, not Q.",
+      "conflicts": [
+        "E04",
+        "E06",
+        "E09",
+        "E16"
+      ],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E10:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E11",
+    "title": "event.E11.title",
+    "text": "event.E11.text",
+    "summaryLine": "event.E11.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 36,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": true,
+      "category": "situational",
+      "clock": "missionAge",
+      "warning": "The crop is ready to eat. Keeping some for science would use food and care time you may need later.",
+      "diagnosis": null,
+      "responseContracts": [
+        {
+          "id": "harvest",
+          "label": "Harvest all",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Gain 8 F at day end; reset crop; forgo research."
+        },
+        {
+          "id": "research",
+          "label": "Keep all for research",
+          "knownCost": {
+            "E": 3,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "R",
+          "outcomes": [
+            "16 D",
+            "12 D",
+            "8 D"
+          ],
+          "effect": "Consume batch; reset progress; no food; reward at day end."
+        },
+        {
+          "id": "split",
+          "label": "Split the batch",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "M",
+          "outcomes": [
+            "8 D",
+            "6 D",
+            "4 D"
+          ],
+          "effect": "Gain 4 F at day end; reset progress."
+        }
+      ],
+      "sourceContract": "E11 Your Experiment Is Dinner Prompt: The crop is ready to eat. Keeping some for science would use food and care time you may need later. Eligibility: Sol >=4; crop progress=2; greenhouse available; not owned by another event. Clock: missionAge. Harvest all (1 E + W; D). Gain 8 F; reset crop progress. Forgo research from this batch. Keep all for research (3 E + W; R). Consume the batch and reset progress. Gain 16 / 12 / 8 D; no F. Ongoing normal food consumption still applies. Split the batch (2 E + W; M). Gain 4 F and 8 / 6 / 4 D; reset progress. Smaller food and research yields than full allocation. Learning and science: Food versus research. All outcomes use a compressed established crop batch, not new growth. Context: ISS Veggie allocation [10].",
+      "lowResourceFallback": {
+        "id": "abandon",
+        "label": "Abandon this opportunity",
+        "knownCost": {
+          "E": 0,
+          "F": 0,
+          "H": 0,
+          "Q": 0,
+          "W": 0
+        },
+        "profile": "D",
+        "effect": "Isolate batch; reset progress; receive no F or D.",
+        "fallback": true
+      },
+      "eligibilityContract": "Sol >=4; crop progress=2; greenhouse available; not owned by another event.",
+      "conflicts": [],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E11:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [
+        "10"
+      ],
+      "scienceRelation": "background context with fictional gameplay assumptions",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E12",
+    "title": "event.E12.title",
+    "text": "event.E12.text",
+    "summaryLine": "event.E12.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 36,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": true,
+      "category": "situational",
+      "clock": "missionAge",
+      "warning": "Earth says “Do not restart,” but their instructions describe the setup you changed earlier.",
+      "diagnosis": null,
+      "responseContracts": [
+        {
+          "id": "restore",
+          "label": "Restore documented setup",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Lab available next morning."
+        },
+        {
+          "id": "test",
+          "label": "Test the new setup",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "R",
+          "outcomes": [
+            "Lab available next morning",
+            "Lab unavailable next Sol",
+            "Lab unavailable next two Sols"
+          ]
+        },
+        {
+          "id": "ask",
+          "label": "Stop and ask again",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Lab unavailable today and next Sol; restore morning Sol+2.",
+          "fallback": true
+        }
+      ],
+      "sourceContract": "E12 Outdated Advice Prompt: Earth says “Do not restart,” but their instructions describe the setup you changed earlier. Eligibility: Sol >=4; laboratory currently available; no laboratory fault. A pending guidance flag is established by the event itself. Clock: missionAge. Restore documented setup (2 E + W; D). Guidance now applies; lab available tomorrow. Forgo today's work. Test the new setup (1 E + W; R). Save 1 E compared with restoring the documented setup, but accept uncertainty: lab available tomorrow / lab unavailable next Sol / lab unavailable for next two Sols. Test consumes today's work even on easy outcome. Stop and ask again (0 E, no W; D). Lab unavailable today and next Sol; guidance restores it on morning Sol+2. Other base work remains possible. Learning and science: Independence versus information delay. Next-day processing includes scheduling, not light travel alone; NASA one-way range is about 4-24 minutes [9].",
+      "lowResourceFallback": {
+        "id": "abandon",
+        "label": "Abandon this opportunity",
+        "knownCost": {
+          "E": 0,
+          "F": 0,
+          "H": 0,
+          "Q": 0,
+          "W": 0
+        },
+        "profile": "D",
+        "effect": "Keep lab off until guidance arrives on morning Sol+2.",
+        "fallback": true
+      },
+      "eligibilityContract": "Sol >=4; laboratory currently available; no laboratory fault. A pending guidance flag is established by the event itself.",
+      "conflicts": [],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E12:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [
+        "9"
+      ],
+      "scienceRelation": "background context with fictional gameplay assumptions",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E13",
+    "title": "event.E13.title",
+    "text": "event.E13.text",
+    "summaryLine": "event.E13.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 37,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "situational",
+      "clock": "missionAge",
+      "warning": "Your rover has stopped in loose ground with a full sample box. Repeated attempts are draining its battery.",
+      "diagnosis": null,
+      "responseContracts": [
+        {
+          "id": "recover",
+          "label": "Crew recovery",
+          "knownCost": {
+            "E": 3,
+            "F": 0,
+            "H": 4,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Robot ready next morning; add 10 D at day end if payload remains."
+        },
+        {
+          "id": "drop",
+          "label": "Drop samples and drive back",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "Robot returns next morning",
+            "Robot returns damaged",
+            "Robot remains stranded"
+          ],
+          "effect": "Lose sample payload once."
+        },
+        {
+          "id": "postpone",
+          "label": "Stop and postpone",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Robot remains unavailable; recovery due next Sol; unrecovered robot lost at mission end.",
+          "fallback": true
+        },
+        {
+          "id": "repair",
+          "label": "Repair damaged robot",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 1,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "toolkit ready",
+            "robot damaged"
+          ],
+          "effect": "Restore robot next morning."
+        }
+      ],
+      "sourceContract": "E13 The Robot Is Stuck Prompt: Your rover has stopped in loose ground with a full sample box. Repeated attempts are draining its battery. Eligibility: Sol >=4; owned robot ready; no E05. Robot becomes unavailable while event is pending. Event carries 10 D not yet counted. Clock: missionAge. Crew recovery (3 E + W + 4 H; D). Robot ready next morning; add 10 D. Lose crew capacity and today's work. Drop samples and drive back (1 E; R). Lose samples. Robot returns next morning / returns damaged / remains stranded. Damaged repair: 2 E + W + 1 Q with toolkit. Stranded robot retains crew-recovery option but adds no D. Stop and postpone (0 E, no W; D). Robot remains unavailable. Offer recovery tomorrow; sacrifice all robot tasks until recovery. At mission end an unrecovered robot is lost. Learning and science: Payload, equipment and crew time compete. Fictional accident; event-local robot battery is abstracted into E costs.",
+      "lowResourceFallback": {
+        "id": "abandon",
+        "label": "Abandon this opportunity",
+        "knownCost": {
+          "E": 0,
+          "F": 0,
+          "H": 0,
+          "Q": 0,
+          "W": 0
+        },
+        "profile": "D",
+        "effect": "Permanently lose robot and sample payload.",
+        "fallback": true
+      },
+      "eligibilityContract": "Sol >=4; owned robot ready; no E05. Robot becomes unavailable while event is pending. Event carries 10 D not yet counted.",
+      "conflicts": [
+        "E05"
+      ],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E13:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E14",
+    "title": "event.E14.title",
+    "text": "event.E14.text",
+    "summaryLine": "event.E14.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 37,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "situational",
+      "clock": "missionAge",
+      "warning": "Your crewmate asks for a break. A short-lived observation opportunity arrives just as they sit down.",
+      "diagnosis": null,
+      "responseContracts": [
+        {
+          "id": "rest",
+          "label": "Rest together",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Gain 8 H at day end, capped at 100; no D."
+        },
+        {
+          "id": "full",
+          "label": "Full observation",
+          "knownCost": {
+            "E": 3,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "R",
+          "outcomes": [
+            "Lose 4 H",
+            "Lose 8 H",
+            "Lose 12 H"
+          ],
+          "effect": "Gain 12 D at day end."
+        },
+        {
+          "id": "short",
+          "label": "Short observation",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Gain 6 D and 3 H at day end."
+        }
+      ],
+      "sourceContract": "E14 An Empty Chair Prompt: Your crewmate asks for a break. A short-lived observation opportunity arrives just as they sit down. Eligibility: Sol >=3; H between 20 and 92; lab available. Clock: missionAge. Rest together (1 E + W; D). Gain 8 H. Observation expires with no D. Full observation (3 E + W; R). Gain 12 D; lose 4 / 8 / 12 H. Reward is constant; fatigue cost rises. Short observation (2 E + W; D). Gain 6 D and 3 H. Sacrifice half the research and most of a full rest's recovery. Learning and science: Workload versus recovery. H is a teaching abstraction, not a clinical fatigue model.",
+      "lowResourceFallback": {
+        "id": "abandon",
+        "label": "Abandon this opportunity",
+        "knownCost": {
+          "E": 0,
+          "F": 0,
+          "H": 0,
+          "Q": 0,
+          "W": 0
+        },
+        "profile": "D",
+        "effect": "Forgo observation research.",
+        "fallback": true
+      },
+      "eligibilityContract": "Sol >=3; H between 20 and 92; lab available.",
+      "conflicts": [],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E14:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E15",
+    "title": "event.E15.title",
+    "text": "event.E15.text",
+    "summaryLine": "event.E15.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 38,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "situational",
+      "clock": "missionAge",
+      "warning": "A spill has blurred two sample labels. You cannot confidently match them to their collection sites.",
+      "diagnosis": null,
+      "responseContracts": [
+        {
+          "id": "replace",
+          "label": "Collect replacements",
+          "knownCost": {
+            "E": 3,
+            "F": 0,
+            "H": 2,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Gain 12 D at day end from identified samples."
+        },
+        {
+          "id": "reconstruct",
+          "label": "Reconstruct the records",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "R",
+          "outcomes": [
+            "12 D",
+            "6 D",
+            "0 D"
+          ]
+        },
+        {
+          "id": "composition",
+          "label": "Study only their composition",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Gain 4 D at day end; forgo location-dependent findings."
+        }
+      ],
+      "sourceContract": "E15 The Unlabelled Samples Prompt: A spill has blurred two sample labels. You cannot confidently match them to their collection sites. Eligibility: Sol >=4; sample research opportunity worth 12 D is created but not yet counted. Clock: missionAge. Collect replacements (3 E + W + 2 H; D). Gain 12 D from identified samples; sacrifice excursion resources and work. Reconstruct the records (1 E + W; R). Recover provenance for 12 / 6 / 0 D. Do not count unsupported location findings. Study only their composition (2 E + W; D). Gain 4 D; permanently forgo the location-dependent findings. Learning and science: Traceability versus research quantity. Fictional handling accident; uncertainty limits claims.",
+      "lowResourceFallback": {
+        "id": "abandon",
+        "label": "Abandon this opportunity",
+        "knownCost": {
+          "E": 0,
+          "F": 0,
+          "H": 0,
+          "Q": 0,
+          "W": 0
+        },
+        "profile": "D",
+        "effect": "Forgo sample research.",
+        "fallback": true
+      },
+      "eligibilityContract": "Sol >=4; sample research opportunity worth 12 D is created but not yet counted.",
+      "conflicts": [],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E15:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E16",
+    "title": "event.E16.title",
+    "text": "event.E16.text",
+    "summaryLine": "event.E16.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 38,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "situational",
+      "clock": "missionAge",
+      "warning": "Your final transmission fails. A greenhouse part could restore the antenna, but the next crew needs that greenhouse.",
+      "diagnosis": null,
+      "responseContracts": [
+        {
+          "id": "borrow",
+          "label": "Borrow from the greenhouse",
+          "knownCost": {
+            "E": 3,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Greenhouse permanently unavailable; transfer min(30,D) to X tonight; combined cost charged once."
+        },
+        {
+          "id": "preserve",
+          "label": "Preserve the greenhouse",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Keep D locally; no X; record preserved greenhouse and delayed research.",
+          "fallback": true
+        },
+        {
+          "id": "temporary",
+          "label": "Try a temporary repair",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "M",
+          "outcomes": [
+            "Transfer min(30,D) to X",
+            "Transfer min(15,D) to X",
+            "Transfer 0 to X"
+          ],
+          "effect": "Transfer at day end; preserve greenhouse; antenna remains unreliable in ending."
+        }
+      ],
+      "sourceContract": "E16 The Last Day Shortcut Prompt: Your final transmission fails. A greenhouse part could restore the antenna, but the next crew needs that greenhouse. Eligibility: Sol 14 only; D>=12; antenna and greenhouse normal; no conflicting technical chain. On entry antenna becomes unavailable. Clock: missionAge. Borrow from the greenhouse (3 E + W; D). Greenhouse becomes unavailable for next crew. Transfer min(30,D) to X tonight; combined repair/transmit cost is charged once. Preserve the greenhouse (0 E, no W; D). Keep D locally and forgo transmission; count no X. End report records preserved greenhouse and delayed research. Try a temporary repair (2 E + W; M). Transfer min(30,D) / min(15,D) / 0 to X. Greenhouse preserved; antenna remains unreliable in ending. Learning and science: Immediate mission results versus inherited infrastructure. No invented claim that locally stored data has already reached Earth.",
+      "lowResourceFallback": {
+        "id": "abandon",
+        "label": "Abandon this opportunity",
+        "knownCost": {
+          "E": 0,
+          "F": 0,
+          "H": 0,
+          "Q": 0,
+          "W": 0
+        },
+        "profile": "D",
+        "effect": "Retain D locally; no X gain.",
+        "fallback": true
+      },
+      "eligibilityContract": "Sol 14 only; D>=12; antenna and greenhouse normal; no conflicting technical chain. On entry antenna becomes unavailable.",
+      "conflicts": [
+        "E04",
+        "E06",
+        "E09",
+        "E10"
+      ],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E16:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E17",
+    "title": "event.E17.title",
+    "text": "event.E17.text",
+    "summaryLine": "event.E17.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 39,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "situational",
+      "clock": "missionAge",
+      "warning": "A leaking drink pouch has reached the edge of an experiment rack.",
+      "diagnosis": null,
+      "responseContracts": [
+        {
+          "id": "shutdown",
+          "label": "Shut down and clean",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "No experiment today; lab returns next morning."
+        },
+        {
+          "id": "isolate",
+          "label": "Isolate one section",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "M",
+          "outcomes": [
+            "6 D",
+            "3 D",
+            "0 D"
+          ],
+          "effect": "Reward at day end; lab returns next morning."
+        },
+        {
+          "id": "backup",
+          "label": "Move to backup equipment",
+          "knownCost": {
+            "E": 3,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "working robot"
+          ],
+          "effect": "Gain 12 D at day end; robot unavailable until morning Sol+2."
+        }
+      ],
+      "sourceContract": "E17 A Spill in the Wrong Place Prompt: A leaking drink pouch has reached the edge of an experiment rack. Eligibility: Sol >=3; lab available; no competing laboratory event. Clock: missionAge. Shut down and clean (1 E + W; D). Protect the rack; no experiment today; lab returns next morning. Isolate one section (2 E + W; M). Spend 1 E more than full shutdown to preserve some experiment operation. Salvage 6 / 3 / 0 D from the interrupted experiment; lab returns next morning. Less research than a normal experiment. Move to backup equipment (3 E + W; D). Gain 12 D; disable robot tasks until morning Sol+2 because its controller is reassigned. Requires working robot. Learning and science: Accident response versus continuity and backup availability. Fictional scenario.",
+      "lowResourceFallback": {
+        "id": "abandon",
+        "label": "Abandon this opportunity",
+        "knownCost": {
+          "E": 0,
+          "F": 0,
+          "H": 0,
+          "Q": 0,
+          "W": 0
+        },
+        "profile": "D",
+        "effect": "Forgo experiment; lab off until next morning.",
+        "fallback": true
+      },
+      "eligibilityContract": "Sol >=3; lab available; no competing laboratory event.",
+      "conflicts": [],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E17:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E18",
+    "title": "event.E18.title",
+    "text": "event.E18.text",
+    "summaryLine": "event.E18.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 39,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": false,
+      "category": "situational",
+      "clock": "missionAge",
+      "warning": "A sharp impact is followed by darkness outside. Both power indicators turn red.",
+      "diagnosis": null,
+      "responseContracts": [
+        {
+          "id": "repair",
+          "label": "Inspect and repair one route",
+          "knownCost": {
+            "E": 3,
+            "F": 0,
+            "H": 0,
+            "Q": 1,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal damaged adjacent cables; generation 4 next morning; permanent loss of 2; no toolkit required."
+        },
+        {
+          "id": "battery",
+          "label": "Use emergency battery",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "requires": [
+            "spare battery ready"
+          ],
+          "effect": "Consume battery; immediately add up to 6 E within capacity; generation remains 0; response due next Sol."
+        },
+        {
+          "id": "shelter",
+          "label": "Move into separate shelter",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Enter persistent F10 shelter: lab/greenhouse/robot stop immediately; independent support next morning; main generation 0; food consumption continues.",
+          "fallback": true
+        }
+      ],
+      "sourceContract": "E18 The Backup Fails Too Prompt: A sharp impact is followed by darkness outside. Both power indicators turn red. Eligibility: Sol 6-10; no panel/antenna event. Entry sets generation=0 from next morning; supply loss persists until repair or shelter operation. The incident is fictional, not a measured Mars impact rate. Clock: missionAge. Inspect and repair one route (3 E + W + 1 Q; D). Inspection reveals adjacent damaged cables. Restore generation to 4 next morning, permanently below normal 6. No toolkit requirement; recipe is abstracted. Use emergency battery (Consume spare battery; no W; D). Add up to 6 E now. Generation remains 0; schedule response next Sol. Diagnosis remains unknown until inspection. Move into separate shelter (0 E + W; D). Enter the persistent shelter mode defined in F10. Its independent support starts next morning; greenhouse/lab/robot missions stop immediately. Main generation remains 0. Inspect/repair later; food consumption continues. Learning and science: Common-cause vulnerability: colocated backups can share one hazard. The combined inspect-and-repair emergency action explicitly consumes W; diagnosis is revealed during it, never in the initial warning.",
+      "eligibilityContract": "Sol 6-10; no panel/antenna event. Entry sets generation=0 from next morning; supply loss persists until repair or shelter operation. The incident is fictional, not a measured Mars impact rate.",
+      "conflicts": [
+        "E02",
+        "E06",
+        "E20"
+      ],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E18:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [],
+      "scienceRelation": "fictional engineering scenario",
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E19",
+    "title": "event.E19.title",
+    "text": "event.E19.text",
+    "summaryLine": "event.E19.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 40,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": true,
+      "category": "environmental",
+      "clock": "missionAge",
+      "warning": "The radiation monitor warns against outdoor work. You can move into the protected area, but the experiment outside will have to wait.",
+      "diagnosis": null,
+      "responseContracts": [
+        {
+          "id": "suspend",
+          "label": "Shelter and suspend work",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Cancel experiment; no D; return to ordinary operation next morning."
+        },
+        {
+          "id": "remote",
+          "label": "Shelter and observe remotely",
+          "knownCost": {
+            "E": 3,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "M",
+          "requires": [
+            "working robot"
+          ],
+          "outcomes": [
+            "10 D",
+            "6 D",
+            "2 D"
+          ],
+          "effect": "Crew sheltered; robot occupied until next morning; installed shielding reduces E cost to 2; monitor adds 2 D; reward at day end."
+        },
+        {
+          "id": "minimum",
+          "label": "Shelter with minimum operations",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 3,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Pause greenhouse; turn off nonessential equipment; life support still mandatory; H cost is fatigue, not radiation.",
+          "fallback": true,
+          "costOverride": {
+            "when": "H <= 3",
+            "H": 0,
+            "effect": "Lose 2 D, or forgo next 2 D if D<2; expose before confirmation."
+          }
+        }
+      ],
+      "sourceContract": "E19 The Shelter Decision Prompt: The radiation monitor warns against outdoor work. You can move into the protected area, but the experiment outside will have to wait. Eligibility: Sol >=3; schedule as an adapted historical scenario, not a real-time forecast. No outdoor activity option while warning is active. Clock: missionAge for response variability only. Historical observation remains unchanged. Shelter and suspend work (1 E + W; D). Cancel today's experiment and enter the existing shielded area. No research gain; return to ordinary operation next morning in this compressed scenario. Shelter and observe remotely (3 E + W; M). Requires working robot; gain 10 / 6 / 2 D. Crew remains sheltered. Robot is occupied until next morning. Installed shielding kit reduces this option to 2 E through a simplified prepared-workspace benefit, not an electric shield. Shelter with minimum operations (0 E + W; D). Turn off nonessential equipment and pause greenhouse progress; lose 3 H as an abstract cramped-workspace/fatigue cost. Basic life support remains mandatory. No radiation damage is represented by this H cost. Source card: May 20, 2024, Curiosity RAD, Mars: reported 8,100 microgray observation [7]. This does not specify a fictional base dose or an instant health loss. Research rewards and one-Sol timing are game abstractions. A radiation monitor adds 2 D to the remote observation outcome; it does not provide shielding.",
+      "eligibilityContract": "Sol >=3; schedule as an adapted historical scenario, not a real-time forecast. No outdoor activity option while warning is active.",
+      "conflicts": [],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E19:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [
+        "7"
+      ],
+      "scienceRelation": "historical observation with fictional gameplay mapping",
+      "sourceObservation": {
+        "reference": "7",
+        "platform": "Curiosity RAD, Mars",
+        "observedAt": "2024-05-20",
+        "value": 8100,
+        "unit": "microgray",
+        "limitation": "Historical observation from CDS; not a fictional habitat dose, live forecast or radiation-to-health conversion."
+      },
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
+  },
+  {
+    "id": "E20",
+    "title": "event.E20.title",
+    "text": "event.E20.text",
+    "summaryLine": "event.E20.summaryLine",
+    "minSol": 15,
+    "weight": 0,
+    "choices": [],
+    "cds": {
+      "revision": "2.2",
+      "sourceDocument": "Mars_Outpost_Event_CDS.pdf",
+      "sourceSection": "Appendix G; normative rules Appendix F",
+      "sourcePage": 40,
+      "implementationStatus": "content_only",
+      "enabled": false,
+      "blockingReason": "Requires CDS lifecycle, prerequisites, scheduler, typed effects and transaction support; current engine ignores this metadata.",
+      "demoFamily": true,
+      "category": "environmental",
+      "clock": "warningAge",
+      "warning": "The panels look duller than before. Even at midday, the power display climbs more slowly.",
+      "diagnosis": "Dust is obscuring the panels. The cause is revealed after the standard 1 E + W inspection.",
+      "responseContracts": [
+        {
+          "id": "investigate",
+          "label": "Investigate",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "effect": "Reveal dust; no repair; retain penalties; response due next Sol."
+        },
+        {
+          "id": "restrict",
+          "label": "Reduce the power budget",
+          "knownCost": {
+            "E": 0,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "D",
+          "effect": "Generation min(current,4) until cleaning; freeze escalation; retain issue and lock.",
+          "fallback": true
+        },
+        {
+          "id": "continue",
+          "label": "Continue with monitoring",
+          "knownCost": {
+            "E": 1,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 0
+          },
+          "profile": "R",
+          "outcomes": [
+            "No additional loss",
+            "Generation -2",
+            "Generation -3"
+          ],
+          "effect": "Retain maximum existing loss; generation change next morning."
+        },
+        {
+          "id": "clean",
+          "label": "Clean after diagnosis",
+          "knownCost": {
+            "E": 2,
+            "F": 0,
+            "H": 0,
+            "Q": 0,
+            "W": 1
+          },
+          "profile": "D",
+          "requires": [
+            "diagnosis known",
+            "no active E19 warning"
+          ],
+          "effect": "Restore generation next morning; no Q or toolkit required."
+        }
+      ],
+      "sourceContract": "E20 The Fading Panels Warning: The panels look duller than before. Even at midday, the power display climbs more slowly. Investigation reveals: Dust is obscuring the panels. The cause is revealed after the standard 1 E + W inspection. Clock: warningAge; Sol >=2. Excludes E02/E18. Clean after diagnosis (2 E + W; D). Restore generation next morning; no Q or toolkit required. Cleaning is disabled during an active E19 warning. Reduce the power budget (0 E/W; D). Accept generation min(current,4) per Sol until cleaning; enter restricted state. The child can continue science more slowly or preserve life-support reserves. Continue with monitoring (1 E; R). Easy: no additional loss. Moderate: generation -2. Severe: generation -3. Keep the maximum existing loss. Costs and changing output are fictional compression, not measured daily InSight values. Source card: InSight produced roughly 5,000 Wh/Sol after landing and about 500 Wh/Sol by spring 2022 as dust accumulated [8]. This comparison spans years and does not describe the fictional base's output.",
+      "technicalConvention": {
+        "initialChoices": [
+          "investigate",
+          "restrict",
+          "continue"
+        ],
+        "afterDiagnosis": "Replace investigate with diagnosed repair responses.",
+        "lifecycle": "F3/F9: investigation reveals without curing; restriction freezes progression and retains locks; repair restores next morning.",
+        "risk": "F5: profile R, warning-age escalation; retain maximum persistent damage; no nightly failure roll."
+      },
+      "eligibilityContract": "Sol >=2; excludes E02/E18; technical scheduling rules in F3.",
+      "conflicts": [
+        "E02",
+        "E18"
+      ],
+      "probabilityProfiles": {
+        "R": {
+          "start": [
+            0.6,
+            0.3,
+            0.1
+          ],
+          "end": [
+            0.1,
+            0.3,
+            0.6
+          ]
+        },
+        "M": {
+          "start": [
+            0.8,
+            0.15,
+            0.05
+          ],
+          "end": [
+            0.5,
+            0.35,
+            0.15
+          ]
+        },
+        "D": {
+          "deterministic": true
+        }
+      },
+      "progressionContract": {
+        "initialDifficulty": 0,
+        "T": 13,
+        "k": 1,
+        "increment": "min(1, s + (k/T) * (0.5 + keyedUniform))",
+        "randomKey": [
+          "runSeed",
+          "eventID",
+          "instanceID",
+          "purpose",
+          "index"
+        ],
+        "hash": "SHA-256 of compact UTF-8 JSON; first four bytes unsigned big-endian / 4294967296",
+        "instanceID": "E20:1",
+        "timing": "F5; only active unknown/known technical issues escalate; restricted/repaired freeze."
+      },
+      "sourceRefs": [
+        "8"
+      ],
+      "scienceRelation": "historical observation with fictional gameplay mapping",
+      "sourceObservation": {
+        "reference": "8",
+        "platform": "InSight, Mars",
+        "period": [
+          "after landing",
+          "spring 2022"
+        ],
+        "values": [
+          5000,
+          500
+        ],
+        "unit": "Wh/Sol",
+        "limitation": "Approximate multi-year contrast quoted by CDS; not daily degradation or human habitat output."
+      },
+      "authoringFormat": "Costs/profiles are structured; prerequisites, effects, eligibility and sourceContract are descriptive contracts, not executable predicates or whitelisted operations."
+    }
   }
 ]
