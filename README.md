@@ -59,3 +59,5 @@ python -m http.server 8000 --bind 127.0.0.1
 规则与翻译测试：`npm test`。翻译表统一使用英文语义 key，具体规范见 [语言配置说明](locales/README.md)。浏览器检查脚本：`python tests/browser_smoke.py`，需要 Python Playwright 和本机 Edge；使用测试响应验证图片路径与状态切换，不提供游戏美术。
 
 https://docs.google.com/document/d/1ULwb509Fd4l8WoeZYRNe-yRgJkW4OErQ/edit
+
+样本采集：工作板可独立安排次日人物出行，或用机器人当天采样。最多 3 个样本，每个支持 2 次常规舱内研究。人物出行一天后返航并自动休整，日终开灯恢复 50% 疲劳、关灯恢复 25%。鼠标悬浮或键盘聚焦人物可查看状态，详细规则见 [内容列表](GAME_CONTENT_LIST.md)。

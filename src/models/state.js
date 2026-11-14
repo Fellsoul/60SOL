@@ -1,6 +1,7 @@
 import { validSnapshot } from './SpaceData.js';
 import { validVisualAction } from './VisualAction.js';
-export const SAVE_VERSION = 3;
+import { CREW_IDS, freshCrew } from './ExpeditionRules.js';
+export const SAVE_VERSION = 4;
 export const LIMITS = Object.freeze({ energy: 12, food: 32, health: 100, sols: 14, target: 60 });
 
 export function createState(toolIds, seed = 20261113) {
@@ -12,6 +13,7 @@ export function createState(toolIds, seed = 20261113) {
     rng: seed >>> 0, currentEventId: null, choiceId: null, workId: null,
     eventDone: false,
     visualAction: null,
+    samples: [], crew:freshCrew(), expeditionPlan:null, robotSampleSol:null,
     missionSnapshot: null,
     spaceTrace: [],
     dailySystems: {spares:2,generationCap:6,trackingCap:6,supportExtra:0,careCost:3,harvestFood:8,labUntil:0,greenhouseDisabled:false,antennaLimit:30},
@@ -29,6 +31,18 @@ export function logEntry(state, text) {
 // 存档属于外部输入；版本和关键字段必须通过校验，不能直接合并进初始状态。
 export function validateState(s, eventIds, toolIds) {
   if (!s || s.version !== SAVE_VERSION) return false;
+  if (!Array.isArray(s.samples) || s.samples.length > 3 || !s.samples.every(uses => uses === 1 || uses === 2)) return false;
+  if (!s.crew || Object.keys(s.crew).length !== 2 || !CREW_IDS.every(id => {
+    const c=s.crew[id];
+    if (!c || Object.keys(c).length !== 3) return false;
+    if (![c.departSol,c.returnSol].every(sol => sol === null || (Number.isInteger(sol) && sol >= 1 && sol <= 14))) return false;
+    if (!Number.isInteger(c.fatigue) || c.fatigue < 0 || c.fatigue > 4) return false;
+    return (c.departSol === null) === (c.returnSol === null) &&
+      (c.departSol === null || (c.departSol === s.sol && c.returnSol === c.departSol+1 && c.fatigue === 0));
+  })) return false;
+  if (s.robotSampleSol !== null && (!Number.isInteger(s.robotSampleSol) || s.robotSampleSol < 1 || s.robotSampleSol > s.sol)) return false;
+  if (s.expeditionPlan !== null && (!s.expeditionPlan || !CREW_IDS.includes(s.expeditionPlan.crewId) ||
+    s.expeditionPlan.departSol !== s.sol+1 || s.sol > 12 || s.crew[s.expeditionPlan.crewId].returnSol !== null || s.crew[s.expeditionPlan.crewId].fatigue > 0)) return false;
   if (!['clear','sandstorm'].includes(s.weather) || typeof s.lightsOn !== 'boolean' || !['seed','sprout','growing','mature'].includes(s.plantStage)) return false;
   if (!Number.isInteger(s.summarySol) || s.summarySol < 0 || s.summarySol > s.sol) return false;
   if (![s.daySummary,s.previousDaySummary].every(lines => Array.isArray(lines) && lines.length <= 30 && lines.every(line => typeof line === 'string' && line.length <= 2000))) return false;

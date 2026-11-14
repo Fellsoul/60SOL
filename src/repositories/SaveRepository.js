@@ -1,4 +1,5 @@
 import { validateState, SAVE_VERSION, LIMITS } from '../models/state.js';
+import { freshCrew } from '../models/ExpeditionRules.js';
 
 export class SaveRepository {
   constructor(storage, { events, tools }, key = 'last-light-outpost.save.v1') {
@@ -42,7 +43,11 @@ export class SaveRepository {
       }
       if (state?.version === 2 && Number.isInteger(state.energy) && state.energy >= 0 && state.energy <= 20) {
         state.energy = Math.min(state.energy,LIMITS.energy);
+        state.version = 3;
+      }
+      if (state?.version === 3) {
         state.version = SAVE_VERSION;
+        state.samples = []; state.crew = freshCrew(); state.expeditionPlan = null; state.robotSampleSol = null;
       }
       if (!validateState(state,this.eventIds,this.toolIds)) throw new Error('存档版本或内容无效');
       const event = this.events.find(item => item.id === state.currentEventId);

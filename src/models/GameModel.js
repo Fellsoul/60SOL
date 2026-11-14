@@ -6,12 +6,40 @@ import { ACTIONS, LIGHT_ACTIONS, applyEffect, unavailableReason, workEnergy } fr
 import { EventEngine } from './EventEngine.js';
 import { beginSol, finishSol } from './TurnEngine.js';
 import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
+import { freshCrew, expeditionReason, robotSampleReason, collectSample, ROBOT_SAMPLE_ENERGY } from './ExpeditionRules.js';
 
 export class GameModel {
   #state = null;
   constructor({ events, tools, environment = {}, resource_log = {} }) { this.events = new EventEngine(events); this.tools = tools; this.environment = environment; this.resourceLog = resource_log; }
   get snapshot() { return this.#state ? structuredClone(this.#state) : null; }
-  restore(state) { this.#state = structuredClone(state); }
+  restore(state) {
+    this.#state = structuredClone(state);
+    if (this.#state) {
+      this.#state.samples ??= []; this.#state.crew ??= freshCrew();
+      this.#state.expeditionPlan ??= null; this.#state.robotSampleSol ??= null;
+    }
+  }
+  planExpedition(crewId) {
+    const s=this.#state;
+    if (!s || s.phase === 'finished') throw new Error('error.missionFinished');
+    if (crewId !== null) {
+      const reason=expeditionReason(s,crewId);
+      if (reason) throw new Error(reason);
+    }
+    s.expeditionPlan = crewId === null ? null : {crewId,departSol:s.sol+1};
+    s.daySummary=s.daySummary.filter(line => !line.startsWith('expedition.plan.') && line !== 'expedition.planCancelled');
+    s.daySummary.push(crewId === null ? 'expedition.planCancelled' : `expedition.plan.${crewId.replaceAll('-','_')}`);
+  }
+  collectWithRobot() {
+    const s=this.#state;
+    const reason=robotSampleReason(s,s ? this.events.get(s.currentEventId) : null);
+    if (reason) throw new Error(reason);
+    const before=resourceSnapshot(s);
+    s.energy -= ROBOT_SAMPLE_ENERGY;
+    collectSample(s); s.robotSampleSol=s.sol;
+    recordResourceChange(s,before,'sampling.robot',this.resourceLog,'action.robot.summary');
+    s.daySummary.push('action.robot.summary');
+  }
   start(toolIds,snapshot=null) {
     if(snapshot!==null&&!validSnapshot(snapshot))throw new Error('Invalid mission snapshot');
     if (toolIds.length !== 2 || new Set(toolIds).size !== 2 || !toolIds.every(id => this.tools.some(tool => tool.id === id))) throw new Error('error.chooseTwoTools');

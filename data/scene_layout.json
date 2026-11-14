@@ -274,7 +274,7 @@
     },
     {
       "id": "astronaut-a",
-      "bind": "crew",
+      "bind": "crewA",
       "zIndex": 50,
       "defaultState": "seated",
       "states": {
@@ -286,12 +286,15 @@
         },
         "exhausted": {
           "src": "assets/scene/crew/astronaut_a/exhausted.png"
+        },
+        "away": {
+          "hidden": true
         }
       }
     },
     {
       "id": "astronaut-b",
-      "bind": "crewIdle",
+      "bind": "crewB",
       "zIndex": 50,
       "defaultState": "seated",
       "states": {
@@ -303,6 +306,9 @@
         },
         "exhausted": {
           "src": "assets/scene/crew/astronaut_b/exhausted.png"
+        },
+        "away": {
+          "hidden": true
         }
       }
     },
@@ -452,6 +458,26 @@
         },
         "off": {
           "hidden": true
+        }
+      }
+    },
+    {
+      "id": "samples",
+      "bind": "samples",
+      "zIndex": 58,
+      "defaultState": "0",
+      "states": {
+        "0": {
+          "src": "assets/scene/interior/outpost_sample0.png"
+        },
+        "1": {
+          "src": "assets/scene/interior/outpost_sample1.png"
+        },
+        "2": {
+          "src": "assets/scene/interior/outpost_sample2.png"
+        },
+        "3": {
+          "src": "assets/scene/interior/outpost_sample3.png"
         }
       }
     }
