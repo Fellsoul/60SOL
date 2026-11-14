@@ -31,6 +31,8 @@
   "settings.reduceMotion": "静态显示",
   "menu.return": "主菜单",
   "terminal.log": "记录",
+  "terminal.generation": "今日发电",
+  "terminal.generationHint": "太阳能板当天的发电量，实际存入电池的电量受容量上限限制。",
   "terminal.arrivalLog": "抵达记录",
   "terminal.missionComplete": "任务结束",
   "terminal.workHeading": "接下来的工作",

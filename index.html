@@ -51,7 +51,7 @@
   <dialog id="terminal" aria-labelledby="terminal-title">
     <img class="console-frame" src="assets/scene/interior/outpost_console.png" alt="" draggable="false">
     <div class="terminal-shell">
-      <header class="terminal-header"><h1 id="terminal-title"></h1><button id="terminal-close" data-i18n-aria-label="terminal.close" aria-label="Close terminal" autofocus>×</button></header>
+      <header class="terminal-header"><div class="terminal-heading"><h1 id="terminal-title"></h1><p id="terminal-generation" hidden></p></div><button id="terminal-close" data-i18n-aria-label="terminal.close" aria-label="Close terminal" autofocus>×</button></header>
       <div id="terminal-scroll" tabindex="0"><div id="terminal-content"></div></div>
       <footer class="terminal-footer"><button id="skip-typing" data-i18n="terminal.showFullText" hidden>Show full text</button><label><input id="reduce-motion" type="checkbox"> <span id="motion-label" data-i18n="settings.reduceMotion">Reduce motion</span></label><button id="restart" data-i18n="menu.return" hidden>Main menu</button></footer>
     </div>
