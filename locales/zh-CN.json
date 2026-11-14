@@ -547,5 +547,10 @@
   "scene.description.E17": "饮料袋漏了，液体正流向实验架。",
   "scene.description.E18": "一声撞击后，两个电源指示灯都变红了。",
   "scene.description.E19": "辐射监测仪发出警告：留在室内。",
-  "scene.description.E20": "阳光充足，太阳能板的发电量却变少了。"
+  "scene.description.E20": "阳光充足，太阳能板的发电量却变少了。",
+  "events.fatigue.title": "宇航员休息",
+  "events.fatigue.cue": "我需要休息一下……",
+  "events.fatigue.description": "这位宇航员累了。每晚继续恢复，照明会影响恢复速度。",
+  "events.fatigue.recover": "让这位宇航员继续休息",
+  "events.fatigue.summary": "疲劳的宇航员继续按计划休息恢复。"
 }

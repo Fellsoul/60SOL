@@ -1,5 +1,6 @@
 import { eventResolved } from '../models/DailyEventRules.js';
 import { i18n } from '../services/I18n.js';
+import { concurrentEvent } from '../models/ConcurrentEvents.js';
 
 // Percent coordinates measured against the shared 1672 × 940 artwork canvas.
 const anchors = {
@@ -47,7 +48,7 @@ export class SceneEventView {
   describe() {
     if (this.node.hidden || !this.eventID) return;
     this.clearDescription();
-    this.description.textContent = i18n.t(`scene.description.${this.eventID}`);
+    this.description.textContent = i18n.t(this.descriptionKey ?? `scene.description.${this.eventID}`);
     this.description.hidden = false;
     this.descriptionTimer = setTimeout(() => {
       this.description.classList.add('is-fading');
@@ -76,15 +77,32 @@ export class SceneEventView {
   }
 
   render(state, event) {
+    if (this.events) {
+      this.extraViews ??= new Map();
+      const active = new Set();
+      for (const instance of state?.concurrentEvents ?? []) {
+        active.add(instance.id);
+        let view = this.extraViews.get(instance.id);
+        if (!view) { view = new SceneEventView(this.root); this.extraViews.set(instance.id,view); }
+        const extra = concurrentEvent(instance, { get: id => this.events.find(item => item.id === id) });
+        view.render({ ...state, choiceId: instance.choiceId, eventDone: Boolean(instance.choiceId) },extra);
+      }
+      for (const [id,view] of this.extraViews) {
+        if (active.has(id)) continue;
+        view.clearDescription(); view.resize.disconnect(); view.node.remove(); view.description.remove();
+        this.extraViews.delete(id);
+      }
+    }
     const cue = event?.sceneCue;
     this.node.hidden = !state || !cue || Boolean(state.outcome) || eventResolved(state, event);
     const identity = state && event ? `${state.sol}:${event.id}` : null;
     if (this.node.hidden || identity !== this.identity) this.clearDescription();
     this.identity = identity;
     this.eventID = event?.id;
+    this.descriptionKey = event?.descriptionKey;
     if (this.node.hidden) return;
     this.node.dataset.kind = event.id === 'E14' ? 'thought' : cue.kind;
-    const anchor = eventAnchors[event.id] ?? cue.anchor;
+    const anchor = event.descriptionKey ? cue.anchor : eventAnchors[event.id] ?? cue.anchor;
     this.node.dataset.anchor = anchor;
     this.anchor = anchors[anchor] ?? anchors['crew-b'];
     this.node.textContent = i18n.t(cue.text);

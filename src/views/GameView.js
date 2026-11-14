@@ -13,6 +13,8 @@ export class GameView {
     this.scene = new SceneView(document.querySelector('#scene'),content.scene_layout);
     this.terminal = new TerminalView(content.tools,content.events,content.resource_log);
     this.tasks = new TaskView();
+    this.tasks.events = content.events;
+    this.events = content.events;
     this.movement = new MovementView(content.movement,this.scene);
     this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelector('#reduce-motion').checked = this.reducedMotion;
@@ -30,6 +32,7 @@ export class GameView {
     await this.scene.mount();
     this.tasks.mount();
     this.sceneEvent = new SceneEventView(this.scene.root);
+    this.sceneEvent.events = this.events;
   }
   coverScene() {
     const veil = document.querySelector('#morning-veil');

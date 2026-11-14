@@ -92,6 +92,7 @@ export class GameController {
       const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
+      if (action === 'concurrent') { void this.commit(() => this.model.chooseConcurrent(target.dataset.instance,id),{keepTasksOpen:true}); return; }
       if (action === 'expedition') { void this.commit(() => this.model.planExpedition(id),{keepTasksOpen:true}); return; }
       if (action === 'robot-sample') { void this.commit(() => this.model.collectWithRobot(),{keepTasksOpen:true}); return; }
       if (action === 'work') {

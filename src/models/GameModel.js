@@ -7,6 +7,7 @@ import { EventEngine } from './EventEngine.js';
 import { beginSol, finishSol } from './TurnEngine.js';
 import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
 import { freshCrew, expeditionReason, robotSampleReason, collectSample, ROBOT_SAMPLE_ENERGY } from './ExpeditionRules.js';
+import { concurrentEvent, concurrentChoiceReason, syncFatigueEvents } from './ConcurrentEvents.js';
 
 export class GameModel {
   #state = null;
@@ -17,6 +18,7 @@ export class GameModel {
     if (this.#state) {
       this.#state.samples ??= []; this.#state.crew ??= freshCrew();
       this.#state.expeditionPlan ??= null; this.#state.robotSampleSol ??= null;
+      syncFatigueEvents(this.#state, this.events);
     }
   }
   planExpedition(crewId) {
@@ -86,6 +88,31 @@ export class GameModel {
       recordVisualAction(s,{action:'clean',label:choice.label,summary:choice.summaryLine,energy:paidEnergy,condition:choice.costH??0,eventId:event.id,choiceId:choice.id});
     }
   }
+  chooseConcurrent(instanceId, choiceId) {
+    const s = this.#state;
+    const instance = s?.concurrentEvents?.find(item => item.id === instanceId);
+    if (!s || s.phase === 'finished' || !instance || instance.choiceId) throw new Error('error.choiceUnavailable');
+    const event = concurrentEvent(instance, this.events);
+    const choice = event?.choices.find(item => item.id === choiceId);
+    if (!choice || concurrentChoiceReason(s, choice, this.events.get(s.currentEventId))) throw new Error('error.choiceUnavailable');
+    const before = resourceSnapshot(s);
+    const energy = choiceEnergy(s, choice);
+    s.energy -= energy;
+    applyEffect(s, choice.action);
+    const primaryId = s.currentEventId;
+    try { s.currentEventId = event.id; applyDailyChoice(s, choice); }
+    finally { s.currentEventId = primaryId; }
+    instance.choiceId = choice.id;
+    s.daySummary.push(choice.summaryLine);
+    recordResourceChange(s, before, `event.${event.id}.${choice.id}`, this.resourceLog, choice.summaryLine);
+    recordSpaceDecision(s, `${instance.id}:${choice.id}`, energy);
+    if (choice.work) {
+      s.workId = `event:${instance.id}:${choice.id}`;
+      if (eventResolved(s, this.events.get(s.currentEventId))) s.phase = 'end';
+      recordVisualAction(s, { action: choice.action, label: choice.label, summary: choice.summaryLine,
+        energy, condition: choice.costH ?? 0, spares: choice.costQ ?? 0, eventId: event.id, choiceId: choice.id });
+    }
+  }
   work(actionId) {
     const s = this.#state;
     const action = ACTIONS.find(item => item.id === actionId);
@@ -130,6 +157,7 @@ export class GameModel {
     logEntry(s,`使用一次性备用电池，实际补充 ${gain} E。`);
   }
   nextSol() {
+    if (this.#state?.concurrentEvents?.some(instance => !instance.choiceId)) throw new Error('error.eventUnresolved');
     if (this.#state && !eventResolved(this.#state,this.events.get(this.#state.currentEventId))) throw new Error('error.eventUnresolved');
     if (this.#state?.phase !== 'end') throw new Error('error.finishDayFirst');
     finishSol(this.#state,this.resourceLog);
