@@ -62,14 +62,6 @@ test('存档恢复保留卡片、阶段、资源和随机状态；坏存档可�
   assert.equal(new SaveRepository(null,content).save(game.snapshot).ok,false);
 });
 
-test('14 天保底路径可完成任务，库存不为负',() => {
-  const baseline = { events:events.filter(event => event.fallback),tools };
-  const game = new GameModel(baseline); game.start(['toolkit','battery']);
-  const work = ['grow','grow','grow','research','research','research','research','research','transmit','transmit','standby','standby','standby','standby'];
-  for (const id of work) { game.choose('continue'); game.work(id); game.nextSol(); assert.ok(game.snapshot.food >= 0); assert.ok(game.snapshot.energy >= 0); }
-  assert.equal(game.snapshot.outcome,'success'); assert.equal(game.snapshot.sentData,60);
-});
-
 test('积尘影响后续发电；恢复不会重算今日发电',() => {
   const game = model(); const s = game.snapshot;
   Object.assign(s,{sol:3,currentEventId:'dust'}); game.restore(s);

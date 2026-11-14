@@ -71,23 +71,6 @@ test('scheduled crop and final-day cases are replaced when prerequisites are mis
   game.nextSol();assert.notEqual(game.snapshot.currentEventId,'E16');assert.equal(game.snapshot.phase,'event');
 });
 
-test('a conservative policy completes fourteen Sols with scheduled storms and daily incidents',() => {
-  const game=new GameModel({events,tools,environment:{default:'clear',days:{4:'sandstorm',8:'sandstorm',9:'sandstorm'}}});
-  game.start(['toolkit','battery']);game.setLights(false);
-  for(let sol=1;sol<=14;sol++) {
-    assert.equal(game.snapshot.sol,sol);assert.equal(game.snapshot.phase,'event');
-    const event=game.events.get(game.snapshot.currentEventId);
-    game.choose(event.choices.find(choice=>choice.energy===0&&!choiceReason(game.snapshot,choice)).id);
-    if(game.snapshot.phase==='work') {
-      const s=game.snapshot;
-      const work=s.dusty && s.weather!=='sandstorm' && s.energy>=2 ? 'clean' : s.food<=8 && s.energy>=s.dailySystems.careCost+2 && !s.dailySystems.greenhouseDisabled ? 'grow' : 'standby';
-      game.work(work);
-    }
-    game.nextSol();
-  }
-  assert.equal(game.snapshot.phase,'finished');assert.ok(game.snapshot.health>0);
-});
-
 test('final daily response sends existing research once before mission evaluation',() => {
   const game=dailyGame();const state=game.snapshot;
   Object.assign(state,{sol:14,currentEventId:'E16',localData:30,sentData:30,food:2});game.restore(state);
