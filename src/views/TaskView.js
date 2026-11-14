@@ -2,6 +2,8 @@ import { choiceReason, choiceEnergy, eventResolved } from '../models/DailyEventR
 import { ACTIONS, unavailableReason, workEnergy } from '../models/ActionRules.js';
 import { i18n } from '../services/I18n.js';
 import { escapeHtml } from './dom.js';
+import { CREW_IDS, expeditionReason, robotSampleReason, researchUses, ROBOT_SAMPLE_ENERGY } from '../models/ExpeditionRules.js';
+import { crewHead, crewStatuses } from './CrewStatus.js';
 
 const text = key => escapeHtml(i18n.t(key));
 const batteryIcon = '<img class="task-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">';
@@ -30,6 +32,11 @@ export class TaskView {
     this.toggle.setAttribute('data-i18n-aria-label','tasks.table');
     this.toggle.innerHTML = `<svg class="table-clipboard" viewBox="0 0 140 100" aria-hidden="true"><path d="M14 8 L126 8 L134 92 L6 92 Z" fill="#70513a" stroke="#302c26" stroke-width="3"/><path d="M22 16 L118 16 L124 83 L16 83 Z" fill="#eee2c1" stroke="#b8a582"/><path d="M50 7 L90 7 L92 22 L48 22 Z" fill="#a5aaa0" stroke="#424940" stroke-width="2"/><g fill="none" stroke="#797562" stroke-width="2"><path d="M29 35h8v8h-8z M30 52h8v8h-8z M31 69h8v8h-8z"/><path d="M45 38h55 M46 55h48 M47 72h55"/></g></svg>`;
     this.content = document.querySelector('#tasks-content');
+    this.content.addEventListener('change',event => {
+      if (event.target.id !== 'expedition-check') return;
+      this.selecting = event.target.checked;
+      this.content.querySelector('[data-crew-picker]').hidden = !this.selecting;
+    });
     this.dialog.addEventListener('cancel',event => { event.preventDefault(); this.close(); });
     this.dialog.addEventListener('click',event => {
       if (event.target !== this.dialog) return;
@@ -48,6 +55,22 @@ export class TaskView {
     this.dialog.close(); this.toggle.setAttribute('aria-expanded','false');
     this.toggle.focus({preventScroll:true});
   }
+  sampling(state,event) {
+    const plan=state.expeditionPlan;
+    if (this.selectingSol !== state.sol) { this.selecting=false; this.selectingSol=state.sol; }
+    const checked=Boolean(plan || this.selecting);
+    const disabled=CREW_IDS.every(id => expeditionReason(state,id)) && !plan;
+    const robotReason=robotSampleReason(state,event);
+    return `<section class="sampling-board"><h2>${text('sampling.title')}</h2><p class="sample-stock">${text('sampling.stock')}: <strong>${state.samples.length} / 3</strong> · ${text('sampling.uses')}: <strong>${researchUses(state)}</strong></p><p class="sampling-hint">${text('sampling.rules')}</p>
+      <label class="expedition-toggle"><input id="expedition-check" type="checkbox" ${checked ? 'checked' : ''} ${state.phase === 'finished' || disabled ? 'disabled' : ''}><span>${text('sampling.planTomorrow')} <small>SOL ${state.sol+1}</small></span></label>
+      ${disabled ? `<p class="sampling-hint">${text(CREW_IDS.map(id => expeditionReason(state,id)).find(Boolean))}</p>` : ''}
+      <div class="crew-picker" data-crew-picker ${checked ? '' : 'hidden'}>${CREW_IDS.map(id => {
+        const reason=expeditionReason(state,id),selected=plan?.crewId===id;
+        return `<button type="button" class="crew-choice${selected ? ' is-selected' : ''}" data-action="expedition" data-id="${id}" aria-pressed="${selected}" ${reason ? 'disabled' : ''} title="${escapeHtml(crewStatuses(state,id).join('\n'))}">${crewHead(id)}<strong>${text(`crew.${id.replaceAll('-','_')}.name`)}</strong><small>${text(reason || (selected ? 'sampling.selected' : 'sampling.selectCrew'))}</small></button>`;
+      }).join('')}</div>
+      <p class="sampling-hint">${text(plan ? 'sampling.plannedHint' : 'sampling.selectHint')}</p>
+      ${Object.hasOwn(state.tools,'robot') ? `<button type="button" class="robot-sample" data-action="robot-sample" ${robotReason ? 'disabled' : ''}><strong>${text('action.robot.label')}</strong><small>${text(robotReason || 'action.robot.narrative')}</small><span>${energyCost(ROBOT_SAMPLE_ENERGY)} · ${text('tasks.noWork')}</span></button>` : ''}</section>`;
+  }
   render(state,event) {
     this.state = state;
     i18n.translate(this.dialog);
@@ -62,7 +85,7 @@ export class TaskView {
     const completed = tasks.some(task => task.done);
     const note = !eventResolved(state,event) ? 'tasks.eventFirst' : state.phase === 'finished' ? 'tasks.finished' : state.workId ? (state.workId.startsWith('event:') ? 'tasks.eventWork' : 'tasks.checked') : 'tasks.choose';
     const eventCopy = event?.choices.length ? `<section class="clipboard-event${eventResolved(state,event) ? ' is-resolved' : ''}"><h2>${text(event.title)}</h2><p>${text(event.text)}</p></section>` : '';
-    this.content.innerHTML = `${eventCopy}<div class="task-list">${tasks.map(task => {
+    this.content.innerHTML = `${this.sampling(state,event)}${eventCopy}<div class="task-list">${tasks.map(task => {
       const {done,reason} = task;
       return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></span></button>`;
     }).join('')}</div><p class="clipboard-note" role="status">${text(note)}</p>`;

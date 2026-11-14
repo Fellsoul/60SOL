@@ -6,7 +6,7 @@ import { clipboardTasks } from '../src/views/TaskView.js';
 
 const events = JSON.parse(await readFile(new URL('../data/events.json',import.meta.url),'utf8')).filter(event => !event.dailySol);
 const tools = JSON.parse(await readFile(new URL('../data/tools.json',import.meta.url),'utf8'));
-const game = () => { const model = new GameModel({events,tools}); model.start(['toolkit','battery']); return model; };
+const game = () => { const model = new GameModel({events,tools}); model.start(['toolkit','battery']); const state=model.snapshot; state.samples=[2]; model.restore(state); return model; };
 const rows = model => clipboardTasks(model.snapshot,model.events.get(model.snapshot.currentEventId));
 
 test('event work is offered on the clipboard before making a terminal decision',() => {

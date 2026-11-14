@@ -1,12 +1,14 @@
 import { CrewMotion } from './CrewMotion.js';
 import { SceneAssets } from './SceneAssets.js';
 import { sceneState, layerState } from './SceneState.js';
+import { CrewStatus } from './CrewStatus.js';
 
 export class SceneView {
   constructor(root,layout) {
     this.root = root; this.layout = layout; this.assets = new SceneAssets(); this.layers = [];
     this.reducedMotion = false; this.generation = 0;
     this.crewMotion = new CrewMotion(root);
+    this.crewStatus = new CrewStatus(root);
     this.onVisibility = () => { this.layers.forEach(layer => this.animate(layer));this.crewMotion.sync(this.reducedMotion); };
   }
   async mount() {
@@ -35,6 +37,7 @@ export class SceneView {
       this.root.append(node);
       this.layers.push({config,node,key:null,animation:null});
     }
+    this.crewStatus.mount();
     if (new URLSearchParams(location.search).has('debug')) {
       this.root.classList.add('debug');
     }
@@ -75,7 +78,7 @@ export class SceneView {
       layer.playback = config;
       this.animate(layer);
     }));
-    if (generation === this.generation) this.crewMotion.sync(reducedMotion);
+    if (generation === this.generation) { this.crewMotion.sync(reducedMotion); this.crewStatus.render(state); }
   }
   animate(layer) {
     if (!layer.track) return;

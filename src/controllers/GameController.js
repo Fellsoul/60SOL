@@ -92,6 +92,8 @@ export class GameController {
       const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
+      if (action === 'expedition') { void this.commit(() => this.model.planExpedition(id),{keepTasksOpen:true}); return; }
+      if (action === 'robot-sample') { void this.commit(() => this.model.collectWithRobot(),{keepTasksOpen:true}); return; }
       if (action === 'work') {
         const state = this.model.snapshot;
         if (state && eventResolved(state,this.model.events.get(state.currentEventId))) void this.commit(() => this.model.work(id),{keepTasksOpen:true});
@@ -100,6 +102,11 @@ export class GameController {
         const state = this.model.snapshot;
         const choice = this.model.events.get(state.currentEventId).choices.find(choice => choice.id === id);
         if (choice) void this.commit(() => this.model.choose(id),{keepTasksOpen:true});
+      }
+    });
+    document.querySelector('#tasks-content').addEventListener('change',event => {
+      if (event.target.id === 'expedition-check' && !event.target.checked && this.model.snapshot?.expeditionPlan && !this.busy) {
+        void this.commit(() => this.model.planExpedition(null),{keepTasksOpen:true});
       }
     });
     const handleDecision = event => {

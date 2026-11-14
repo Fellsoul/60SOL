@@ -2,6 +2,7 @@
 const fields = ['energy','food','health','localData','pendingData','sentData','growth','powerFailures','generation'];
 export function resourceSnapshot(state) {
   return Object.fromEntries([...fields.map(key => [key,state[key] ?? 0]),
+    ['samples',state.samples?.length ?? 0],['researchUses',(state.samples ?? []).reduce((sum,uses) => sum+uses,0)],
     ...Object.entries(state.dailySystems ?? {}).filter(([,value]) => typeof value === 'number').map(([key,value]) => [`systems.${key}`,value])]);
 }
 export function recordResourceChange(state,before,source,config = {},fallback = '') {

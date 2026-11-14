@@ -82,12 +82,14 @@ test('final daily response sends existing research once before mission evaluatio
 test('a full daily-event mission can reach the 60-data objective safely',() => {
   const game=new GameModel({events,tools,environment:{default:'clear',days:{4:'sandstorm',8:'sandstorm',9:'sandstorm'}}});
   game.start(['toolkit','battery']);game.setLights(false);
-  const route=[['abandon','research'],['restrict','research'],['manual','research'],['close','transmit'],['forgo','clean'],['replace',null],['ask','standby'],['lock','grow'],['replace',null],['isolate','repair'],['minimum',null],['forgo','research'],['isolate','transmit'],['forgo','standby']];
+  const route=[['secure',null],['inspect_clean',null],['manual','research'],['close','transmit'],['forgo','clean'],['replace',null],['restore',null],['lock','research'],['standby','research'],['isolate','repair'],['minimum',null],['forgo','research'],['isolate','transmit'],['borrow',null]];
   for(let index=0;index<route.length;index++) {
     assert.equal(game.snapshot.sol,index+1);
-    if(index===3)game.useBattery();
+    if(index===6)game.useBattery();
     const [response,work]=route[index];game.choose(response);
     if(work)game.work(work);
+    if([0,10].includes(index))game.planExpedition('astronaut-a');
+    if(index===4)game.planExpedition('astronaut-b');
     game.nextSol();
   }
   assert.equal(game.snapshot.outcome,'success');assert.equal(game.snapshot.sentData,60);assert.ok(game.snapshot.health>0);
