@@ -7,6 +7,8 @@ import { crewHead, crewStatuses } from './CrewStatus.js';
 import { concurrentEvent, concurrentChoiceReason } from '../models/ConcurrentEvents.js';
 
 const text = key => escapeHtml(i18n.t(key));
+// Match the room portraits: astronaut B (glasses) sits left, astronaut A sits right.
+const crewDisplayOrder = ['astronaut-b', 'astronaut-a'];
 const batteryIcon = '<img class="task-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">';
 const energyCost = energy => `<span class="task-energy-cost" role="img" aria-label="${text('tasks.cost')}: ${energy} E"><span aria-hidden="true">−</span>${energy > 0 ? batteryIcon.repeat(energy) : '<span aria-hidden="true">0</span>'}</span>`;
 
@@ -65,7 +67,7 @@ export class TaskView {
     return `<section class="sampling-board"><h2>${text('sampling.title')}</h2><p class="sample-stock">${text('sampling.stock')}: <strong>${state.samples.length} / 3</strong> · ${text('sampling.uses')}: <strong>${researchUses(state)}</strong></p><p class="sampling-hint">${text('sampling.rules')}</p>
       <label class="expedition-toggle"><input id="expedition-check" type="checkbox" ${checked ? 'checked' : ''} ${state.phase === 'finished' || disabled ? 'disabled' : ''}><span>${text('sampling.planTomorrow')} <small>SOL ${state.sol+1}</small></span></label>
       ${disabled ? `<p class="sampling-hint">${text(CREW_IDS.map(id => expeditionReason(state,id)).find(Boolean))}</p>` : ''}
-      <div class="crew-picker" data-crew-picker ${checked ? '' : 'hidden'}>${CREW_IDS.map(id => {
+      <div class="crew-picker" data-crew-picker ${checked ? '' : 'hidden'}>${crewDisplayOrder.map(id => {
         const reason=expeditionReason(state,id),selected=plan?.crewId===id;
         return `<button type="button" class="crew-choice${selected ? ' is-selected' : ''}" data-action="expedition" data-id="${id}" aria-pressed="${selected}" ${reason ? 'disabled' : ''} title="${escapeHtml(crewStatuses(state,id).join('\n'))}">${crewHead(id)}<strong>${text(`crew.${id.replaceAll('-','_')}.name`)}</strong><small>${text(reason || (selected ? 'sampling.selected' : 'sampling.selectCrew'))}</small></button>`;
       }).join('')}</div>

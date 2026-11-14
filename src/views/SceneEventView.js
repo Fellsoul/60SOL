@@ -2,6 +2,8 @@ import { eventResolved } from '../models/DailyEventRules.js';
 import { i18n } from '../services/I18n.js';
 import { concurrentEvent } from '../models/ConcurrentEvents.js';
 
+const activeDescriptions = new WeakMap();
+
 // Percent coordinates measured against the shared 1672 × 940 artwork canvas.
 const anchors = {
   'crew-a': [59.8, 39], 'crew-b': [39.5, 39],
@@ -30,6 +32,14 @@ export class SceneEventView {
     this.description.hidden = true;
     this.description.setAttribute('role', 'status');
     this.description.setAttribute('aria-atomic', 'true');
+    this.description.tabIndex = 0;
+    this.description.addEventListener('click', () => this.fadeDescription());
+    this.description.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        this.fadeDescription();
+      }
+    });
     this.node.addEventListener('click', () => this.describe());
     root.append(this.node, this.description);
     this.root = root;
@@ -40,22 +50,45 @@ export class SceneEventView {
   clearDescription() {
     clearTimeout(this.descriptionTimer);
     clearTimeout(this.fadeTimer);
+    if (this.descriptionAnimation) {
+      this.descriptionAnimation.onfinish = null;
+      this.descriptionAnimation.cancel();
+      this.descriptionAnimation = null;
+    }
     this.description.hidden = true;
     this.description.classList.remove('is-fading');
     this.description.textContent = '';
+    if (activeDescriptions.get(this.root) === this) activeDescriptions.delete(this.root);
+  }
+
+  fadeDescription() {
+    if (this.description.hidden || this.description.classList.contains('is-fading')) return;
+    clearTimeout(this.descriptionTimer);
+    if (this.descriptionAnimation) {
+      this.descriptionAnimation.onfinish = null;
+      this.descriptionAnimation.cancel();
+    }
+    this.description.classList.add('is-fading');
+    this.descriptionAnimation = this.description.animate([{opacity: 1}, {opacity: 0}], {duration: 400, fill: 'forwards'});
+    this.descriptionAnimation.onfinish = () => this.clearDescription();
+    this.fadeTimer = setTimeout(() => this.clearDescription(), 400);
   }
 
   describe() {
     if (this.node.hidden || !this.eventID) return;
     this.dismissedIdentity = this.identity;
     this.node.hidden = true;
+    activeDescriptions.get(this.root)?.fadeDescription();
     this.clearDescription();
     this.description.textContent = i18n.t(this.descriptionKey ?? `scene.description.${this.eventID}`);
     this.description.hidden = false;
-    this.descriptionTimer = setTimeout(() => {
-      this.description.classList.add('is-fading');
-      this.fadeTimer = setTimeout(() => this.clearDescription(), 400);
-    }, 5000);
+    activeDescriptions.set(this.root, this);
+    // Keep the lower-center panel visible for 3 seconds, then fade for 400 ms.
+    this.descriptionAnimation = this.description.animate([
+      {opacity: 1, offset: 0}, {opacity: 1, offset: 3000 / 3400}, {opacity: 0, offset: 1}
+    ], {duration: 3400, fill: 'forwards'});
+    this.descriptionAnimation.onfinish = () => this.clearDescription();
+    this.descriptionTimer = setTimeout(() => this.fadeDescription(), 3000);
   }
 
   position() {

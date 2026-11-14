@@ -134,9 +134,11 @@ body.reduced-motion #terminal-toggle { transition: none; }
   color: #302b24;
   font: 500 clamp(13px, 1.4vw, 22px)/1.5 system-ui, sans-serif;
   text-align: center;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   opacity: 1;
   transition: opacity 400ms ease-out;
 }
 .scene-event-description.is-fading { opacity: 0; }
+.scene-event-description:focus-visible { outline: 3px solid #b7e988; outline-offset: 4px; }
 body.reduced-motion .scene-event-description { transition: none; }
