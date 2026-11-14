@@ -80,9 +80,13 @@ export class TerminalView {
         const sign = delta > 0 ? '+' : '−';
         const amount = Math.abs(delta);
         const accessible = escapeHtml(`${label} ${sign}${amount}`);
-        return resource === 'energy'
-          ? `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}</span>${'<img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">'.repeat(amount)}</span>`
-          : `<span class="summary-resource-change">${escapeHtml(label)} ${sign}${amount}</span>`;
+        if (resource === 'energy') {
+          const battery = '<img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">';
+          const icons = amount > 4 ? `${battery}<span aria-hidden="true">× ${amount}</span>`
+            : amount > 0 ? battery.repeat(amount) : '<span aria-hidden="true">0</span>';
+          return `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}</span>${icons}</span>`;
+        }
+        return `<span class="summary-resource-change">${escapeHtml(label)} ${sign}${amount}</span>`;
       }).join(' ');
       return this.copy(`resource-copy-${index}`,description,` <span class="summary-resource-changes">${changes}</span>`);
     }).join('');

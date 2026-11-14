@@ -11,7 +11,7 @@ const text = key => escapeHtml(i18n.t(key));
 // Match the room portraits: astronaut B (glasses) sits left, astronaut A sits right.
 const crewDisplayOrder = ['astronaut-b', 'astronaut-a'];
 const batteryIcon = '<img class="task-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">';
-const energyCost = energy => `<span class="task-energy-cost" role="img" aria-label="${text('tasks.cost')}: ${energy} E"><span aria-hidden="true">−</span>${energy > 0 ? batteryIcon.repeat(energy) : '<span aria-hidden="true">0</span>'}</span>`;
+const energyCost = energy => `<span class="task-energy-cost" role="img" aria-label="${text('tasks.cost')}: ${energy} E"><span aria-hidden="true">−</span>${energy > 4 ? `${batteryIcon}<span aria-hidden="true">× ${energy}</span>` : energy > 0 ? batteryIcon.repeat(energy) : '<span aria-hidden="true">0</span>'}</span>`;
 const toolBadge = task => task.tool === 'toolkit' ? `<span class="tool-badge">${toolkitIcon}${text('tool.toolkit.name')}</span>` : '';
 
 // Derive rows from saved state so completed and unfinished work survive reopening/reload.
