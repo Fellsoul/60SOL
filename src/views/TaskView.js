@@ -1,4 +1,3 @@
-import { spaceEvidence } from './SpaceEvidence.js';
 import { choiceReason, choiceEnergy, eventResolved } from '../models/DailyEventRules.js';
 import { ACTIONS, unavailableReason, workEnergy } from '../models/ActionRules.js';
 import { i18n } from '../services/I18n.js';
@@ -63,7 +62,7 @@ export class TaskView {
     const completed = tasks.some(task => task.done);
     const note = !eventResolved(state,event) ? 'tasks.eventFirst' : state.phase === 'finished' ? 'tasks.finished' : state.workId ? (state.workId.startsWith('event:') ? 'tasks.eventWork' : 'tasks.checked') : 'tasks.choose';
     const eventCopy = event?.choices.length ? `<section class="clipboard-event${eventResolved(state,event) ? ' is-resolved' : ''}"><h2>${text(event.title)}</h2><p>${text(event.text)}</p></section>` : '';
-    this.content.innerHTML = `${spaceEvidence(state)}${eventCopy}<div class="task-list">${tasks.map(task => {
+    this.content.innerHTML = `${eventCopy}<div class="task-list">${tasks.map(task => {
       const {done,reason} = task;
       return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></span></button>`;
     }).join('')}</div><p class="clipboard-note" role="status">${text(note)}</p>`;

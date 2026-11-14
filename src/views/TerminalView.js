@@ -1,4 +1,4 @@
-import { spaceEvidence, snapshotSelector, snapshotComparison } from './SpaceEvidence.js';
+import { snapshotSelector, snapshotComparison } from './SpaceEvidence.js';
 import { choiceReason, eventResolved, emergencyCleanAvailable } from '../models/DailyEventRules.js';
 import { escapeHtml } from './dom.js';
 import { LIGHT_ACTIONS } from '../models/ActionRules.js';
@@ -84,7 +84,7 @@ export class TerminalView {
         const amount = Math.abs(delta);
         const accessible = escapeHtml(`${label} ${sign}${amount}`);
         return resource === 'energy'
-          ? `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}${amount === 0 ? '0' : ''}</span>${'<img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">'.repeat(amount)}</span>`
+          ? `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}</span><img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true"><span aria-hidden="true">× ${amount}</span></span>`
           : `<span class="summary-resource-change">${escapeHtml(label)} ${sign}${amount}</span>`;
       }).join(' ');
       return this.copy(`${prefix}-${index}`,description,` <span class="summary-resource-changes">${changes}</span>`);
@@ -139,7 +139,6 @@ export class TerminalView {
       if (state.outcome) today = {success:'outcome.success',incomplete:'outcome.incomplete',unsafe:'outcome.unsafe'}[state.outcome];
       const todayCopy = `<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}`;
       this.content.innerHTML = `${this.todayRecords(state)}<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}${todayCopy}<div id="terminal-decisions" class="terminal-choices"></div>`;
-      this.content.insertAdjacentHTML('afterbegin',spaceEvidence(state));
       const decisions = this.content.querySelector('#terminal-decisions');
       if (state.phase === 'event') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.eventOnClipboard'))}</p>`;
