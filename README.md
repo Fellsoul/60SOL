@@ -17,11 +17,11 @@ python -m http.server 8000 --bind 127.0.0.1
 场景仅读取你自己提供的 PNG，没有程序绘制的场景或占位美术。素材未放入前，对应图层为空，终端仍可使用。
 
 - [素材需求、生成说明和导入步骤](assets/README.md)
-- [42 个场景 PNG 文件路径清单](assets/PNG_FILES.txt)
+- [场景 PNG 文件路径清单](assets/PNG_FILES.txt)
 - `assets/scene/`：已经建立的素材目录。
-- `data/scene_layout.json`：图片与状态映射、覆盖层级、风沙序列配置。所有场景 PNG 与 interior 基底同尺寸、同原点叠放。
+- `data/scene_layout.json`：图片与状态映射、覆盖层级、沙尘移动配置。静态场景 PNG 与 interior 基底同尺寸、同原点叠放；四张沙尘纹理在各自窗口区域横向平铺移动，远景慢、近景快。
 
-建议先完成清单中的第一批 15 张正常场景素材，再补沙暴与其他状态。各物件的位置和大小在生成素材时确定，网页只安排前后覆盖顺序；整个场景随视口等比缩放。
+建议先完成清单中的第一批 16 张正常场景素材，再补沙暴与其他状态。室内基底分为 `outpost_baseMain.png` 与 `outpost_baseRight.png`，均保留原始完整画布；主窗、右窗分别按外景、沙尘、室内基底叠放，右窗整组在主窗组上方。整个场景随视口等比缩放。
 
 ## 模块分工
 
@@ -38,7 +38,7 @@ python -m http.server 8000 --bind 127.0.0.1
 | `src/views/GameView.js` | 黑幕过渡与视图组合 |
 | `src/views/TerminalView.js`、`Typewriter.js` | 侧滑、滚动、选择和可跳过的打字机效果 |
 | `src/views/SceneState.js` | 将游戏状态投影成天气、植物、灯光、人物和工具的素材状态 |
-| `src/views/SceneView.js`、`SceneAssets.js` | PNG 加载、图层显示、序列帧播放；不结算游戏 |
+| `src/views/SceneView.js`、`SceneAssets.js` | PNG 加载、图层显示、沙尘连续位移动画；不结算游戏 |
 | `data/events.json` | 事件文本；每个事件与选项均含 `summaryLine` |
 | `data/environment.json` | 固定演示天气序列，非实时火星天气 |
 
@@ -54,7 +54,7 @@ python -m http.server 8000 --bind 127.0.0.1
 
 已有基础 14 Sol 流程、6 张示例事件、工具选择、灯光/植物/沙暴的状态映射、本地存档和终端交互。开关灯为独立操作，不占工作机会；每个日终保持亮灯消耗 1 E，关灯不扣照明电力，电力耗尽自动熄灯。天气演示默认 Sol 4、8、9 为沙暴，可在环境 JSON 中修改。
 
-还未包含完整 20 张事件、全部工具损坏事件、多设施维修、NASA 来源页和最终美术。图片是否对齐、透明区域是否正确、真实沙暴帧是否连贯，要在提供 PNG 后验证。
+还未包含完整 20 张事件、全部工具损坏事件、多设施维修、NASA 来源页和最终美术。图片是否对齐、透明区域是否正确、沙尘纹理是否无缝衔接，要在提供 PNG 后验证。
 
 规则与翻译测试：`npm test`。翻译表统一使用英文语义 key，具体规范见 [语言配置说明](locales/README.md)。浏览器检查脚本：`python tests/browser_smoke.py`，需要 Python Playwright 和本机 Edge；使用测试响应验证图片路径与状态切换，不提供游戏美术。
 

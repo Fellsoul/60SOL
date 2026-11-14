@@ -5,13 +5,14 @@ export class SceneView {
   constructor(root,layout) {
     this.root = root; this.layout = layout; this.assets = new SceneAssets(); this.layers = [];
     this.reducedMotion = false; this.generation = 0;
-    this.onVisibility = () => { this.layers.forEach(layer => this.stop(layer)); if (!document.hidden) this.layers.forEach(layer => this.animate(layer)); };
+    this.onVisibility = () => this.layers.forEach(layer => this.animate(layer));
   }
   async mount() {
     this.root.replaceChildren();
     // All layers share the interior base's original canvas and scale together.
     const base = await this.assets.load(this.layout.canvas.referenceImage);
     const canvas = base ? {width:base.naturalWidth,height:base.naturalHeight} : this.layout.canvas;
+    this.canvas = canvas;
     const fit = () => {
       const { width,height } = canvas;
       const scale = Math.min(innerWidth/width,innerHeight/height);
@@ -22,8 +23,13 @@ export class SceneView {
     for (const config of this.layout.layers) {
       const node = document.createElement('div'); node.className = 'scene-layer'; node.dataset.layer = config.id;
       node.style.zIndex = config.zIndex;
+      if (config.viewport) {
+        const {x,y,width,height} = config.viewport;
+        Object.assign(node.style,{left:`${x}%`,top:`${y}%`,width:`${width}%`,height:`${height}%`});
+        node.classList.add('scene-dust');
+      }
       this.root.append(node);
-      this.layers.push({config,node,key:null,frames:[],timer:null,frameIndex:0});
+      this.layers.push({config,node,key:null,animation:null});
     }
     if (new URLSearchParams(location.search).has('debug')) {
       this.root.classList.add('debug');
@@ -38,35 +44,78 @@ export class SceneView {
       const key = layerState(layer.config,appearance);
       const config = layer.config.states[key] ?? layer.config.states[layer.config.defaultState];
       if (layer.key !== key) {
-        const frames = await this.assets.state(config);
+        const asset = await this.assets.state(config);
         if (generation !== this.generation) return; // 丢弃过时的异步加载。
-        this.stop(layer); layer.node.replaceChildren(); layer.key = key; layer.frames = frames; layer.frameIndex = 0;
+        this.stop(layer); layer.node.replaceChildren(); layer.key = key; layer.track = null; layer.drift = null;
         layer.node.dataset.state = key;
-        layer.node.hidden = !frames.length;
-        if (frames.length) {
-          layer.image = document.createElement('img'); layer.image.alt = ''; layer.image.draggable = false;
-          layer.image.src = frames[0].src; layer.node.append(layer.image);
+        layer.node.hidden = !asset;
+        if (asset) {
+          const image = document.createElement('img'); image.alt = ''; image.draggable = false;
+          image.src = asset.src;
+          if (config.motion) {
+            // Two identical tiles make the end of each translation match its start.
+            layer.track = document.createElement('div'); layer.track.className = 'scene-dust-track';
+            layer.drift = document.createElement('div'); layer.drift.className = 'scene-dust-motion';
+            layer.drift.style.opacity = config.opacity ?? 1;
+            layer.track.append(image,image.cloneNode()); layer.drift.append(layer.track); layer.node.append(layer.drift);
+          } else layer.node.append(image);
         }
       }
       if (generation !== this.generation) return;
       layer.playback = config;
-      this.stop(layer); this.animate(layer);
+      this.animate(layer);
     }));
   }
   animate(layer) {
-    if (!layer.frames.length) return;
-    if (this.reducedMotion) { layer.frameIndex = 0; layer.image.src = layer.frames[0].src; return; }
-    if (layer.frames.length < 2 || document.hidden) return;
-    const count = layer.frames.length;
-    const pingPong = layer.playback?.playback !== 'loop';
-    const period = pingPong ? count*2-2 : count;
-    let tick = layer.frameIndex;
-    layer.timer = setInterval(() => {
-      tick = (tick+1)%period;
-      layer.frameIndex = pingPong && tick >= count ? period-tick : tick;
-      layer.image.src = layer.frames[layer.frameIndex].src;
-    },1000/Math.max(1,Math.min(24,layer.playback?.fps ?? 6)));
+    if (!layer.track) return;
+    if (this.reducedMotion || document.hidden) {
+      for (const animation of [layer.animation,layer.variation]) {
+        animation?.pause();
+        if (this.reducedMotion && animation) animation.currentTime = 0;
+      }
+      return;
+    }
+    if (!layer.animation) {
+      const {speed = 90,depth = 1,direction = 'left'} = layer.playback.motion;
+      // Speed is in original canvas pixels/second; greater depth moves more slowly.
+      const distance = this.canvas.width * (layer.config.viewport?.width ?? 100)/100;
+      const duration = 1000 * distance * Math.max(0.1,depth)/Math.max(1,speed);
+      const frames = [{transform:'translateX(0)'},{transform:'translateX(-50%)'}];
+      layer.animation = layer.track.animate(direction === 'right' ? frames.reverse() : frames,
+        {duration,iterations:Infinity,easing:'linear'});
+    } else if (layer.animation.playState === 'paused') layer.animation.play();
+    if (!layer.variation && layer.playback.motion.variation) this.vary(layer);
+    else if (layer.variation?.playState === 'paused') layer.variation.play();
   }
-  stop(layer) { clearInterval(layer.timer); layer.timer = null; }
+  vary(layer) {
+    const config = layer.playback.motion.variation;
+    const random = (min,max) => min + Math.random()*(max-min);
+    const opacity = layer.playback.opacity ?? 0.5;
+    const drift = config.driftPercent ?? 1;
+    // Enlarge the inner surface so vertical drift never reveals its edges.
+    const minScale = Math.max(config.scaleMin ?? 1.04,1 + 2*drift/100 + 0.005);
+    const maxScale = Math.max(minScale,config.scaleMax ?? 1.16);
+    const base = {opacity,transform:`translateY(0%) scale(${minScale})`,easing:'ease-in-out'};
+    const sample = opacity => ({opacity,
+      transform:`translateY(${random(-drift,drift)}%) scale(${random(minScale,maxScale)})`,easing:'ease-in-out'});
+    const frames = [base,
+      {...sample(random(config.opacityMin ?? 0.3,opacity)),offset:random(0.25,0.35)},
+      {...sample(random(opacity,config.opacityMax ?? 0.7)),offset:random(0.65,0.75)},base];
+    const animation = layer.drift.animate(frames,{
+      duration:random(config.durationMinMs ?? 3500,config.durationMaxMs ?? 7000),fill:'both'
+    });
+    layer.variation = animation;
+    animation.onfinish = () => {
+      if (layer.variation !== animation) return;
+      // Keep the shared endpoint while replacing this breath with a fresh random one.
+      layer.drift.style.transform = base.transform;
+      animation.cancel(); layer.variation = null;
+      this.animate(layer);
+    };
+  }
+  stop(layer) {
+    if (layer.variation) { layer.variation.onfinish = null; layer.variation.cancel(); }
+    layer.animation?.cancel(); layer.animation = null; layer.variation = null;
+  }
   dispose() { this.generation++; this.layers.forEach(layer => this.stop(layer)); window.removeEventListener('resize',this.resize); document.removeEventListener('visibilitychange',this.onVisibility); }
 }

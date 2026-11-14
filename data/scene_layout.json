@@ -1,9 +1,9 @@
 {
-  "description": "所有场景 PNG 与 interior/outpost_base.png 同尺寸、同原点。仅设置覆盖顺序和状态，不单独调整大小或位置。",
+  "description": "静态场景 PNG 与 outpost 基底同尺寸、同原点。沙尘使用独立横向平铺纹理，viewport 为画布百分比，motion.depth 越大移动越慢。",
   "canvas": {
-    "width": 1920,
-    "height": 1080,
-    "referenceImage": "assets/scene/interior/outpost_base.png"
+    "width": 1672,
+    "height": 940,
+    "referenceImage": "assets/scene/interior/outpost_baseMain.png"
   },
   "layers": [
     {
@@ -14,44 +14,13 @@
       "states": {
         "clear": {
           "src": "assets/scene/exterior/main/clear.png"
-        },
-        "sandstorm": {
-          "sequence": {
-            "pattern": "assets/scene/exterior/main/sandstorm/frame_{index}.png",
-            "start": 1,
-            "count": 6,
-            "pad": 2
-          },
-          "fps": 6,
-          "playback": "ping-pong"
-        }
-      }
-    },
-    {
-      "id": "exterior-right",
-      "bind": "weather",
-      "zIndex": 12,
-      "defaultState": "clear",
-      "states": {
-        "clear": {
-          "src": "assets/scene/exterior/right/clear.png"
-        },
-        "sandstorm": {
-          "sequence": {
-            "pattern": "assets/scene/exterior/right/sandstorm/frame_{index}.png",
-            "start": 1,
-            "count": 6,
-            "pad": 2
-          },
-          "fps": 6,
-          "playback": "ping-pong"
         }
       }
     },
     {
       "id": "solar-dust",
       "bind": "panels",
-      "zIndex": 16,
+      "zIndex": 12,
       "defaultState": "clean",
       "states": {
         "clean": {
@@ -63,9 +32,104 @@
       }
     },
     {
+      "id": "sandstorm-main-far",
+      "bind": "weather",
+      "zIndex": 14,
+      "viewport": {
+        "x": 26,
+        "y": 22,
+        "width": 46,
+        "height": 36
+      },
+      "defaultState": "clear",
+      "states": {
+        "clear": {
+          "hidden": true
+        },
+        "sandstorm": {
+          "src": "assets/scene/exterior/main/sandstorm/far.png",
+          "motion": {
+            "speed": 900,
+            "depth": 3,
+            "direction": "left",
+            "variation": {
+              "opacityMin": 0.3,
+              "opacityMax": 0.7,
+              "scaleMin": 1.04,
+              "scaleMax": 1.16,
+              "durationMinMs": 3500,
+              "durationMaxMs": 7000,
+              "driftPercent": 1
+            }
+          },
+          "opacity": 0.5
+        }
+      }
+    },
+    {
+      "id": "sandstorm-main-near",
+      "bind": "weather",
+      "zIndex": 16,
+      "viewport": {
+        "x": 26,
+        "y": 22,
+        "width": 46,
+        "height": 36
+      },
+      "defaultState": "clear",
+      "states": {
+        "clear": {
+          "hidden": true
+        },
+        "sandstorm": {
+          "src": "assets/scene/exterior/main/sandstorm/near.png",
+          "motion": {
+            "speed": 900,
+            "depth": 1,
+            "direction": "left",
+            "variation": {
+              "opacityMin": 0.3,
+              "opacityMax": 0.7,
+              "scaleMin": 1.04,
+              "scaleMax": 1.16,
+              "durationMinMs": 3500,
+              "durationMaxMs": 7000,
+              "driftPercent": 1
+            }
+          },
+          "opacity": 0.5
+        }
+      }
+    },
+    {
+      "id": "outpost-main",
+      "bind": "lighting",
+      "zIndex": 20,
+      "defaultState": "on",
+      "states": {
+        "on": {
+          "src": "assets/scene/interior/outpost_baseMain.png"
+        },
+        "off": {
+          "src": "assets/scene/interior/outpost_baseMain.png"
+        }
+      }
+    },
+    {
+      "id": "exterior-right",
+      "bind": "weather",
+      "zIndex": 22,
+      "defaultState": "clear",
+      "states": {
+        "clear": {
+          "src": "assets/scene/exterior/right/clear.png"
+        }
+      }
+    },
+    {
       "id": "greenhouse",
       "bind": "plants",
-      "zIndex": 25,
+      "zIndex": 24,
       "defaultState": "seed",
       "states": {
         "seed": {
@@ -85,7 +149,7 @@
     {
       "id": "plants",
       "bind": "plants",
-      "zIndex": 30,
+      "zIndex": 26,
       "defaultState": "seed",
       "states": {
         "seed": {
@@ -103,16 +167,86 @@
       }
     },
     {
-      "id": "outpost",
+      "id": "sandstorm-right-far",
+      "bind": "weather",
+      "zIndex": 34,
+      "viewport": {
+        "x": 75,
+        "y": 10,
+        "width": 25,
+        "height": 80
+      },
+      "defaultState": "clear",
+      "states": {
+        "clear": {
+          "hidden": true
+        },
+        "sandstorm": {
+          "src": "assets/scene/exterior/right/sandstorm/far.png",
+          "motion": {
+            "speed": 900,
+            "depth": 3,
+            "direction": "left",
+            "variation": {
+              "opacityMin": 0.3,
+              "opacityMax": 0.7,
+              "scaleMin": 1.04,
+              "scaleMax": 1.16,
+              "durationMinMs": 3500,
+              "durationMaxMs": 7000,
+              "driftPercent": 1
+            }
+          },
+          "opacity": 0.5
+        }
+      }
+    },
+    {
+      "id": "sandstorm-right-near",
+      "bind": "weather",
+      "zIndex": 36,
+      "viewport": {
+        "x": 75,
+        "y": 10,
+        "width": 25,
+        "height": 80
+      },
+      "defaultState": "clear",
+      "states": {
+        "clear": {
+          "hidden": true
+        },
+        "sandstorm": {
+          "src": "assets/scene/exterior/right/sandstorm/near.png",
+          "motion": {
+            "speed": 900,
+            "depth": 1,
+            "direction": "left",
+            "variation": {
+              "opacityMin": 0.3,
+              "opacityMax": 0.7,
+              "scaleMin": 1.04,
+              "scaleMax": 1.16,
+              "durationMinMs": 3500,
+              "durationMaxMs": 7000,
+              "driftPercent": 1
+            }
+          },
+          "opacity": 0.5
+        }
+      }
+    },
+    {
+      "id": "outpost-right",
       "bind": "lighting",
       "zIndex": 40,
       "defaultState": "on",
       "states": {
         "on": {
-          "src": "assets/scene/interior/outpost_base.png"
+          "src": "assets/scene/interior/outpost_baseRight.png"
         },
         "off": {
-          "src": "assets/scene/interior/outpost_base.png"
+          "src": "assets/scene/interior/outpost_baseRight.png"
         }
       }
     },
@@ -161,26 +295,6 @@
         },
         "off": {
           "src": "assets/scene/interior/outpost_table.png"
-        }
-      }
-    },
-    {
-      "id": "transmission",
-      "bind": "transmission",
-      "zIndex": 65,
-      "defaultState": "idle",
-      "states": {
-        "idle": {
-          "src": "assets/scene/equipment/terminal/idle.png"
-        },
-        "stored": {
-          "src": "assets/scene/equipment/terminal/stored.png"
-        },
-        "sending": {
-          "src": "assets/scene/equipment/terminal/sending.png"
-        },
-        "received": {
-          "src": "assets/scene/equipment/terminal/received.png"
         }
       }
     },
@@ -281,6 +395,26 @@
         },
         "absent": {
           "hidden": true
+        }
+      }
+    },
+    {
+      "id": "transmission",
+      "bind": "transmission",
+      "zIndex": 65,
+      "defaultState": "idle",
+      "states": {
+        "idle": {
+          "src": "assets/scene/equipment/terminal/idle.png"
+        },
+        "stored": {
+          "src": "assets/scene/equipment/terminal/stored.png"
+        },
+        "sending": {
+          "src": "assets/scene/equipment/terminal/sending.png"
+        },
+        "received": {
+          "src": "assets/scene/equipment/terminal/received.png"
         }
       }
     },
