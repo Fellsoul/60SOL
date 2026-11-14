@@ -253,22 +253,22 @@
     {
       "id": "shelf",
       "bind": "always",
-      "zIndex": 42,
+      "zIndex": 56,
       "defaultState": "visible",
       "states": {
         "visible": {
-          "src": "assets/outpost_base_shelf.png"
+          "src": "assets/scene/interior/outpost_base_shelf.png"
         }
       }
     },
     {
       "id": "shelf-override",
       "bind": "always",
-      "zIndex": 46,
+      "zIndex": 59,
       "defaultState": "visible",
       "states": {
         "visible": {
-          "src": "assets/outpost_base_shelfOverride.png"
+          "src": "assets/scene/interior/outpost_base_shelfOverride.png"
         }
       }
     },
