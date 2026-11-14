@@ -31,6 +31,11 @@ export function logEntry(state, text) {
 // 存档属于外部输入；版本和关键字段必须通过校验，不能直接合并进初始状态。
 export function validateState(s, eventIds, toolIds) {
   if (!s || s.version !== SAVE_VERSION) return false;
+  if (s.concurrentEvents !== undefined && (!Array.isArray(s.concurrentEvents) || s.concurrentEvents.length > 6 ||
+    new Set(s.concurrentEvents.map(item => item?.id)).size !== s.concurrentEvents.length ||
+    !s.concurrentEvents.every(item => item && typeof item.id === 'string' && item.id.length <= 80 &&
+      eventIds.includes(item.eventId) && (item.choiceId === null || typeof item.choiceId === 'string') &&
+      (item.crewId === undefined || (CREW_IDS.includes(item.crewId) && item.eventId === 'E14'))))) return false;
   if (!Array.isArray(s.samples) || s.samples.length > 3 || !s.samples.every(uses => uses === 1 || uses === 2)) return false;
   if (!s.crew || Object.keys(s.crew).length !== 2 || !CREW_IDS.every(id => {
     const c=s.crew[id];

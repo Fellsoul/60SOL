@@ -547,5 +547,10 @@
   "scene.description.E17": "A drink pouch is leaking beside the experiment rack.",
   "scene.description.E18": "You hear a sharp impact. Both power indicators turn red.",
   "scene.description.E19": "The radiation monitor warns you to stay inside.",
-  "scene.description.E20": "The solar panels produce less power, even in full sun."
+  "scene.description.E20": "The solar panels produce less power, even in full sun.",
+  "events.fatigue.title": "Crew recovery",
+  "events.fatigue.cue": "I need some rest…",
+  "events.fatigue.description": "This astronaut is tired. Recovery continues each night; lighting affects its speed.",
+  "events.fatigue.recover": "Let this astronaut recover",
+  "events.fatigue.summary": "The tired astronaut continues their scheduled recovery."
 }

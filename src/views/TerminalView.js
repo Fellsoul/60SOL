@@ -130,7 +130,8 @@ export class TerminalView {
       } else if (state.phase === 'work') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.onTable'))}</p>`;
       } else if (state.phase === 'end') {
-        decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('terminal.dayComplete'))}</p>${choice('next','',state.sol === 14 ? 'terminal.finishMission' : 'terminal.endDay',eventResolved(state,event) ? '' : 'error.eventUnresolved',!eventResolved(state,event))}`;
+        const complete = eventResolved(state,event) && !(state.concurrentEvents ?? []).some(item => !item.choiceId);
+        decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('terminal.dayComplete'))}</p>${choice('next','',state.sol === 14 ? 'terminal.finishMission' : 'terminal.endDay',complete ? '' : 'error.eventUnresolved',!complete)}`;
       }
       if (eventResolved(state,event)) {
         const result=event.choices.find(choice => choice.id === state.choiceId);

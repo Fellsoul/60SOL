@@ -3,6 +3,7 @@ import { dailyState } from './DailyEventRules.js';
 import { LIMITS, logEntry } from './state.js';
 import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
 import { advanceExpeditions, recoverCrew } from './ExpeditionRules.js';
+import { beginConcurrentEvents } from './ConcurrentEvents.js';
 
 export function beginSol(state, events, environment = {}, resourceLog = {}) {
   state.weather = environment.days?.[String(state.sol)] ?? environment.default ?? 'clear';
@@ -25,6 +26,7 @@ export function beginSol(state, events, environment = {}, resourceLog = {}) {
   state.currentEventId = events.select(state);
   const expeditionBefore = resourceSnapshot(state);
   advanceExpeditions(state,events.get(state.currentEventId));
+  beginConcurrentEvents(state,events);
   recordResourceChange(state,expeditionBefore,'expedition.return',resourceLog,'expedition.samplesReturned');
   state.phase = 'event';
   logEntry(state,`晨报：发电 ${state.generation} E，生命维持${state.lifeSupportPaid ? '已支付 '+support+' E' : '供电不足'}，可用 ${state.energy} E。`);

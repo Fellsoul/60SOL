@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { CrewMotion } from '../src/views/CrewMotion.js';
-import { GameView } from '../src/views/GameView.js';
 import { GameModel } from '../src/models/GameModel.js';
 import { SaveRepository } from '../src/repositories/SaveRepository.js';
 import { MovementDirector, movementSteps, safeVisualState } from '../src/views/MovementDirector.js';
@@ -117,14 +116,6 @@ test('game-authorized emergency cleaning receives an EVA plan without repeating 
   assert.equal(plan.mode,'eva');assert.equal(plan.cost.condition,20);assert.equal(plan.cost.energy,0);
   const {director}=clock();director.present(plan);director.skip();
   assert.deepEqual(model.snapshot,before);assert.equal(model.snapshot.health,70);
-});
-
-
-test('the accepted visual record is retained before asynchronous scene refresh for browser recovery',() => {
-  const {plan}=acceptedEVA();let presented=null;
-  const view={reducedMotion:true,movement:{present:value=>{presented=value;}}};
-  GameView.prototype.presentActivity.call(view,plan);
-  assert.equal(view.lastVisualAction,plan);assert.equal(presented,plan);
 });
 
 

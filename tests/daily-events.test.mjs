@@ -5,11 +5,21 @@ import { readFile } from 'node:fs/promises';
 import { GameModel } from '../src/models/GameModel.js';
 import { SaveRepository } from '../src/repositories/SaveRepository.js';
 import { choiceReason } from '../src/models/DailyEventRules.js';
+import { concurrentEvent, eventPressure, beginConcurrentEvents, syncFatigueEvents } from '../src/models/ConcurrentEvents.js';
 
 const events=JSON.parse(await readFile(new URL('../data/events.json',import.meta.url),'utf8'));
 const tools=JSON.parse(await readFile(new URL('../data/tools.json',import.meta.url),'utf8'));
 function dailyGame() { const model=new GameModel({events,tools}); model.start(['toolkit','battery']); model.setLights(false); return model; }
 function storage() { const items=new Map(); return {getItem:key=>items.get(key)??null,setItem:(key,value)=>items.set(key,value)}; }
+function settleExtras(game) {
+  for (const instance of game.snapshot.concurrentEvents ?? []) {
+    if (instance.choiceId) continue;
+    const event = concurrentEvent(instance,game.events);
+    const choice = event.choices.find(item => item.energy === 0 && item.work === false && !choiceReason(game.snapshot,item));
+    assert.ok(choice);
+    game.chooseConcurrent(instance.id,choice.id);
+  }
+}
 
 test('all fourteen Sols have a playable daily event, resolved before next Sol',() => {
   const game=dailyGame(); const seen=[];
@@ -25,7 +35,7 @@ test('all fourteen Sols have a playable daily event, resolved before next Sol',(
     game.choose(choice.id); assert.equal(game.snapshot.eventDone,true);
     assert.throws(()=>game.choose(choice.id));
     if(game.snapshot.phase==='work') game.work('standby');
-    game.nextSol();
+    settleExtras(game); game.nextSol();
   }
   assert.equal(seen.length,14); assert.equal(game.snapshot.phase,'finished'); assert.equal(game.snapshot.outcome,'incomplete');
 });
@@ -68,7 +78,7 @@ test('scheduled crop and final-day cases are replaced when prerequisites are mis
   Object.assign(state,{sol:11,phase:'end',choiceId:'minimum',currentEventId:'E19',eventDone:true,growth:0,food:30});game.restore(state);
   game.nextSol();assert.notEqual(game.snapshot.currentEventId,'E11');assert.ok(game.events.get(game.snapshot.currentEventId).dailySol);
   const last=game.snapshot;Object.assign(last,{sol:13,phase:'end',currentEventId:'E09',choiceId:'isolate',eventDone:true,localData:0});game.restore(last);
-  game.nextSol();assert.notEqual(game.snapshot.currentEventId,'E16');assert.equal(game.snapshot.phase,'event');
+  settleExtras(game);game.nextSol();assert.notEqual(game.snapshot.currentEventId,'E16');assert.equal(game.snapshot.phase,'event');
 });
 
 test('final daily response sends existing research once before mission evaluation',() => {
@@ -90,7 +100,39 @@ test('a full daily-event mission can reach the 60-data objective safely',() => {
     if(work)game.work(work);
     if([0,10].includes(index))game.planExpedition('astronaut-a');
     if(index===4)game.planExpedition('astronaut-b');
-    game.nextSol();
+    settleExtras(game);game.nextSol();
   }
   assert.equal(game.snapshot.outcome,'success');assert.equal(game.snapshot.sentData,60);assert.ok(game.snapshot.health>0);
+});
+
+test('fatigue events exceed random slots and stay attached to each tired astronaut',() => {
+  const game=dailyGame();const state=game.snapshot;
+  state.concurrentEvents=Array.from({length:4},(_,i)=>({id:`extra${i}`,eventId:'E01',choiceId:'secure'}));
+  for(const crew of Object.values(state.crew))crew.fatigue=4;
+  syncFatigueEvents(state,game.events);syncFatigueEvents(state,game.events);
+  assert.equal(state.concurrentEvents.length,6);
+  assert.equal(state.concurrentEvents.filter(item=>item.crewId).length,2);
+  game.restore(state);game.choose('secure');
+  const energy=game.snapshot.energy;
+  assert.throws(()=>game.nextSol(),{message:'error.eventUnresolved'});
+  settleExtras(game);
+  assert.equal(game.snapshot.energy,energy);
+  assert.equal(game.snapshot.crew['astronaut-a'].fatigue,4);
+  assert.throws(()=>game.chooseConcurrent('fatigue:astronaut-a','recover'));
+  const repo=new SaveRepository(storage(),{events,tools});const saved=repo.save(game.snapshot);
+  assert.ok(repo.load(saved.id).state);
+  game.nextSol();assert.equal(game.snapshot.sol,2);
+});
+
+test('event pressure accelerates nonlinearly and seeded concurrent draws survive reload',() => {
+  assert.ok(eventPressure(14).slots>eventPressure(7).slots);
+  assert.ok(eventPressure(14).chance-eventPressure(7).chance>eventPressure(7).chance-eventPressure(1).chance);
+  const game=dailyGame();const state=game.snapshot;
+  state.sol=14;state.currentEventId='E16';state.rng=123;state.history={};
+  const copy=structuredClone(state);
+  beginConcurrentEvents(state,game.events);beginConcurrentEvents(copy,game.events);
+  assert.deepEqual(state.concurrentEvents,copy.concurrentEvents);assert.equal(state.rng,copy.rng);
+  assert.ok(state.concurrentEvents.length>0);
+  assert.ok(state.concurrentEvents.every(instance=>instance.eventId!=='E16'));
+  game.restore(state);const saved=game.snapshot;game.restore(saved);assert.deepEqual(game.snapshot,saved);
 });
