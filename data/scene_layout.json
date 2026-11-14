@@ -104,7 +104,7 @@
     {
       "id": "outpost-main",
       "bind": "lighting",
-      "zIndex": 20,
+      "zIndex": 40,
       "defaultState": "on",
       "states": {
         "on": {

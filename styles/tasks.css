@@ -48,7 +48,9 @@
 .task-details { display: grid; gap: 5px; flex: 1; min-width: 0; }
 .task-details strong { font-size: .94rem; font-weight: 600; }
 .task-details small { font-size: .78rem; line-height: 1.55; color: #6a624f; }
-.task-cost { font: .69rem 'Courier New', monospace; color: #5d674f; }
+.task-cost { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font: .69rem 'Courier New', monospace; color: #5d674f; }
+#tasks-power, .task-energy-cost { display: inline-flex; align-items: center; gap: 6px; }
+.task-battery-icon { display: block; width: 12px; height: 18px; object-fit: contain; flex: none; transform: rotate(20deg); }
 .task-arrow { color: #7d775f; }
 .clipboard-note { padding: 16px 0 24px; font-size: .94rem; line-height: 1.7; }
 .task-completed { font-weight: 600; }

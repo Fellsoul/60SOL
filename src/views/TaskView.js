@@ -3,6 +3,8 @@ import { i18n } from '../services/I18n.js';
 import { escapeHtml } from './dom.js';
 
 const text = key => escapeHtml(i18n.t(key));
+const batteryIcon = '<img class="task-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">';
+const energyCost = energy => `<span class="task-energy-cost" role="img" aria-label="${text('tasks.cost')}: ${energy} E"><span aria-hidden="true">−</span>${energy > 0 ? batteryIcon.repeat(energy) : '<span aria-hidden="true">0</span>'}</span>`;
 
 // Derive rows from saved state so completed and unfinished work survive reopening/reload.
 export function clipboardTasks(state,event) {
@@ -49,14 +51,16 @@ export class TaskView {
     i18n.translate(this.dialog);
     if (!state) { this.toggle.hidden = true; return; }
     document.querySelector('#tasks-sol').textContent = `SOL ${String(state.sol).padStart(2,'0')} / 14`;
-    document.querySelector('#tasks-power').textContent = `${i18n.t('tasks.energy')} · ${state.energy} E`;
+    const power = document.querySelector('#tasks-power');
+    power.innerHTML = `${batteryIcon}<span aria-hidden="true">${state.energy}</span>`;
+    power.setAttribute('aria-label',`${i18n.t('tasks.energy')}: ${state.energy} E`);
     this.toggle.setAttribute('aria-label',i18n.t('tasks.table'));
     this.toggle.dataset.phase = state.phase;
     const tasks = clipboardTasks(state,event);
     const completed = tasks.some(task => task.done);
     this.content.innerHTML = `<div class="task-list">${tasks.map(task => {
       const {done,reason} = task;
-      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${task.energy} E · ${text('tasks.work')}</span></span></button>`;
+      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text('tasks.work')}</span></span></span></button>`;
     }).join('')}</div><p class="clipboard-note" role="status">${text(state.phase === 'event' ? (tasks.some(task => task.command === 'choose') ? 'tasks.eventOptions' : 'tasks.eventFirst') : completed ? 'tasks.checked' : state.phase === 'end' ? 'tasks.eventWork' : state.phase === 'finished' ? 'tasks.finished' : 'tasks.choose')}</p>`;
     if (this.dialog.open && completed) document.querySelector('#tasks-close').focus({preventScroll:true});
   }
