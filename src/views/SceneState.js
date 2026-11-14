@@ -5,8 +5,8 @@ export function sceneState(state) {
   return {
     always: 'visible',
     samples: String(state.samples?.length ?? 0),
-    crewA: crewAway(state,'astronaut-a') ? 'away' : (crewFatigued(state,'astronaut-a') || state.health < 45) ? 'exhausted' : 'seated',
-    crewB: crewAway(state,'astronaut-b') ? 'away' : (crewFatigued(state,'astronaut-b') || state.health < 45) ? 'exhausted' : 'seated',
+    crewA: crewAway(state,'astronaut-a') ? 'away' : state.health < 100 ? 'injured' : crewFatigued(state,'astronaut-a') ? 'exhausted' : 'seated',
+    crewB: crewAway(state,'astronaut-b') ? 'away' : state.health < 100 ? 'injured' : crewFatigued(state,'astronaut-b') ? 'exhausted' : 'seated',
     crewIdle: 'seated',
     weather: state.weather,
     lighting: state.lightsOn && state.lifeSupportPaid && state.energy > 0 ? 'on' : 'off',

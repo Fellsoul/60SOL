@@ -106,6 +106,13 @@ test('天气、灯光、植物和消耗工具投影为图片状态，不依赖�
   game.nextSol(); assert.equal(sceneState(game.snapshot).weather,'sandstorm');
   game.choose('review'); game.setLights(false);
   assert.equal(sceneState(game.snapshot).lighting,'off');
+  const injured=game.snapshot;injured.health=99;
+  assert.equal(sceneState(injured).crewA,'injured');
+  assert.equal(sceneState(injured).crewB,'injured');
+  injured.crew['astronaut-a']={departSol:injured.sol,returnSol:injured.sol+1,fatigue:0};
+  assert.equal(sceneState(injured).crewA,'away');
+  injured.health=100;
+  assert.equal(sceneState(injured).crewB,'seated');
 });
 
 test('旧存档升级，不凭空编造昨日简报',() => {
