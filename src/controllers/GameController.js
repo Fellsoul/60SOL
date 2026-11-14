@@ -1,24 +1,40 @@
 import { i18n } from '../services/I18n.js';
 export class GameController {
-  constructor(model,view,repository) { this.model = model; this.view = view; this.repository = repository; this.busy = false; }
+  constructor(model,view,repository) { this.model = model; this.view = view; this.repository = repository; this.busy = false; this.activeSaveId = null; }
+  showMenu() {
+    const result = this.repository.list();
+    this.view.menu.show(result.saves.some(save => save.state));
+    if (result.message) this.view.notify(result.message);
+  }
+  showSaves(notice = '') {
+    const {saves,message} = this.repository.list();
+    this.view.menu.showSaves(saves,message || notice);
+  }
+  loadSave(id) {
+    const loaded = this.repository.load(id);
+    if (!loaded.state) { this.showSaves('save.unavailable'); return; }
+    void this.commit(() => { this.model.restore(loaded.state); this.activeSaveId = id; },{morning:true,save:false});
+  }
   async start() {
-    const {state,message} = this.repository.load();
-    this.savedState = state;
-    this.view.menu.show(Boolean(state));
-    if (message && !state) this.view.notify(message);
+    this.showMenu();
     document.querySelector('#main-menu').addEventListener('click',event => {
       const command = event.target.closest('[data-menu]')?.dataset.menu;
       if (this.busy || !command) return;
       if (command === 'settings') { void this.view.terminal.open(null,null,this.view.reducedMotion,'settings'); return; }
       if (command === 'new') {
-        if (this.savedState && !confirm(i18n.t('confirm.new'))) return;
-        this.model.restore(null); void this.view.terminal.open(null,null,this.view.reducedMotion); return;
+        this.activeSaveId = null; this.model.restore(null); void this.view.terminal.open(null,null,this.view.reducedMotion); return;
       }
-      if (command === 'load' || command === 'continue') {
-        const loaded = this.repository.load();
-        if (!loaded.state) { this.view.notify(i18n.t('save.unavailable')); return; }
-        void this.commit(() => this.model.restore(loaded.state),{morning:true,save:false});
+      if (command === 'load') { this.showSaves(); return; }
+      if (command === 'continue') {
+        const latest = this.repository.list().saves.find(save => save.state);
+        if (!latest) { this.showMenu(); this.view.notify(i18n.t('save.unavailable')); return; }
+        this.loadSave(latest.id);
       }
+    });
+    document.querySelector('#save-list').addEventListener('click',event => {
+      const button = event.target.closest('button[data-save-id]');
+      if (!button || button.disabled || this.busy) return;
+      this.loadSave(button.dataset.saveId);
     });
     document.querySelector('#terminal-toggle').addEventListener('click',() => { if (!this.busy) void this.view.openTerminal(); });
     document.querySelector('#terminal-close').addEventListener('click',() => { void this.view.closeTerminal(); });
@@ -26,7 +42,7 @@ export class GameController {
     document.querySelector('#terminal-content').addEventListener('change',event => {
       if (event.target.id === 'language-select') {
         i18n.setLanguage(event.target.value); this.view.terminal.renderSettings();
-        this.view.menu.show(Boolean(this.savedState));
+        this.showMenu();
         document.querySelector('#skip-typing').textContent = i18n.t('显示全文');
         document.querySelector('#restart').textContent = i18n.t('重新开始');
         document.querySelector('#motion-label').textContent = i18n.t('静态显示');
@@ -53,7 +69,7 @@ export class GameController {
     document.querySelector('#restart').addEventListener('click',() => {
       if (this.busy) return;
       void this.view.closeTerminal().then(() => {
-        this.savedState = this.repository.load().state; this.view.menu.show(Boolean(this.savedState));
+        this.showMenu();
       });
     });
     document.querySelector('#reduce-motion').addEventListener('change',event => { void this.view.reduceMotion(event.target.checked); });
@@ -69,10 +85,11 @@ export class GameController {
       command();
     } catch (error) { this.model.restore(before); this.view.notify(error.message); this.busy = false; return; }
     // 规则确认后立刻保存；动画和图片加载不能撤销已经作出的决定。
-    const result = save ? this.repository.save(this.model.snapshot) : {ok:true};
-    if (save && result.ok) this.savedState = this.model.snapshot;
+    const result = save ? this.repository.save(this.model.snapshot,this.activeSaveId) : {ok:true};
+    if (save && result.ok) this.activeSaveId = result.id;
     if (morning) this.view.startTransitionAudio(before);
     try {
+      this.view.menu.closeSaves();
       await this.view.closeTerminal();
       this.view.menu.hide();
       await this.render({morning});

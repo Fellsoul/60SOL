@@ -77,20 +77,27 @@ try:
         assert 'Shoots appeared' in page.locator('#summary-copy').inner_text()
         page.keyboard.press('Escape')
         page.wait_for_function("!document.querySelector('#terminal').open")
-        before = page.evaluate('(key) => localStorage.getItem(key)', KEY)
+        active_key = page.evaluate("(prefix) => Object.keys(localStorage).find(key => key.startsWith(prefix + '.slot.'))", KEY)
+        assert active_key
+        before = page.evaluate('(key) => localStorage.getItem(key)', active_key)
         page.reload()
         page.locator('[data-menu=continue]').click()
         ready()
-        assert before == page.evaluate('(key) => localStorage.getItem(key)', KEY)
+        assert before == page.evaluate('(key) => localStorage.getItem(key)', active_key)
 
         # 注入合法天气状态，验证路径、往返帧播放和减少动画。
         page.evaluate("""(key) => {
-          const s = JSON.parse(localStorage.getItem(key));
+          const record = JSON.parse(localStorage.getItem(key));
+          const s = record.state;
           Object.assign(s,{sol:4,currentEventId:'sandstorm',weather:'sandstorm',phase:'event',choiceId:null,workId:null});
-          localStorage.setItem(key,JSON.stringify(s));
-        }""", KEY)
+          localStorage.setItem(key,JSON.stringify(record));
+        }""", active_key)
         page.reload()
         page.locator('[data-menu=load]').click()
+        page.locator('#save-picker[open]').wait_for()
+        assert page.locator('#main-menu').is_visible()
+        assert page.locator('#save-list button:enabled').count() == 1
+        page.locator('#save-list button:enabled').click()
         ready()
         terminal()
         page.locator('#reduce-motion').uncheck()
@@ -121,6 +128,36 @@ try:
             assert abs(bounds['width'] - width*.6) < 1
             page.keyboard.press('Escape')
             page.wait_for_function("!document.querySelector('#terminal').open")
+
+        # 新任务另存，旧任务只能在玩家选择后加载；取消读档不修改缓存。
+        terminal()
+        page.locator('#restart').click()
+        page.locator('#main-menu').wait_for(state='visible')
+        older = page.evaluate('(key) => localStorage.getItem(key)', active_key)
+        page.locator('[data-menu=new]').click()
+        page.locator('[value=robot]').check(); page.locator('[value=shield]').check()
+        decide('#loadout-form button')
+        assert page.evaluate('(key) => localStorage.getItem(key)', active_key) == older
+        terminal(); page.locator('#restart').click()
+        page.locator('#main-menu').wait_for(state='visible')
+        page.locator('[data-menu=load]').click()
+        assert page.locator('#save-list button:enabled').count() == 2
+        before_cancel = page.evaluate('JSON.stringify({...localStorage})')
+        page.keyboard.press('Escape')
+        assert page.locator('#main-menu').is_visible()
+        assert page.evaluate('JSON.stringify({...localStorage})') == before_cancel
+        page.locator('[data-menu=load]').click()
+        page.locator(f'[data-save-id="{active_key}"]').click()
+        ready(); terminal()
+        assert page.locator('#terminal-title').inner_text() == 'SOL 04'
+        page.keyboard.press('Escape')
+        page.wait_for_function("!document.querySelector('#terminal').open")
+        page.reload()
+        page.locator('[data-menu=continue]').click()
+        ready(); terminal()
+        assert page.locator('#terminal-title').inner_text() == 'SOL 01'
+        page.keyboard.press('Escape')
+        page.wait_for_function("!document.querySelector('#terminal').open")
         assert not errors, errors
 
         # 素材全部缺失时不会自动拼图，终端仍可使用。
@@ -134,6 +171,10 @@ try:
         missing_page.keyboard.press('Escape')
         missing_page.wait_for_function("!document.querySelector('#terminal').open")
         assert missing_page.locator('[data-menu=new]').inner_text() == '新游戏'
+        missing_page.locator('[data-menu=load]').click()
+        assert missing_page.locator('#save-picker-message').inner_text() == '还没有本地存档，开始新游戏后会自动创建。'
+        missing_page.keyboard.press('Escape')
+        assert missing_page.locator('#main-menu').is_visible()
         missing_page.reload()
         missing_page.locator('[data-menu=new]').wait_for()
         assert missing_page.locator('[data-menu=new]').inner_text() == '新游戏'

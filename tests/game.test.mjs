@@ -10,7 +10,7 @@ const events = JSON.parse(await readFile(new URL('../data/events.json',import.me
 const tools = JSON.parse(await readFile(new URL('../data/tools.json',import.meta.url),'utf8'));
 const content = { events,tools };
 function model(toolIds = ['toolkit','battery']) { const game = new GameModel(content); game.start(toolIds); return game; }
-function memory() { const data = new Map(); return { getItem:key => data.get(key) ?? null, setItem:(key,value) => data.set(key,value) }; }
+function memory() { const data = new Map(); return { get length() { return data.size; }, key:index => [...data.keys()][index] ?? null, getItem:key => data.get(key) ?? null, setItem:(key,value) => data.set(key,value) }; }
 
 test('开局先发电再支付生命维持；状态副本不能修改 Model',() => {
   const game = model();
@@ -54,11 +54,11 @@ test('零库存不等于当日供给失败，连续供电不足才提前终止',
 test('存档恢复保留卡片、阶段、资源和随机状态；坏存档可降级',() => {
   const game = model(); game.choose('plan'); game.work('research'); game.nextSol();
   const storage = memory(); const repository = new SaveRepository(storage,content);
-  assert.equal(repository.save(game.snapshot).ok,true);
-  const loaded = repository.load(); assert.deepEqual(loaded.state,game.snapshot);
+  const saved = repository.save(game.snapshot); assert.equal(saved.ok,true);
+  const loaded = repository.load(saved.id); assert.deepEqual(loaded.state,game.snapshot);
   const restored = new GameModel(content); restored.restore(loaded.state);
   assert.deepEqual(restored.snapshot,game.snapshot);
-  storage.setItem(repository.key,'{broken'); assert.equal(repository.load().state,null);
+  storage.setItem(saved.id,'{broken'); assert.equal(repository.load(saved.id).state,null);
   assert.equal(new SaveRepository(null,content).save(game.snapshot).ok,false);
 });
 
@@ -101,8 +101,8 @@ test('所有事件及选项提供总结，昨日简报只记录实际选择并�
   assert.ok(game.snapshot.previousDaySummary.includes(events[0].choices[0].summaryLine));
   assert.ok(!game.snapshot.previousDaySummary.includes(events[0].choices[1].summaryLine));
   assert.equal(game.snapshot.summarySol,1);
-  const repository = new SaveRepository(memory(),content); repository.save(game.snapshot);
-  assert.deepEqual(repository.load().state.previousDaySummary,game.snapshot.previousDaySummary);
+  const repository = new SaveRepository(memory(),content); const saved = repository.save(game.snapshot);
+  assert.deepEqual(repository.load(saved.id).state.previousDaySummary,game.snapshot.previousDaySummary);
 });
 
 test('天气、灯光、植物和消耗工具投影为图片状态，不依赖动画',() => {
@@ -122,4 +122,45 @@ test('旧存档升级，不凭空编造昨日简报',() => {
   storage.setItem(repo.key,JSON.stringify(old));
   const restored = repo.load().state;
   assert.equal(restored.version,2); assert.deepEqual(restored.previousDaySummary,[]);
+  assert.equal(repo.save(restored,repo.key).ok,true);
+  assert.deepEqual(repo.load(repo.key).state,restored); assert.equal(repo.list().saves.length,1);
+});
+
+test('不同任务独立保存，加载指定存档后仅更新该任务',() => {
+  const storage = memory(); const repo = new SaveRepository(storage,content);
+  const first = model(); const second = model(['robot','shield']);
+  const a = repo.save(first.snapshot); const b = repo.save(second.snapshot);
+  assert.equal(a.ok,true); assert.equal(b.ok,true); assert.notEqual(a.id,b.id);
+  assert.equal(repo.list().saves.length,2);
+  first.restore(repo.load(a.id).state); first.choose('grow');
+  assert.equal(repo.save(first.snapshot,a.id).id,a.id);
+  assert.equal(repo.list().saves.length,2);
+  assert.deepEqual(repo.load(a.id).state,first.snapshot);
+  assert.deepEqual(repo.load(b.id).state,second.snapshot);
+});
+
+test('列表按保存时间排序，同时保留旧存档和坏存档，忽略其他缓存',() => {
+  const storage = memory(); const repo = new SaveRepository(storage,content); const state = model().snapshot;
+  storage.setItem(repo.key,JSON.stringify(state));
+  storage.setItem(`${repo.slotPrefix}older`,JSON.stringify({ savedAt:'2026-11-13T12:00:00.000Z',state }));
+  storage.setItem(`${repo.slotPrefix}newer`,JSON.stringify({ savedAt:'2026-11-14T12:00:00.000Z',state }));
+  storage.setItem(`${repo.slotPrefix}broken`,'{broken'); storage.setItem('outpost.language','zh-CN');
+  const before = Array.from({length:storage.length},(_,index) => storage.getItem(storage.key(index)));
+  const {saves,message} = repo.list();
+  assert.equal(message,''); assert.equal(saves.length,4);
+  assert.equal(saves[0].id,`${repo.slotPrefix}newer`); assert.equal(saves[1].id,`${repo.slotPrefix}older`);
+  assert.deepEqual(saves.find(save => save.id === repo.key).state,state);
+  assert.equal(saves.find(save => save.id.endsWith('broken')).state,null);
+  assert.deepEqual(Array.from({length:storage.length},(_,index) => storage.getItem(storage.key(index))),before);
+  const added = repo.save(state);
+  assert.equal(added.ok,true); assert.equal(repo.list().saves.length,5);
+  assert.equal(storage.getItem(repo.key),JSON.stringify(state));
+});
+
+test('空存档列表和不可用存储安全返回，不影响有效存档',() => {
+  assert.deepEqual(new SaveRepository(memory(),content).list(),{saves:[],message:''});
+  assert.equal(new SaveRepository(null,content).list().saves.length,0);
+  const blocked = {getItem() { throw new Error('Storage blocked'); },setItem() { throw new Error('Quota exceeded'); }};
+  const repo = new SaveRepository(blocked,content);
+  assert.ok(repo.list().message); assert.equal(repo.load().state,null); assert.equal(repo.save(model().snapshot).ok,false);
 });

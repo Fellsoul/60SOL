@@ -31,6 +31,12 @@
     <div id="morning-veil" aria-hidden="true"><span id="sol-title"></span></div>
     <p id="notice" role="status" aria-live="polite" hidden></p>
   </main>
+  <dialog id="save-picker" aria-labelledby="save-picker-title" aria-describedby="save-picker-description">
+    <header class="save-picker-header"><h1 id="save-picker-title"></h1><button id="save-picker-close" type="button" autofocus></button></header>
+    <p id="save-picker-description"></p>
+    <p id="save-picker-message" role="status"></p>
+    <div id="save-list"></div>
+  </dialog>
   <dialog id="terminal" aria-labelledby="terminal-title">
     <img class="console-frame" src="assets/scene/interior/outpost_console.png" alt="" draggable="false">
     <div class="terminal-shell">

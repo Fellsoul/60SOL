@@ -1,5 +1,9 @@
 {
   "menu.new":"New Game", "menu.continue":"Continue", "menu.load":"Load Save", "menu.settings":"Settings",
+  "save.choose":"Choose a local save to load. Most recent saves appear first.", "save.back":"Back", "save.empty":"No local saves yet. Start a new game to create one.",
+  "save.slot":"Save", "save.unknownDate":"Save time unavailable", "save.invalid":"Unreadable or incompatible save", "save.load":"Load this save", "save.cannotLoad":"Cannot load",
+  "save.phase.event":"Awaiting event decision", "save.phase.work":"Awaiting work orders", "save.phase.end":"Day complete", "save.phase.finished":"Mission complete",
+  "存档无法读取或版本不兼容，原存档已保留。":"The save is unreadable or incompatible. The original save has been kept.",
   "settings.language":"Language", "settings.volume":"Transition audio volume", "confirm.new":"Starting a new mission will replace your save. Continue?", "save.unavailable":"No valid save is available.",
   "火星前哨站内部":"Mars outpost interior", "打开终端":"Open terminal", "关闭终端":"Close terminal", "显示全文":"Show full text", "静态显示":"Reduce motion", "重新开始":"Main menu",
   "记录":"LOG", "抵达记录":"Arrival log", "任务结束":"Mission complete", "接下来的工作":"Today's work", "选择两件工具":"Choose two tools", "进入前哨站":"Enter the outpost",
