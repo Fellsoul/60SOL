@@ -65,6 +65,13 @@ export class GameView {
   openTerminal() { this.tasks.close(); return this.terminal.open(this.state,this.event,this.reducedMotion); }
   async openTasks() { await this.terminal.close(); if (this.state) this.tasks.open(); }
   async closeTerminal() { await this.terminal.close(); }
+  async refreshTerminal(state,event) {
+    this.state = state; this.event = event;
+    await this.terminal.fadeContentOut(this.reducedMotion);
+    await this.scene.render(state,this.reducedMotion);
+    this.terminal.render(state,event,{autoplay:false});
+    this.terminal.typeContent(this.reducedMotion);
+  }
   async reduceMotion(value) {
     document.body.classList.toggle('reduced-motion',value);
     this.reducedMotion = value; this.terminal.setReducedMotion(value);

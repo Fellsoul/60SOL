@@ -42,6 +42,7 @@ try:
             page.locator('#terminal-toggle').click()
             page.locator('#terminal[open]').wait_for()
 
+<<<<<<< HEAD
         def clipboard():
             ready()
             if page.locator('#terminal[open]').count():
@@ -68,6 +69,17 @@ try:
                 page.keyboard.press('Escape')
             page.wait_for_function("!document.querySelector('#terminal').open && !document.querySelector('#tasks').open")
             ready()
+=======
+        def decide(selector, *, closes=False, appears=None, disappears=None):
+            page.locator(selector).click()
+            if closes:
+                page.wait_for_function("!document.querySelector('#terminal').open")
+                ready()
+            else:
+                assert page.locator('#terminal').is_visible()
+                if appears: page.locator(appears).wait_for()
+                if disappears: page.locator(disappears).wait_for(state='detached')
+>>>>>>> 9ca661c6f0529034f3490f6570492bf929863177
 
         page.goto(url)
         page.locator('[data-menu=new]').click()
@@ -75,7 +87,15 @@ try:
         page.locator('[value=toolkit]').check()
         page.locator('[value=battery]').check()
         assert page.locator('[value=robot]').is_disabled()
-        decide('#loadout-form button')
+        page.evaluate("""() => {
+          window.newSceneRevealOpacity = [];
+          new MutationObserver(() => {
+            const scene = document.querySelector('#scene-viewport');
+            if (!scene.hidden) newSceneRevealOpacity.push(Number(getComputedStyle(document.querySelector('#morning-veil')).opacity));
+          }).observe(document.querySelector('#scene-viewport'),{attributes:true,attributeFilter:['hidden']});
+        }""")
+        decide('#loadout-form button',closes=True)
+        assert page.evaluate('newSceneRevealOpacity.length === 1 && newSceneRevealOpacity[0] === 1'), 'New game scene appeared before the black veil'
         collapsed = page.locator('#terminal-toggle').bounding_box()
         assert abs(collapsed['width'] - 1440 * .6) < 1
         assert abs((900-collapsed['y'])/collapsed['height'] - .1) < .01
@@ -99,15 +119,23 @@ try:
         page.wait_for_function("!document.querySelector('#terminal').open")
         terminal()
         assert page.locator('#terminal-title').inner_text() == 'SOL 01'
-        decide('[data-action=choose][data-id=grow]')
-        assert page.locator('#terminal-toggle .terminal-battery-slot').get_attribute('data-energy') == '6'
+        page.locator('#reduce-motion').uncheck()
+        terminal_before = page.locator('#terminal').bounding_box()
+        page.locator('[data-action=choose][data-id=grow]').click()
+        page.wait_for_function("Number(getComputedStyle(document.querySelector('#terminal-content')).opacity) < .8")
+        assert page.locator('#terminal[open]').is_visible()
+        page.locator('[data-action=next]').wait_for()
+        assert page.locator('.typing').count() > 0
+        terminal_after = page.locator('#terminal').bounding_box()
+        assert all(abs(terminal_before[key]-terminal_after[key]) < 1 for key in ['x','y','width','height'])
+        page.locator('#skip-typing').click()
+        page.locator('#reduce-motion').check()
+        assert page.locator('#terminal .terminal-battery-slot').get_attribute('data-energy') == '6'
         assert page.locator('[data-layer=plants]').get_attribute('data-state') == 'sprout'
-        terminal()
-        decide('[data-action=battery]')
-        assert page.locator('#terminal-toggle .terminal-battery-slot [data-lit=true]').count() == 12
+        decide('[data-action=battery]',disappears='[data-action=battery]')
+        assert page.locator('#terminal .terminal-battery-slot [data-lit=true]').count() == 12
         assert page.locator('[data-layer=tool-battery]').is_hidden()
-        terminal()
-        decide('[data-action=next]')
+        decide('[data-action=next]',closes=True)
         terminal()
         assert 'Shoots appeared' in page.locator('#summary-copy').inner_text()
         page.keyboard.press('Escape')
@@ -177,8 +205,9 @@ try:
         assert frozen == tracks.evaluate_all('(nodes) => nodes.map(node => getComputedStyle(node).transform)')
         assert tracks.evaluate_all('(nodes) => nodes.every(node => node.getAnimations()[0].playState === "paused")')
         assert page.locator('.scene-dust-motion').evaluate_all('(nodes) => nodes.every(node => Number(getComputedStyle(node).opacity) === 0.5 && node.getAnimations().every(animation => animation.playState === "paused"))')
-        decide('[data-action=choose][data-id=shelter]')
+        decide('[data-action=choose][data-id=shelter]',appears='[data-action=work][data-id=research]')
         assert page.locator('[data-layer=cabin-lights]').is_hidden()
+<<<<<<< HEAD
         terminal()
         assert page.locator('#terminal [data-action=work]').count() == 0
         clipboard()
@@ -195,6 +224,16 @@ try:
         page.keyboard.press('Escape')
         terminal()
         decide('[data-action=lights][data-id=lights_off]')
+=======
+        assert page.locator('[data-action=work][data-id=research]').is_enabled()
+        decide('[data-action=lights][data-id=lights_on]',appears='[data-action=lights][data-id=lights_off]')
+        assert page.locator('[data-action=work][data-id=research]').is_enabled()
+        decide('[data-action=work][data-id=research]',appears='[data-action=next]')
+        assert page.locator('[data-action=next]').is_visible()
+        decide('[data-action=lights][data-id=lights_off]',appears='[data-action=lights][data-id=lights_on]')
+        page.keyboard.press('Escape')
+        page.wait_for_function("!document.querySelector('#terminal').open")
+>>>>>>> 9ca661c6f0529034f3490f6570492bf929863177
 
         for width in [390, 768, 1440]:
             page.set_viewport_size({'width': width, 'height': 800})
@@ -229,7 +268,7 @@ try:
         older = page.evaluate('(key) => localStorage.getItem(key)', active_key)
         page.locator('[data-menu=new]').click()
         page.locator('[value=robot]').check(); page.locator('[value=shield]').check()
-        decide('#loadout-form button')
+        decide('#loadout-form button',closes=True)
         assert page.locator('.scene-dust:visible').count() == 0
         assert page.evaluate('window.dustAnimations.every(animation => animation.playState === "idle")')
         assert page.evaluate('(key) => localStorage.getItem(key)', active_key) == older
