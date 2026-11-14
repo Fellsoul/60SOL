@@ -1,3 +1,4 @@
+import { SpaceSnapshotService } from './services/SpaceSnapshotService.js';
 import { loadContent } from './services/ContentLoader.js';
 import { GameModel } from './models/GameModel.js';
 import { SaveRepository } from './repositories/SaveRepository.js';
@@ -11,11 +12,13 @@ async function bootstrap() {
   const content = await loadContent();
   let storage = null;
   try { storage = window.localStorage; } catch { /* 禁用存储时仍允许当局游玩。 */ }
+  const snapshots = new SpaceSnapshotService(content.space_data,storage);
+  void snapshots.prepare();
   const model = new GameModel(content);
   const repository = new SaveRepository(storage,content);
   const view = new GameView(content);
   await view.mount();
-  const controller = new GameController(model,view,repository);
+  const controller = new GameController(model,view,repository,snapshots);
   await controller.start();
 }
 

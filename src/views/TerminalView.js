@@ -1,3 +1,4 @@
+import { spaceEvidence, snapshotSelector, snapshotComparison } from './SpaceEvidence.js';
 import { choiceReason, eventResolved, emergencyCleanAvailable } from '../models/DailyEventRules.js';
 import { escapeHtml } from './dom.js';
 import { LIGHT_ACTIONS } from '../models/ActionRules.js';
@@ -129,7 +130,7 @@ export class TerminalView {
     document.querySelector('#terminal-title').setAttribute('aria-label',title);
     document.querySelector('#restart').hidden = !state;
     if (!state) {
-      this.content.innerHTML = this.copy('briefing-copy','loadout.intro') + `<form id="loadout-form"><div class="loadout">${this.tools.map(tool => `<label><input type="checkbox" name="tool" value="${escapeHtml(tool.id)}"><span>${escapeHtml(i18n.t(tool.name))}<small>${escapeHtml(i18n.t(tool.description))}</small></span></label>`).join('')}</div><div class="terminal-choices"><button class="terminal-choice" type="submit" disabled>${escapeHtml(i18n.t('loadout.chooseTwo'))}</button></div></form>`;
+      this.content.innerHTML = this.copy('briefing-copy','loadout.intro') + `<form id="loadout-form">${snapshotSelector()}<div class="loadout">${this.tools.map(tool => `<label><input type="checkbox" name="tool" value="${escapeHtml(tool.id)}"><span>${escapeHtml(i18n.t(tool.name))}<small>${escapeHtml(i18n.t(tool.description))}</small></span></label>`).join('')}</div><div class="terminal-choices"><button class="terminal-choice" type="submit" disabled>${escapeHtml(i18n.t('loadout.chooseTwo'))}</button></div></form>`;
     } else {
       const hasLightingDetail = state.previousResourceLog?.some(entry => entry.source === 'lighting');
       const previousLines = state.previousDaySummary.filter(line => !(hasLightingDetail && i18n.t(line) === i18n.t('summary.lightingCost')));
@@ -138,6 +139,7 @@ export class TerminalView {
       if (state.outcome) today = {success:'outcome.success',incomplete:'outcome.incomplete',unsafe:'outcome.unsafe'}[state.outcome];
       const todayCopy = `<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}`;
       this.content.innerHTML = `${this.todayRecords(state)}<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}${todayCopy}<div id="terminal-decisions" class="terminal-choices"></div>`;
+      this.content.insertAdjacentHTML('afterbegin',spaceEvidence(state));
       const decisions = this.content.querySelector('#terminal-decisions');
       if (state.phase === 'event') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.eventOnClipboard'))}</p>`;
@@ -159,6 +161,7 @@ export class TerminalView {
       }
       if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy >= LIMITS.energy));
     }
+    if(state?.outcome)this.content.insertAdjacentHTML('beforeend',snapshotComparison(state));
     this.jobs = [{node:document.querySelector('#terminal-title'),text:title},...Array.from(this.content.querySelectorAll('[data-copy]'),node => ({node,text:node.dataset.copy}))];
     if (autoplay) this.writer.play(this.jobs,{reducedMotion:true});
     this.resetScroll();

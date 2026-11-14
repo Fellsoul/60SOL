@@ -1,3 +1,5 @@
+import { validSnapshot } from './SpaceData.js';
+import { validVisualAction } from './VisualAction.js';
 export const SAVE_VERSION = 3;
 export const LIMITS = Object.freeze({ energy: 12, food: 32, health: 100, sols: 14, target: 60 });
 
@@ -9,6 +11,9 @@ export function createState(toolIds, seed = 20261113) {
     tools: Object.fromEntries(toolIds.map(id => [id, 'ready'])),
     rng: seed >>> 0, currentEventId: null, choiceId: null, workId: null,
     eventDone: false,
+    visualAction: null,
+    missionSnapshot: null,
+    spaceTrace: [],
     dailySystems: {spares:2,generationCap:6,trackingCap:6,supportExtra:0,careCost:3,harvestFood:8,labUntil:0,greenhouseDisabled:false,antennaLimit:30},
     history: {}, queue: [], log: [], outcome: null,
     weather: 'clear', lightsOn: true, plantStage: 'seed',
@@ -39,6 +44,9 @@ export function validateState(s, eventIds, toolIds) {
   }
   const ranges = { sol: [1,14], energy: [0,LIMITS.energy], food: [0,32], health: [0,100], localData: [0,10000], sentData: [0,10000], pendingData: [0,30], growth: [0,2], powerFailures: [0,14], generation: [0,6], rng: [0,4294967295] };
   if (!Object.entries(ranges).every(([key,[min,max]]) => Number.isInteger(s[key]) && s[key] >= min && s[key] <= max)) return false;
+  if (s.missionSnapshot != null && !validSnapshot(s.missionSnapshot)) return false;
+  if (s.spaceTrace !== undefined && (!Array.isArray(s.spaceTrace) || s.spaceTrace.length>100 || !s.spaceTrace.every(entry=>Number.isInteger(entry.sol)&&entry.sol>=1&&entry.sol<=14&&entry.snapshotID===s.missionSnapshot?.snapshotID&&entry.ruleVersion==='space-v1'&&typeof entry.choice==='string'&&entry.choice.length<=100&&Number.isInteger(entry.costE)&&entry.costE>=0&&entry.costE<=20))) return false;
+  if (s.visualAction != null && (!validVisualAction(s.visualAction) || s.visualAction.sol>s.sol)) return false;
   if (s.eventDone !== undefined && (typeof s.eventDone !== 'boolean' || (s.eventDone !== (s.choiceId !== null)))) return false;
   if (s.dailySystems !== undefined) {
     const d=s.dailySystems;

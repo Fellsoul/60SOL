@@ -1,0 +1,30 @@
+.motion-card {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+  border: 1px solid #8b9d77; border-radius: 6px;
+  color: #e0e8d6; background: #142019f5; font-size: .8rem; line-height: 1.45;
+}
+.motion-stage { position: fixed; z-index: 110; left: 16px; bottom: 16px; width: min(470px, calc(100vw - 32px)); box-shadow: 0 6px 28px #0006; }
+.motion-console { position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); width: min(470px, calc(100vw - 32px)); max-height: 200px; overflow-y: auto; }
+#terminal:not(.is-console) > .motion-card { display: none; }
+.motion-inline { flex: none; margin: 8px 12px; max-height: 150px; overflow-y: auto; }
+.clipboard-paper .motion-inline { position: sticky; top: 0; z-index: 2; margin: 0 0 12px; background: #e5dfc9; color: #343e30; border-color: #aba286; }
+.motion-copy { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.motion-task { font-weight: 600; }
+.motion-destination { font-size: .75rem; }
+.motion-cost { font: .7rem 'Courier New', monospace; }
+.motion-status { margin: 2px 0; }
+.motion-explanation { font-size: .66rem; opacity: .8; }
+.motion-art { width: 78px; aspect-ratio: 1; flex: none; background-size: 200% 200%; background-repeat: no-repeat; }
+.motion-skip { align-self: flex-start; padding: 8px 10px; min-height: 40px; border: 1px solid currentColor; border-radius: 3px; color: inherit; background: transparent; }
+.motion-skip:hover { background: #80926b33; }
+@media (max-width:600px) {
+  .motion-art { width: 48px; }
+  .motion-card { gap: 8px; padding: 8px; font-size: .72rem; }
+  .motion-inline { margin: 4px 6px; max-height: 110px; }
+}
+
+/* Clipboard feedback is text only; character animation belongs to the room. */
+.clipboard-paper .motion-inline .motion-art { display: none; }
+.clipboard-paper .motion-inline .motion-destination,
+.clipboard-paper .motion-inline .motion-cost,
+.clipboard-paper .motion-inline .motion-explanation { display: none; }

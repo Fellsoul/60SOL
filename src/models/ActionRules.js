@@ -1,3 +1,4 @@
+import { outsideBlocked, spaceEnergyCost } from './SpaceData.js';
 import { dailyState, choiceReason } from './DailyEventRules.js';
 import { LIMITS, logEntry } from './state.js';
 
@@ -34,7 +35,10 @@ export const LIGHT_ACTIONS = Object.freeze([
   {id:'lights_on',label:'action.lights_on.label',narrative:'action.lights_on.narrative',summaryLine:'summary.lightsSwitchedOn'},
 ]);
 
+export function workEnergy(state,action) { return spaceEnergyCost(state,action.id==='grow' ? dailyState(state).careCost : action.energy,['clean','repair'].includes(action.id)); }
+
 export function unavailableReason(state, action, event = null) {
+  if (outsideBlocked(state) && ['clean','repair'].includes(action.id)) return 'dependency.spaceAdvisory';
   if (state.phase === 'finished') return 'error.missionFinished';
   if (state.workId || !['event','work'].includes(state.phase)) return 'error.workUsed';
   if (action.tool && state.tools[action.tool] !== 'ready') return 'error.toolUnavailable';
@@ -46,7 +50,7 @@ export function unavailableReason(state, action, event = null) {
   const systems = dailyState(state);
   if (action.id === 'grow' && systems.greenhouseDisabled) return 'error.facilityUnavailable';
   if (action.id === 'research' && state.sol < systems.labUntil) return 'error.facilityUnavailable';
-  if (state.energy < (action.id === 'grow' ? systems.careCost : action.energy)) return 'error.powerInsufficient';
+  if (state.energy < workEnergy(state,action)) return 'error.powerInsufficient';
   if (action.id === 'transmit' && systems.antennaLimit === 0) return 'error.facilityUnavailable';
   if (action.id === 'transmit' && state.localData === 0) return 'error.noLocalData';
   if (['clean','repair'].includes(action.id) && !state.dusty && systems.generationCap === 6 && (action.id !== 'repair' || systems.trackingCap === 6)) return 'error.panelsClean';

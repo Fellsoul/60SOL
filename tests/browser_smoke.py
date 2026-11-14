@@ -508,6 +508,25 @@ try:
         daily_page.locator('#terminal-toggle:enabled').wait_for()
         daily_page.locator('#terminal-toggle').click()
         assert daily_page.locator('#terminal [data-action=next]').count()==0
+        motion_context=browser.new_context(reduced_motion='no-preference')
+        motion_page=motion_context.new_page();motion_page.goto(url)
+        motion_page.locator('[data-menu=new]').click(force=True)
+        motion_page.locator('[value=toolkit]').check();motion_page.locator('[value=battery]').check()
+        motion_page.locator('#loadout-form button').click()
+        motion_page.locator('#terminal-toggle:enabled').wait_for()
+        motion_page.locator('#tasks-toggle').click()
+        motion_page.locator('#tasks [data-action=choose][data-id=secure]').click()
+        motion_page.locator('#tasks .is-complete').wait_for()
+        motion_key=motion_page.evaluate("() => Object.keys(localStorage).find(key=>key.includes('.slot.'))")
+        committed=motion_page.evaluate('(key)=>localStorage.getItem(key)',motion_key)
+        motion_page.locator('#tasks .motion-skip:visible').click()
+        motion_page.locator('#tasks .motion-card[data-checkpoint=complete]').wait_for()
+        assert motion_page.evaluate('(key)=>localStorage.getItem(key)',motion_key)==committed
+        assert motion_page.locator('#tasks .motion-skip').is_hidden()
+        motion_page.reload();motion_page.locator('[data-menu=continue]').click()
+        motion_page.locator('#terminal-toggle:enabled').wait_for()
+        assert motion_page.locator('.motion-stage[data-checkpoint=complete]').is_visible()
+        assert motion_page.evaluate('(key)=>localStorage.getItem(key)',motion_key)==committed
         browser.close()
         print('Browser smoke passed: terminal, summaries, PNG states, dust parallax, reduced motion, missing assets, 3 viewport sizes.')
 finally:

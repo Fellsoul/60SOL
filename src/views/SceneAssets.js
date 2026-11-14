@@ -1,14 +1,29 @@
-// 只读取用户提供的 PNG；缺失素材不生成占位图。刷新页面后会重新读取。
+// Missing or stalled art falls back safely; refreshing retries failed files.
 export class SceneAssets {
-  constructor() { this.cache = new Map(); this.missing = new Set(); }
+  constructor({timeoutMs=3000,imageFactory=()=>new Image(),schedule=(fn,ms)=>setTimeout(fn,ms),cancel=id=>clearTimeout(id)}={}) {
+    this.cache=new Map();this.missing=new Set();
+    this.timeoutMs=timeoutMs;this.imageFactory=imageFactory;this.schedule=schedule;this.cancel=cancel;
+  }
   load(url) {
     if (!url) return Promise.resolve(null);
     if (!this.cache.has(url)) {
-      this.cache.set(url,new Promise(resolve => {
-        const image = new Image();
-        image.onload = () => resolve(image);
-        image.onerror = () => { this.missing.add(url); resolve(null); };
-        image.src = url;
+      this.cache.set(url,new Promise(resolve=> {
+        let image;
+        try { image=this.imageFactory(); }
+        catch { this.missing.add(url);resolve(null);return; }
+        let settled=false,timer=null;
+        const finish=asset=> {
+          if (settled) return;
+          settled=true;
+          if (timer!==null) this.cancel(timer);
+          image.onload=null;image.onerror=null;
+          if (!asset) this.missing.add(url);
+          resolve(asset);
+        };
+        image.onload=()=>finish(image);
+        image.onerror=()=>finish(null);
+        timer=this.schedule(()=>finish(null),this.timeoutMs);
+        image.src=url;
       }));
     }
     return this.cache.get(url);

@@ -1,6 +1,8 @@
-import { applyDailyChoice, choiceReason, eventResolved, dailyState, emergencyCleanAvailable } from './DailyEventRules.js';
+import { validSnapshot, recordSpaceDecision } from './SpaceData.js';
+import { recordVisualAction } from './VisualAction.js';
+import { applyDailyChoice, choiceReason, choiceEnergy, eventResolved, dailyState, emergencyCleanAvailable } from './DailyEventRules.js';
 import { createState, logEntry, LIMITS } from './state.js';
-import { ACTIONS, LIGHT_ACTIONS, applyEffect, unavailableReason } from './ActionRules.js';
+import { ACTIONS, LIGHT_ACTIONS, applyEffect, unavailableReason, workEnergy } from './ActionRules.js';
 import { EventEngine } from './EventEngine.js';
 import { beginSol, finishSol } from './TurnEngine.js';
 import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
@@ -10,9 +12,11 @@ export class GameModel {
   constructor({ events, tools, environment = {}, resource_log = {} }) { this.events = new EventEngine(events); this.tools = tools; this.environment = environment; this.resourceLog = resource_log; }
   get snapshot() { return this.#state ? structuredClone(this.#state) : null; }
   restore(state) { this.#state = structuredClone(state); }
-  start(toolIds) {
+  start(toolIds,snapshot=null) {
+    if(snapshot!==null&&!validSnapshot(snapshot))throw new Error('Invalid mission snapshot');
     if (toolIds.length !== 2 || new Set(toolIds).size !== 2 || !toolIds.every(id => this.tools.some(tool => tool.id === id))) throw new Error('error.chooseTwoTools');
-    this.#state = createState(toolIds);
+    this.#state = createState(toolIds,snapshot?.seed);
+    this.#state.missionSnapshot=structuredClone(snapshot);
     beginSol(this.#state,this.events,this.environment,this.resourceLog);
   }
   choose(choiceId) {
@@ -21,16 +25,19 @@ export class GameModel {
     const choice = this.events.get(s.currentEventId).choices.find(item => item.id === choiceId);
     if (!choice || choiceReason(s,choice)) throw new Error('error.choiceUnavailable');
     const before = resourceSnapshot(s);
-    s.energy -= choice.energy;
+    const paidEnergy=choiceEnergy(s,choice);
+    s.energy -= paidEnergy;
     applyEffect(s,choice.action);
     applyDailyChoice(s,choice);
     recordResourceChange(s,before,`event.${s.currentEventId}.${choice.id}`,this.resourceLog,choice.summaryLine);
+    recordSpaceDecision(s,choice.id,paidEnergy);
     s.eventDone = true;
     s.choiceId = choiceId;
     s.daySummary.push(choice.summaryLine ?? this.events.get(s.currentEventId).summaryLine);
     if (choice.work) s.workId = `event:${choice.id}`;
     s.phase = s.workId ? 'end' : 'work';
-    logEntry(s,`事件决策：${choice.label}；消耗 ${choice.energy} E${choice.work ? '，占用今日工作' : ''}。`);
+    if (choice.work) recordVisualAction(s,{action:choice.action,label:choice.label,summary:choice.summaryLine,energy:paidEnergy,condition:choice.costH??0,spares:choice.costQ??0,eventId:s.currentEventId,choiceId:choice.id});
+    logEntry(s,`事件决策：${choice.label}；消耗 ${paidEnergy} E${choice.work ? '，占用今日工作' : ''}。`);
   }
   chooseEmergencyClean(choiceId) {
     const s = this.#state;
@@ -38,14 +45,17 @@ export class GameModel {
     const choice = event?.choices.find(item => item.id === choiceId);
     if (!emergencyCleanAvailable(s,s ? this.events.get(s.currentEventId) : null) || s.history.emergency_clean === s.sol || !choice || choiceReason(s,choice)) throw new Error('error.choiceUnavailable');
     const before = resourceSnapshot(s);
-    s.energy -= choice.energy;
+    const paidEnergy=choiceEnergy(s,choice);
+    s.energy -= paidEnergy;
     applyDailyChoice(s,choice);
     recordResourceChange(s,before,`event.${event.id}.${choice.id}`,this.resourceLog,choice.summaryLine);
+    recordSpaceDecision(s,`emergency:${choice.id}`,paidEnergy);
     s.history.emergency_clean = s.sol;
     s.daySummary.push(choice.summaryLine);
     if (choice.work) {
       s.workId = `event:${choice.id}`;
       s.phase = eventResolved(s,this.events.get(s.currentEventId)) ? 'end' : 'event';
+      recordVisualAction(s,{action:'clean',label:choice.label,summary:choice.summaryLine,energy:paidEnergy,condition:choice.costH??0,eventId:event.id,choiceId:choice.id});
     }
   }
   work(actionId) {
@@ -58,13 +68,16 @@ export class GameModel {
     const response = s.phase === 'event' ? event.workResolutions?.[actionId] : null;
     if (response) { this.choose(response); return; }
     const before = resourceSnapshot(s);
-    s.energy -= action.id === 'grow' ? dailyState(s).careCost : action.energy;
+    const paidEnergy=workEnergy(s,action);
+    s.energy -= paidEnergy;
     applyEffect(s,actionId);
     recordResourceChange(s,before,`work.${actionId}`,this.resourceLog,action.summaryLine);
     s.daySummary.push(action.summaryLine);
     s.workId = actionId;
+    recordSpaceDecision(s,actionId,paidEnergy);
     s.phase = eventResolved(s,event) ? 'end' : 'event';
-    logEntry(s,`基地工作：${action.label}；消耗 ${action.id === 'grow' ? dailyState(s).careCost : action.energy} E。${action.description ?? action.narrative}`);
+    recordVisualAction(s,{action:actionId,label:action.label,summary:action.summaryLine,energy:paidEnergy});
+    logEntry(s,`基地工作：${action.label}；消耗 ${paidEnergy} E。${action.description ?? action.narrative}`);
   }
   setLights(on) {
     const s = this.#state;
