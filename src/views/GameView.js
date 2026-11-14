@@ -29,7 +29,7 @@ export class GameView {
   async mount() {
     await this.scene.mount();
     this.tasks.mount();
-    this.sceneEvent = new SceneEventView(this.scene.root, () => { void this.openTasks(); });
+    this.sceneEvent = new SceneEventView(this.scene.root);
   }
   coverScene() {
     const veil = document.querySelector('#morning-veil');
