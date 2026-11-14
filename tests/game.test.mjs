@@ -222,7 +222,8 @@ test('照明电力不足时自动熄灯，库存不为负且不额外扣 health'
     finishSol(state);
     assert.equal(state.energy,0); assert.equal(state.lightsOn,false); assert.equal(state.health,100);
     assert.ok(state.previousDaySummary.includes('summary.lightsPowerLost'));
-    assert.equal(state.previousDaySummary.includes('summary.lightingCost'),energy===1);
+    assert.equal(state.previousDaySummary.includes('summary.lightingCost'),false);
+    assert.equal(state.previousResourceLog.some(entry => entry.source==='lighting' && entry.changes.energy===-1),energy===1);
   }
   const game = model(); const state=game.snapshot; state.energy=0; state.lightsOn=false; game.restore(state);
   assert.throws(() => game.setLights(true),{message:'error.powerInsufficient'});
@@ -244,7 +245,8 @@ test('读档不重复结算照明，结束当天才扣费，任务结束后不�
   const saved=repo.save(game.snapshot); const restored=new GameModel(content); restored.restore(repo.load(saved.id).state);
   assert.equal(restored.snapshot.energy,game.snapshot.energy);
   restored.nextSol(); assert.equal(restored.snapshot.energy,game.snapshot.energy-1+6-3);
-  assert.equal(restored.snapshot.previousDaySummary.filter(key => key==='summary.lightingCost').length,1);
+  assert.equal(restored.snapshot.previousResourceLog.filter(entry => entry.source==='lighting' && entry.changes.energy===-1).length,1);
+  assert.ok(!restored.snapshot.previousDaySummary.includes('summary.lightingCost'));
   const finished=restored.snapshot; Object.assign(finished,{phase:'finished',outcome:'success'}); restored.restore(finished);
   assert.throws(() => restored.setLights(false),{message:'error.lightsUnavailable'});
 });

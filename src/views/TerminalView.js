@@ -74,13 +74,16 @@ export class TerminalView {
     return entries.map((entry,index) => {
       const variants = localize(this.resourceLog.sources?.[entry.source]?.descriptions);
       const description = variants?.[entry.variant % variants.length] ?? i18n.t(entry.fallback || entry.source);
-      const changes = Object.entries(entry.changes).map(([resource,delta]) => {
+      // Generation is a daily rate, not another resource gain. Show only power
+      // actually stored, including a zero when the batteries were already full.
+      const deltas = entry.source === 'generation' ? {energy:entry.changes.energy ?? 0} : entry.changes;
+      const changes = Object.entries(deltas).map(([resource,delta]) => {
         const label = localize(this.resourceLog.resources?.[resource]) ?? resource;
-        const sign = delta > 0 ? '+' : '−';
+        const sign = delta >= 0 ? '+' : '−';
         const amount = Math.abs(delta);
         const accessible = escapeHtml(`${label} ${sign}${amount}`);
         return resource === 'energy'
-          ? `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}</span>${'<img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">'.repeat(amount)}</span>`
+          ? `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}${amount === 0 ? '0' : ''}</span>${'<img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">'.repeat(amount)}</span>`
           : `<span class="summary-resource-change">${escapeHtml(label)} ${sign}${amount}</span>`;
       }).join(' ');
       return this.copy(`resource-copy-${index}`,description,` <span class="summary-resource-changes">${changes}</span>`);
@@ -119,7 +122,9 @@ export class TerminalView {
     if (!state) {
       this.content.innerHTML = this.copy('briefing-copy','loadout.intro') + `<form id="loadout-form"><div class="loadout">${this.tools.map(tool => `<label><input type="checkbox" name="tool" value="${escapeHtml(tool.id)}"><span>${escapeHtml(i18n.t(tool.name))}<small>${escapeHtml(i18n.t(tool.description))}</small></span></label>`).join('')}</div><div class="terminal-choices"><button class="terminal-choice" type="submit" disabled>${escapeHtml(i18n.t('loadout.chooseTwo'))}</button></div></form>`;
     } else {
-      const previous = state.previousDaySummary.length ? state.previousDaySummary.map(line => i18n.t(line)).join('\n\n') : 'summary.arrival';
+      const hasLightingDetail = state.previousResourceLog?.some(entry => entry.source === 'lighting');
+      const previousLines = state.previousDaySummary.filter(line => !(hasLightingDetail && i18n.t(line) === i18n.t('summary.lightingCost')));
+      const previous = state.previousDaySummary.length ? previousLines.map(line => i18n.t(line)).join('\n\n') : 'summary.arrival';
       let today = event.text;
       if (state.outcome) today = {success:'outcome.success',incomplete:'outcome.incomplete',unsafe:'outcome.unsafe'}[state.outcome];
       this.content.innerHTML = `<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}<div id="terminal-decisions" class="terminal-choices"></div>`;

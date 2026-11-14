@@ -29,7 +29,7 @@ export function finishSol(state, resourceLog = {}) {
   let before = resourceSnapshot(state);
   // 工作已在确认时结算；通信先于最终结局、收获先于食物消耗。
   if (state.lightsOn) {
-    if (state.energy > 0) { state.energy -= 1; state.daySummary.push('summary.lightingCost'); }
+    if (state.energy > 0) state.energy -= 1;
     if (state.energy === 0) { state.lightsOn = false; state.daySummary.push('summary.lightsPowerLost'); }
   }
   recordResourceChange(state,before,'lighting',resourceLog,'summary.lightingCost');
