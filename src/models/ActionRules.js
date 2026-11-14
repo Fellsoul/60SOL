@@ -26,9 +26,12 @@ export const ACTIONS = Object.freeze([
   { id:'monitor', label:'action.monitor.label', energy:2, description:'本地数据 +6；不会降低辐射。', tool:'monitor' },
   { id:'shield', label:'action.shield.label', energy:0, description:'消耗加固包和今日工作；永久保留屏蔽状态。', tool:'shield' },
   { id:'standby', label:'action.standby.label', energy:0, description:'保留电力；日终仍消耗食物。' },
-  { id:'lights_off', label:'action.lights_off.label', energy:0 },
-  { id:'lights_on', label:'action.lights_on.label', energy:1 },
 ].map(action => ({...action,narrative:NARRATIVES[action.id][0],summaryLine:NARRATIVES[action.id][1]})));
+
+export const LIGHT_ACTIONS = Object.freeze([
+  {id:'lights_off',label:'action.lights_off.label',narrative:'action.lights_off.narrative',summaryLine:'summary.lightsSwitchedOff'},
+  {id:'lights_on',label:'action.lights_on.label',narrative:'action.lights_on.narrative',summaryLine:'summary.lightsSwitchedOn'},
+]);
 
 export function unavailableReason(state, action) {
   if (state.phase === 'event') return 'error.eventFirst';
@@ -39,8 +42,6 @@ export function unavailableReason(state, action) {
   if (action.id === 'transmit' && state.localData === 0) return 'error.noLocalData';
   if (['clean','repair'].includes(action.id) && !state.dusty) return 'error.panelsClean';
   if (state.weather === 'sandstorm' && ['clean','repair','robot'].includes(action.id)) return 'error.stormOutside';
-  if (action.id === 'lights_off' && !state.lightsOn) return 'error.lightsAlreadyOff';
-  if (action.id === 'lights_on' && state.lightsOn) return 'error.lightsAlreadyOn';
   return '';
 }
 

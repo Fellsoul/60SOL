@@ -111,7 +111,7 @@ test('天气、灯光、植物和消耗工具投影为图片状态，不依赖�
   assert.equal(sceneState(game.snapshot).plants,'sprout');
   game.useBattery(); assert.equal(sceneState(game.snapshot).tools.battery,'consumed');
   game.nextSol(); assert.equal(sceneState(game.snapshot).weather,'sandstorm');
-  game.choose('review'); game.work('lights_off');
+  game.choose('review'); game.setLights(false);
   assert.equal(sceneState(game.snapshot).lighting,'off');
 });
 
@@ -189,4 +189,61 @@ test('删除拒绝非存档键，存储不可用时返回失败',() => {
   assert.equal(new SaveRepository(null,content).delete(repo.key).ok,false);
   const blocked = { removeItem() { throw new Error('Storage blocked'); } };
   assert.equal(new SaveRepository(blocked,content).delete(repo.key).ok,false);
+});
+
+test('开关灯不扣即时电力，不改变事件、工作机会或已完成的工作',() => {
+  const game = model(); const energy = game.snapshot.energy;
+  for (let i=0;i<50;i++) { game.setLights(false); game.setLights(true); }
+  assert.equal(game.snapshot.phase,'event'); assert.equal(game.snapshot.choiceId,null);
+  assert.equal(game.snapshot.energy,energy); assert.equal(game.snapshot.daySummary.length,1);
+  game.choose('plan'); game.setLights(false);
+  assert.equal(game.snapshot.phase,'work'); assert.equal(game.snapshot.workId,null);
+  game.work('research'); game.setLights(true); game.setLights(false);
+  assert.equal(game.snapshot.phase,'end'); assert.equal(game.snapshot.workId,'research');
+  assert.equal(game.snapshot.energy,energy-3); assert.throws(() => game.work('grow'));
+  const repo = new SaveRepository(memory(),content); const saved = repo.save(game.snapshot);
+  assert.deepEqual(repo.load(saved.id).state,game.snapshot);
+});
+
+test('持续开灯每日扣 1 E，关灯不扣，重复切换不会重复收费',() => {
+  const game = model(); game.choose('grow');
+  game.setLights(false); game.setLights(true); game.setLights(false); game.setLights(true);
+  const on = game.snapshot; on.energy=10;
+  for (let day=0;day<3;day++) finishSol(on);
+  assert.equal(on.energy,7); assert.equal(on.health,100);
+  const off = game.snapshot; off.lightsOn=false; off.energy=10; finishSol(off);
+  assert.equal(off.energy,10); assert.equal(off.health,100);
+});
+
+test('照明电力不足时自动熄灯，库存不为负且不额外扣 health',() => {
+  for (const energy of [0,1]) {
+    const state = model().snapshot; Object.assign(state,{phase:'end',energy});
+    finishSol(state);
+    assert.equal(state.energy,0); assert.equal(state.lightsOn,false); assert.equal(state.health,100);
+    assert.ok(state.previousDaySummary.includes('summary.lightsPowerLost'));
+    assert.equal(state.previousDaySummary.includes('summary.lightingCost'),energy===1);
+  }
+  const game = model(); const state=game.snapshot; state.energy=0; state.lightsOn=false; game.restore(state);
+  assert.throws(() => game.setLights(true),{message:'error.powerInsufficient'});
+});
+
+test('沙暴开关灯选项都保留工作机会，日终按最终灯光状态收费',() => {
+  for (const id of ['shelter','inside']) {
+    const game = model(); const state=game.snapshot;
+    Object.assign(state,{sol:4,currentEventId:'sandstorm',weather:'sandstorm'}); game.restore(state);
+    game.choose(id); assert.equal(game.snapshot.phase,'work'); assert.equal(game.snapshot.workId,null);
+    game.work('research'); const energy=game.snapshot.energy;
+    const end=game.snapshot; finishSol(end);
+    assert.equal(end.energy,energy-(id==='inside' ? 1 : 0));
+  }
+});
+
+test('读档不重复结算照明，结束当天才扣费，任务结束后不可切灯',() => {
+  const game=model(); game.choose('grow'); const repo=new SaveRepository(memory(),content);
+  const saved=repo.save(game.snapshot); const restored=new GameModel(content); restored.restore(repo.load(saved.id).state);
+  assert.equal(restored.snapshot.energy,game.snapshot.energy);
+  restored.nextSol(); assert.equal(restored.snapshot.energy,game.snapshot.energy-1+6-3);
+  assert.equal(restored.snapshot.previousDaySummary.filter(key => key==='summary.lightingCost').length,1);
+  const finished=restored.snapshot; Object.assign(finished,{phase:'finished',outcome:'success'}); restored.restore(finished);
+  assert.throws(() => restored.setLights(false),{message:'error.lightsUnavailable'});
 });

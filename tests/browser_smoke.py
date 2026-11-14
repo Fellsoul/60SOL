@@ -144,6 +144,15 @@ try:
         assert page.locator('.scene-dust-motion').evaluate_all('(nodes) => nodes.every(node => Number(getComputedStyle(node).opacity) === 0.5 && node.getAnimations().every(animation => animation.playState === "paused"))')
         decide('[data-action=choose][data-id=shelter]')
         assert page.locator('[data-layer=cabin-lights]').is_hidden()
+        terminal()
+        assert page.locator('[data-action=work][data-id=research]').is_enabled()
+        decide('[data-action=lights][data-id=lights_on]')
+        terminal()
+        assert page.locator('[data-action=work][data-id=research]').is_enabled()
+        decide('[data-action=work][data-id=research]')
+        terminal()
+        assert page.locator('[data-action=next]').is_visible()
+        decide('[data-action=lights][data-id=lights_off]')
 
         for width in [390, 768, 1440]:
             page.set_viewport_size({'width': width, 'height': 800})

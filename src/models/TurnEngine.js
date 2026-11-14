@@ -17,6 +17,10 @@ export function beginSol(state, events, environment = {}) {
 
 export function finishSol(state) {
   // 工作已在确认时结算；通信先于最终结局、收获先于食物消耗。
+  if (state.lightsOn) {
+    if (state.energy > 0) { state.energy -= 1; state.daySummary.push('summary.lightingCost'); }
+    if (state.energy === 0) { state.lightsOn = false; state.daySummary.push('summary.lightsPowerLost'); }
+  }
   if (state.pendingData) logEntry(state,`地球确认收到 ${state.pendingData} 点科研数据。`);
   if (state.pendingData) state.daySummary.push('summary.transmissionConfirmed');
   state.sentData += state.pendingData;
