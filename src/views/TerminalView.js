@@ -12,8 +12,9 @@ function choice(action,id,label,description='',disabled=false) {
 }
 
 export class TerminalView {
-  constructor(tools,resourceLog = {}) {
+  constructor(tools,events = [],resourceLog = {}) {
     this.resourceLog = resourceLog;
+    this.events = events;
     this.tools = tools; this.dialog = document.querySelector('#terminal'); this.content = document.querySelector('#terminal-content');
     this.writer = new Typewriter(); this.animation = null;
     this.batterySlot = new BatterySlotView();

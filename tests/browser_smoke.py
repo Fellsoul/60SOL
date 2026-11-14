@@ -40,6 +40,7 @@ try:
 
         def ready():
             page.locator('#terminal-toggle:enabled').wait_for()
+            assert '画面更新失败' not in page.locator('#notice').inner_text()
 
         def terminal():
             ready()
