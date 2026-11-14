@@ -1,0 +1,63 @@
+#terminal {
+  position: fixed; inset: 0 auto 0 0; width: min(540px, 94vw); height: 100dvh;
+  max-height: none; max-width: none; padding: 0; margin: 0;
+  border: 0; border-right: 1px solid #788b6966; color: var(--phosphor);
+  background: #101a14f5; box-shadow: 24px 0 70px #0008;
+}
+#terminal::backdrop { background: #03070438; }
+.console-frame { display: none; }
+/* Game console: one image coordinate plane, 10% exposed when collapsed and 80% when open. */
+#terminal.is-console {
+  inset: auto auto 0 20vw;
+  width: 60vw; height: auto; aspect-ratio: 1672 / 941;
+  border: 0; background: transparent; box-shadow: none; overflow: hidden;
+  transform: translateY(20%);
+  opacity: .9; transition: opacity 500ms ease-in-out;
+}
+body.console-pointer-outside #terminal.is-console { opacity: .5; }
+body.reduced-motion #terminal.is-console { transition: none; }
+#terminal.is-console::backdrop { background: transparent; }
+#terminal.is-console .console-frame { position: absolute; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+#terminal.is-console .terminal-shell {
+  position: absolute; top: 7%; left: 4%; right: 4%; bottom: 24%; height: auto;
+  background: transparent; overflow: hidden;
+}
+#terminal.is-console .terminal-header { padding: 6px 14px; }
+#terminal.is-console #terminal-scroll { padding: 14px; }
+#terminal.is-console .terminal-footer { padding: 5px 14px; gap: 8px; }
+#terminal.is-console #terminal-content { font-size: clamp(.65rem, 1.1vw, 1rem); }
+#terminal.is-console .terminal-header h1 { font-size: clamp(.7rem, 1.3vw, 1.2rem); }
+#terminal.is-console #terminal-close { width: 30px; height: 30px; font-size: 1.1rem; }
+body.console-open #terminal-toggle { visibility: hidden; }
+/* Keep the screen usable in narrow views without changing the requested image width. */
+@media (max-width: 600px) {
+  #terminal.is-console .terminal-header { padding: 2px 7px; }
+  #terminal.is-console #terminal-scroll { padding: 6px; }
+  #terminal.is-console .terminal-footer { display: none; }
+  #terminal.is-console #terminal-close { width: 24px; height: 24px; }
+}
+.terminal-shell { height: 100%; display: flex; flex-direction: column; background: repeating-linear-gradient(0deg, transparent 0 3px, #00000018 3px 4px); }
+.terminal-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 26px; border-bottom: 1px solid var(--line); flex: none; }
+.terminal-header h1 { font: 500 1.2rem "Courier New", monospace; letter-spacing: .18em; margin: 0; }
+#terminal-close { background: none; border: 1px solid var(--line); width: 40px; height: 40px; font-size: 1.6rem; border-radius: 4px; }
+#terminal-scroll { overflow-y: auto; overscroll-behavior: contain; flex: 1; min-height: 0; padding: 26px; scrollbar-color: #667c5c #17251b; }
+#terminal-content { line-height: 1.9; font-size: .96rem; }
+#terminal-content h2 { font-size: 1rem; font-weight: 500; letter-spacing: .1em; margin: 28px 0 12px; color: #e2e9d8; }
+#terminal-content h2:first-child { margin-top: 0; }
+.terminal-copy { white-space: pre-wrap; margin: 0 0 20px; }
+.typing::after { content: '▌'; color: #d4e7b9; }
+.terminal-choices { display: grid; gap: 10px; margin: 24px 0; }
+.terminal-choice { width: 100%; text-align: left; display: grid; gap: 6px; padding: 14px 16px; border: 1px solid #607358; border-radius: 3px; background: #1d2c2080; min-height: 48px; }
+.terminal-choice:not(:disabled):hover { background: #31432c; border-color: #bdd3a2; }
+.terminal-choice small { color: #9ead96; line-height: 1.65; }
+.terminal-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 26px; border-top: 1px solid var(--line); font-size: .75rem; flex: none; color: var(--dim); }
+.terminal-footer button { background: none; border: 0; min-height: 36px; padding: 0 6px; }
+.terminal-footer label { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+.terminal-footer input, .loadout input { accent-color: #bdd3a2; }
+.loadout { display: grid; gap: 10px; }
+.loadout label { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border: 1px solid var(--line); cursor: pointer; }
+.loadout input { margin-top: 7px; }
+.loadout small { display: block; font-size: .8rem; color: var(--dim); }
+.loadout label:has(input:checked) { background: #2b3a26; border-color: #a2bb8c; }
+.terminal-note { color: var(--dim); font-size: .85rem; }
+@media (max-width: 600px) { #terminal-scroll { padding: 20px; } .terminal-header { padding: 16px 20px; } .terminal-footer { padding: 10px 20px; } }

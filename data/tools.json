@@ -1,0 +1,27 @@
+[
+  {
+    "id": "toolkit",
+    "name": "工具箱",
+    "description": "让维修变得可靠，仍然需要电力和时间。"
+  },
+  {
+    "id": "robot",
+    "name": "小型机器人",
+    "description": "代替队员完成部分采样工作，需要较多电力。"
+  },
+  {
+    "id": "battery",
+    "name": "备用电池",
+    "description": "接入供电系统后就不能再次使用。"
+  },
+  {
+    "id": "monitor",
+    "name": "辐射监测仪",
+    "description": "记录环境变化，本身不提供辐射防护。"
+  },
+  {
+    "id": "shield",
+    "name": "屏蔽加固包",
+    "description": "安装后成为避难区的一部分。"
+  }
+]

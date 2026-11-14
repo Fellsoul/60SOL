@@ -1,0 +1,26 @@
+import { i18n } from '../services/I18n.js';
+export class MenuView {
+  constructor(config) {
+    this.root = document.querySelector('#main-menu');
+    for (const name of ['space','mars','meteors']) {
+      const img = this.root.querySelector(`[data-menu-layer=${name}]`);
+      img.src = config[name]; img.onerror = () => { img.hidden = true; };
+    }
+    this.root.addEventListener('pointermove',event => {
+      if (document.querySelector('#reduce-motion').checked) return;
+      this.root.style.setProperty('--mx',`${(event.clientX/innerWidth-.5)*28}px`);
+      this.root.style.setProperty('--my',`${(event.clientY/innerHeight-.5)*20}px`);
+    });
+    this.root.addEventListener('pointerleave',() => { this.root.style.setProperty('--mx','0px'); this.root.style.setProperty('--my','0px'); });
+  }
+  show(hasSave) {
+    this.root.hidden = false;
+    document.querySelector('#scene-viewport').hidden = true;
+    document.querySelector('#terminal-toggle').hidden = true;
+    const veil = document.querySelector('#morning-veil'); veil.style.opacity = '0'; veil.style.pointerEvents = 'none';
+    this.root.querySelector('[data-menu=continue]').hidden = !hasSave;
+    this.root.querySelector('[data-menu=load]').disabled = !hasSave;
+    this.root.querySelectorAll('[data-menu]').forEach(button => { button.textContent = i18n.t(`menu.${button.dataset.menu}`); });
+  }
+  hide() { this.root.hidden = true; document.querySelector('#scene-viewport').hidden = false; document.querySelector('#terminal-toggle').hidden = false; }
+}

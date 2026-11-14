@@ -1,0 +1,6 @@
+{
+  "description": "固定演示天气，不是实时火星天气，也不依赖库存。可修改每天的天气；未列出的 Sol 使用 default。",
+  "default": "clear",
+  "days": { "4": "sandstorm", "8": "sandstorm", "9": "sandstorm" }
+  
+}

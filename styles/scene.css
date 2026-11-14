@@ -1,0 +1,19 @@
+#scene-viewport { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; background: #080b0e; }
+/* 使用 contain：所有图层跟随同一坐标平面缩放，绝不单独裁剪背景。 */
+#scene { position: relative; overflow: hidden; isolation: isolate; flex: none; background: #121a20; }
+.scene-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+.scene-layer img { display: block; width: 100%; height: 100%; object-fit: contain; }
+#morning-veil { position: fixed; inset: 0; z-index: 120; background: #000; opacity: 1; pointer-events: auto; }
+#scene.debug { outline: 1px solid #ffcc8c; }
+#scene.debug .scene-layer { outline: 1px dashed #ffd59a66; }
+#terminal-toggle {
+  position: fixed; z-index: 95;
+  top: auto; left: 20vw; bottom: 0; width: 60vw; height: auto; aspect-ratio: 1672 / 941;
+  min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent;
+  box-shadow: none; transform: translateY(90%); overflow: hidden;
+  opacity: .9; transition: opacity 500ms ease-in-out;
+}
+#terminal-toggle img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+#terminal-toggle:disabled { opacity: .9; }
+body.console-pointer-outside #terminal-toggle { opacity: .5; }
+body.reduced-motion #terminal-toggle { transition: none; }

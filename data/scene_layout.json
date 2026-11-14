@@ -1,0 +1,288 @@
+{
+  "description": "所有场景 PNG 与 interior/outpost_base.png 同尺寸、同原点。仅设置覆盖顺序和状态，不单独调整大小或位置。",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "referenceImage": "assets/scene/interior/outpost_base.png"
+  },
+  "layers": [
+    {
+      "id": "exterior-main",
+      "bind": "weather",
+      "zIndex": 10,
+      "defaultState": "clear",
+      "states": {
+        "clear": {
+          "src": "assets/scene/exterior/main/clear.png"
+        },
+        "sandstorm": {
+          "sequence": {
+            "pattern": "assets/scene/exterior/main/sandstorm/frame_{index}.png",
+            "start": 1,
+            "count": 6,
+            "pad": 2
+          },
+          "fps": 6,
+          "playback": "ping-pong"
+        }
+      }
+    },
+    {
+      "id": "exterior-right",
+      "bind": "weather",
+      "zIndex": 12,
+      "defaultState": "clear",
+      "states": {
+        "clear": {
+          "src": "assets/scene/exterior/right/clear.png"
+        },
+        "sandstorm": {
+          "sequence": {
+            "pattern": "assets/scene/exterior/right/sandstorm/frame_{index}.png",
+            "start": 1,
+            "count": 6,
+            "pad": 2
+          },
+          "fps": 6,
+          "playback": "ping-pong"
+        }
+      }
+    },
+    {
+      "id": "solar-dust",
+      "bind": "panels",
+      "zIndex": 16,
+      "defaultState": "clean",
+      "states": {
+        "clean": {
+          "hidden": true
+        },
+        "dusty": {
+          "src": "assets/scene/exterior/main/panels_dust.png"
+        }
+      }
+    },
+    {
+      "id": "greenhouse",
+      "bind": "plants",
+      "zIndex": 25,
+      "defaultState": "seed",
+      "states": {
+        "seed": {
+          "src": "assets/scene/greenhouse/room_base.png"
+        },
+        "sprout": {
+          "src": "assets/scene/greenhouse/room_base.png"
+        },
+        "growing": {
+          "src": "assets/scene/greenhouse/room_base.png"
+        },
+        "mature": {
+          "src": "assets/scene/greenhouse/room_base.png"
+        }
+      }
+    },
+    {
+      "id": "plants",
+      "bind": "plants",
+      "zIndex": 30,
+      "defaultState": "seed",
+      "states": {
+        "seed": {
+          "hidden": true
+        },
+        "sprout": {
+          "src": "assets/scene/greenhouse/plants/sprout.png"
+        },
+        "growing": {
+          "src": "assets/scene/greenhouse/plants/growing.png"
+        },
+        "mature": {
+          "src": "assets/scene/greenhouse/plants/mature.png"
+        }
+      }
+    },
+    {
+      "id": "outpost",
+      "bind": "lighting",
+      "zIndex": 40,
+      "defaultState": "on",
+      "states": {
+        "on": {
+          "src": "assets/scene/interior/outpost_base.png"
+        },
+        "off": {
+          "src": "assets/scene/interior/outpost_base.png"
+        }
+      }
+    },
+    {
+      "id": "astronaut-a",
+      "bind": "crew",
+      "zIndex": 50,
+      "defaultState": "seated",
+      "states": {
+        "seated": {
+          "src": "assets/scene/crew/astronaut_a/seated.png"
+        },
+        "resting": {
+          "src": "assets/scene/crew/astronaut_a/resting.png"
+        },
+        "exhausted": {
+          "src": "assets/scene/crew/astronaut_a/exhausted.png"
+        }
+      }
+    },
+    {
+      "id": "astronaut-b",
+      "bind": "crew",
+      "zIndex": 50,
+      "defaultState": "seated",
+      "states": {
+        "seated": {
+          "src": "assets/scene/crew/astronaut_b/seated.png"
+        },
+        "resting": {
+          "src": "assets/scene/crew/astronaut_b/resting.png"
+        },
+        "exhausted": {
+          "src": "assets/scene/crew/astronaut_b/exhausted.png"
+        }
+      }
+    },
+    {
+      "id": "transmission",
+      "bind": "transmission",
+      "zIndex": 65,
+      "defaultState": "idle",
+      "states": {
+        "idle": {
+          "src": "assets/scene/equipment/terminal/idle.png"
+        },
+        "stored": {
+          "src": "assets/scene/equipment/terminal/stored.png"
+        },
+        "sending": {
+          "src": "assets/scene/equipment/terminal/sending.png"
+        },
+        "received": {
+          "src": "assets/scene/equipment/terminal/received.png"
+        }
+      }
+    },
+    {
+      "id": "tool-toolkit",
+      "bind": "tools.toolkit",
+      "zIndex": 60,
+      "defaultState": "absent",
+      "states": {
+        "ready": {
+          "src": "assets/scene/tools/toolkit/ready.png"
+        },
+        "damaged": {
+          "src": "assets/scene/tools/toolkit/damaged.png"
+        },
+        "consumed": {
+          "hidden": true
+        },
+        "absent": {
+          "hidden": true
+        }
+      }
+    },
+    {
+      "id": "tool-robot",
+      "bind": "tools.robot",
+      "zIndex": 60,
+      "defaultState": "absent",
+      "states": {
+        "ready": {
+          "src": "assets/scene/tools/robot/ready.png"
+        },
+        "damaged": {
+          "src": "assets/scene/tools/robot/damaged.png"
+        },
+        "consumed": {
+          "hidden": true
+        },
+        "absent": {
+          "hidden": true
+        }
+      }
+    },
+    {
+      "id": "tool-battery",
+      "bind": "tools.battery",
+      "zIndex": 60,
+      "defaultState": "absent",
+      "states": {
+        "ready": {
+          "src": "assets/scene/tools/battery/ready.png"
+        },
+        "damaged": {
+          "src": "assets/scene/tools/battery/damaged.png"
+        },
+        "consumed": {
+          "hidden": true
+        },
+        "absent": {
+          "hidden": true
+        }
+      }
+    },
+    {
+      "id": "tool-monitor",
+      "bind": "tools.monitor",
+      "zIndex": 60,
+      "defaultState": "absent",
+      "states": {
+        "ready": {
+          "src": "assets/scene/tools/monitor/ready.png"
+        },
+        "damaged": {
+          "src": "assets/scene/tools/monitor/damaged.png"
+        },
+        "consumed": {
+          "hidden": true
+        },
+        "absent": {
+          "hidden": true
+        }
+      }
+    },
+    {
+      "id": "tool-shield",
+      "bind": "tools.shield",
+      "zIndex": 60,
+      "defaultState": "absent",
+      "states": {
+        "ready": {
+          "src": "assets/scene/tools/shield/ready.png"
+        },
+        "damaged": {
+          "src": "assets/scene/tools/shield/damaged.png"
+        },
+        "consumed": {
+          "hidden": true
+        },
+        "absent": {
+          "hidden": true
+        }
+      }
+    },
+    {
+      "id": "cabin-lights",
+      "bind": "lighting",
+      "zIndex": 80,
+      "defaultState": "on",
+      "states": {
+        "on": {
+          "src": "assets/scene/lighting/cabin_on.png"
+        },
+        "off": {
+          "hidden": true
+        }
+      }
+    }
+  ]
+}

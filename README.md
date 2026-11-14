@@ -1,0 +1,57 @@
+# Last Light Outpost
+
+纯 HTML/CSS/JavaScript 的场景叙事原型，采用 Controller–View–Model 架构。主画面只呈现场景与终端入口；任务文字和选择位于可关闭、可滚动的侧滑终端。每天开始时黑幕淡出，资源数值保留在后台规则中。
+
+## 启动
+
+```powershell
+python -m http.server 8000 --bind 127.0.0.1
+```
+
+访问 <http://localhost:8000>。不要直接双击 HTML。
+
+## 先准备图片
+
+场景仅读取你自己提供的 PNG，没有程序绘制的场景或占位美术。素材未放入前，对应图层为空，终端仍可使用。
+
+- [素材需求、生成说明和导入步骤](assets/README.md)
+- [41 个 PNG 文件路径清单](assets/PNG_FILES.txt)
+- `assets/scene/`：已经建立的素材目录。
+- `data/scene_layout.json`：图片与状态映射、覆盖层级、风沙序列配置。所有场景 PNG 与 interior 基底同尺寸、同原点叠放。
+
+建议先完成清单中的第一批 14 张正常场景素材，再补沙暴与其他状态。各物件的位置和大小在生成素材时确定，网页只安排前后覆盖顺序；整个场景随视口等比缩放。
+
+## 模块分工
+
+| 模块 | 责任 |
+| --- | --- |
+| `src/app.js` | 加载配置，组装 Model、View、Controller 和 Repository |
+| `src/controllers/GameController.js` | 接收终端操作，确认规则、保存，再协调画面过渡 |
+| `src/models/GameModel.js` | 唯一游戏状态与命令入口 |
+| `src/models/TurnEngine.js` | 每日结算、昨日简报、天气与结局 |
+| `src/models/ActionRules.js` | 行动成本、效果、叙事总结 |
+| `src/models/EventEngine.js` | 教学、天气事件、带种子的权重抽取 |
+| `src/models/state.js` | 状态定义、存档版本和校验 |
+| `src/repositories/SaveRepository.js` | localStorage 读写与旧版本迁移 |
+| `src/views/GameView.js` | 黑幕过渡与视图组合 |
+| `src/views/TerminalView.js`、`Typewriter.js` | 侧滑、滚动、选择和可跳过的打字机效果 |
+| `src/views/SceneState.js` | 将游戏状态投影成天气、植物、灯光、人物和工具的素材状态 |
+| `src/views/SceneView.js`、`SceneAssets.js` | PNG 加载、图层显示、序列帧播放；不结算游戏 |
+| `data/events.json` | 事件文本；每个事件与选项均含 `summaryLine` |
+| `data/environment.json` | 固定演示天气序列，非实时火星天气 |
+
+建议分工：A 负责 App/Controller/存档，B 负责 Model/规则测试，C 负责 View/样式/美术对齐，D 负责事件文案与素材。三人时 A 兼任内容配置。
+
+`summaryLine` 的选项分支记录实际决定，工作也有独立总结；日终汇总后写入 `previousDaySummary`，翌日终端读取，刷新不重新生成昨天的经历。
+
+## 当前范围与验证
+
+启动时先进入主菜单：新游戏、存在有效存档时显示的继续、读取本浏览器存档、设置。设置使用左侧终端，支持语言和过场音量；默认英语，支持中文。游戏中的“主菜单”按钮返回菜单。
+
+菜单 PNG 清单见 `assets/menu/README.md`；音频导入见 `assets/audio/README.md`。图片和音频需要自行放入对应路径。过场时长、音频路径及事件录音映射位于 `data/presentation.json`；默认约 7.7 秒，`SOL xxx` 字幕只在画面全黑时独立淡入、淡出。语言扩展方法见 `locales/README.md`。
+
+已有基础 14 Sol 流程、6 张示例事件、工具选择、灯光/植物/沙暴的状态映射、本地存档和终端交互。天气演示默认 Sol 4、8、9 为沙暴，可在环境 JSON 中修改。
+
+还未包含完整 20 张事件、全部工具损坏事件、多设施维修、NASA 来源页和最终美术。图片是否对齐、透明区域是否正确、真实沙暴帧是否连贯，要在提供 PNG 后验证。
+
+规则测试：`node --test tests/game.test.mjs`。浏览器检查脚本：`python tests/browser_smoke.py`，需要 Python Playwright 和本机 Edge；使用测试响应验证图片路径与状态切换，不提供游戏美术。

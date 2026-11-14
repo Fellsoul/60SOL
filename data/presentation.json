@@ -1,0 +1,17 @@
+{
+  "fadeInMs": 1500,
+  "titleFadeInMs": 700,
+  "blackHoldMs": 1800,
+  "titleFadeOutMs": 700,
+  "fadeOutMs": 3000,
+  "audioFadeInMs": 1200,
+  "audioFadeOutMs": 1800,
+  "volume": 0.65,
+  "ambient": "assets/audio/transition/ambient.mp3",
+  "recaps": {},
+  "menu": {
+    "space": "assets/menu/space.png",
+    "mars": "assets/menu/mars.png",
+    "meteors": "assets/menu/meteors.png"
+  }
+}
