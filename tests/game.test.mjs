@@ -9,7 +9,7 @@ import { sceneState } from '../src/views/SceneState.js';
 const events = JSON.parse(await readFile(new URL('../data/events.json',import.meta.url),'utf8')).filter(event => !event.dailySol);
 const tools = JSON.parse(await readFile(new URL('../data/tools.json',import.meta.url),'utf8'));
 const content = { events,tools };
-function model(toolIds = ['toolkit','battery']) { const game = new GameModel(content); game.start(toolIds); return game; }
+function model(toolIds = ['toolkit','battery']) { const game = new GameModel(content); game.start(toolIds); const state=game.snapshot; state.samples=[2]; game.restore(state); return game; }
 function memory() { const data = new Map(); return { get length() { return data.size; }, key:index => [...data.keys()][index] ?? null, getItem:key => data.get(key) ?? null, setItem:(key,value) => data.set(key,value), removeItem:key => data.delete(key) }; }
 
 test('开局先发电再支付生命维持；状态副本不能修改 Model',() => {
@@ -114,7 +114,7 @@ test('旧存档升级，不凭空编造昨日简报',() => {
   for (const key of ['weather','lightsOn','plantStage','daySummary','previousDaySummary','summarySol']) delete old[key];
   storage.setItem(repo.key,JSON.stringify(old));
   const restored = repo.load().state;
-  assert.equal(restored.version,3); assert.deepEqual(restored.previousDaySummary,[]);
+  assert.equal(restored.version,4); assert.deepEqual(restored.previousDaySummary,[]);
   assert.equal(repo.save(restored,repo.key).ok,true);
   assert.deepEqual(repo.load(repo.key).state,restored); assert.equal(repo.list().saves.length,1);
 });

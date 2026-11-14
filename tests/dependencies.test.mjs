@@ -12,7 +12,7 @@ const tools=JSON.parse(await readFile(new URL('../data/tools.json',import.meta.u
 function pending(id,toolIds=['robot','battery'],energy=3) {
   const model=new GameModel({events,tools});model.start(toolIds);
   const state=model.snapshot;
-  Object.assign(state,{sol:4,currentEventId:id,energy,weather:'clear',health:90,localData:12});
+  Object.assign(state,{sol:4,currentEventId:id,energy,weather:'clear',health:90,localData:12,samples:[2]});
   model.restore(state);return model;
 }
 const rows=model=>clipboardTasks(model.snapshot,model.events.get(model.snapshot.currentEventId));

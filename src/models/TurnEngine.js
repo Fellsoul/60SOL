@@ -2,6 +2,7 @@ import { spaceHeating } from './SpaceData.js';
 import { dailyState } from './DailyEventRules.js';
 import { LIMITS, logEntry } from './state.js';
 import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
+import { advanceExpeditions, recoverCrew } from './ExpeditionRules.js';
 
 export function beginSol(state, events, environment = {}, resourceLog = {}) {
   state.weather = environment.days?.[String(state.sol)] ?? environment.default ?? 'clear';
@@ -22,6 +23,9 @@ export function beginSol(state, events, environment = {}, resourceLog = {}) {
   state.choiceId = null;
   state.workId = null;
   state.currentEventId = events.select(state);
+  const expeditionBefore = resourceSnapshot(state);
+  advanceExpeditions(state,events.get(state.currentEventId));
+  recordResourceChange(state,expeditionBefore,'expedition.return',resourceLog,'expedition.samplesReturned');
   state.phase = 'event';
   logEntry(state,`晨报：发电 ${state.generation} E，生命维持${state.lifeSupportPaid ? '已支付 '+support+' E' : '供电不足'}，可用 ${state.energy} E。`);
 }
@@ -29,6 +33,8 @@ export function beginSol(state, events, environment = {}, resourceLog = {}) {
 export function finishSol(state, resourceLog = {}) {
   let before = resourceSnapshot(state);
   // 工作已在确认时结算；通信先于最终结局、收获先于食物消耗。
+  const lit = state.lightsOn && state.energy > 0;
+  recoverCrew(state,lit);
   if (state.lightsOn) {
     if (state.energy > 0) state.energy -= 1;
     if (state.energy === 0) { state.lightsOn = false; state.daySummary.push('summary.lightsPowerLost'); }

@@ -1,6 +1,7 @@
 import { outsideBlocked, spaceEnergyCost } from './SpaceData.js';
 import { dailyState, choiceReason } from './DailyEventRules.js';
 import { LIMITS, logEntry } from './state.js';
+import { consumeSample, CREW_IDS, crewAway, crewFatigued } from './ExpeditionRules.js';
 
 // 规则保留数值，终端只使用 narrative 和 summaryLine。
 const NARRATIVES = {
@@ -10,7 +11,6 @@ const NARRATIVES = {
   clean: ['action.clean.narrative','action.clean.summary'],
   repair: ['action.repair.narrative','action.repair.summary'],
   rest: ['action.rest.narrative','action.rest.summary'],
-  robot: ['action.robot.narrative','action.robot.summary'],
   monitor: ['action.monitor.narrative','action.monitor.summary'],
   shield: ['action.shield.narrative','action.shield.summary'],
   standby: ['action.standby.narrative','action.standby.summary'],
@@ -19,12 +19,11 @@ const NARRATIVES = {
 };
 export const ACTIONS = Object.freeze([
   { id:'grow', label:'action.grow.label', energy:3, description:'照料 +1；累计 3 次获得 8 F。', facility:'greenhouse' },
-  { id:'research', label:'action.research.label', energy:3, description:'本地科研数据 +12。', facility:'cabin' },
+  { id:'research', label:'action.research.label', energy:3, description:'消耗一次样本研究次数；本地科研数据 +12。', facility:'cabin' },
   { id:'transmit', label:'action.transmit.label', energy:2, description:'最多发送 30 点；日终确认计入目标。', facility:'antenna' },
   { id:'clean', label:'action.clean.label', energy:2, description:'清除积尘，次日起恢复 6 E 发电。', facility:'solar' },
   { id:'repair', label:'action.repair.label', energy:2, description:'本骨架支持维修积尘面板；需要工具箱。', facility:'solar', tool:'toolkit' },
   { id:'rest', label:'action.rest.label', energy:1, description:'人员状态 +8，上限 100。', facility:'cabin' },
-  { id:'robot', label:'action.robot.label', energy:4, description:'本地数据 +12；基础示例暂不含故障概率。', tool:'robot' },
   { id:'monitor', label:'action.monitor.label', energy:2, description:'本地数据 +6；不会降低辐射。', tool:'monitor' },
   { id:'shield', label:'action.shield.label', energy:0, description:'消耗加固包和今日工作；永久保留屏蔽状态。', tool:'shield' },
   { id:'standby', label:'action.standby.label', energy:0, description:'保留电力；日终仍消耗食物。' },
@@ -48,9 +47,11 @@ export function unavailableReason(state, action, event = null) {
     if (response) return choiceReason(state,response);
   }
   const systems = dailyState(state);
+  if (!['rest','standby'].includes(action.id) && !CREW_IDS.some(id => !crewAway(state,id) && !crewFatigued(state,id))) return 'error.crewResting';
   if (action.id === 'grow' && systems.greenhouseDisabled) return 'error.facilityUnavailable';
   if (action.id === 'research' && state.sol < systems.labUntil) return 'error.facilityUnavailable';
   if (state.energy < workEnergy(state,action)) return 'error.powerInsufficient';
+  if (action.id === 'research' && !state.samples?.length) return 'error.noSamples';
   if (action.id === 'transmit' && systems.antennaLimit === 0) return 'error.facilityUnavailable';
   if (action.id === 'transmit' && state.localData === 0) return 'error.noLocalData';
   if (['clean','repair'].includes(action.id) && !state.dusty && systems.generationCap === 6 && (action.id !== 'repair' || systems.trackingCap === 6)) return 'error.panelsClean';
@@ -69,8 +70,7 @@ const effects = {
       logEntry(s,`温室完成收获，实际入库 ${gain} F。`);
     }
   },
-  research(s) { s.localData += 12; },
-  robot(s) { s.localData += 12; },
+  research(s) { consumeSample(s); s.localData += 12; },
   monitor(s) { s.localData += 6; },
   transmit(s) { const amount = Math.min(dailyState(s).antennaLimit,s.localData); s.localData -= amount; s.pendingData += amount; },
   clean(s) { s.dusty = false; dailyState(s).generationCap=6; },

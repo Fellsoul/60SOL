@@ -517,6 +517,9 @@ try:
         bubble = motion_page.locator('.scene-event-bubble[data-kind=sound][data-anchor=hatch]')
         assert bubble.is_visible()
         bubble.click()
+        assert motion_page.locator('.scene-event-description').is_visible()
+        assert not motion_page.locator('#tasks').evaluate('(node) => node.open')
+        motion_page.locator('#tasks-toggle').click()
         assert motion_page.locator('#tasks .clipboard-event p').count() == 0
         motion_page.locator('#tasks [data-action=choose][data-id=secure]').click()
         motion_page.locator('#tasks .is-complete').wait_for()
