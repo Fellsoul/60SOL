@@ -3735,5 +3735,36 @@
       "clean": "inspect_clean",
       "repair": "inspect_clean"
     }
+  },
+  {
+    "id": "emergency_clean",
+    "opportunity": true,
+    "title": "event.emergency_clean.title",
+    "text": "event.emergency_clean.text",
+    "summaryLine": "event.emergency_clean.summaryLine",
+    "choices": [
+      {
+        "id": "force_clean",
+        "label": "event.emergency_clean.choice.force_clean.label",
+        "description": "event.emergency_clean.choice.force_clean.description",
+        "summaryLine": "event.emergency_clean.choice.force_clean.summaryLine",
+        "energy": 0,
+        "costH": 20,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "clean"
+          }
+        ]
+      },
+      {
+        "id": "stay_inside",
+        "label": "event.emergency_clean.choice.stay_inside.label",
+        "description": "event.emergency_clean.choice.stay_inside.description",
+        "summaryLine": "event.emergency_clean.choice.stay_inside.summaryLine",
+        "energy": 0,
+        "work": false
+      }
+    ]
   }
 ]

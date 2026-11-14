@@ -1,4 +1,4 @@
-import { choiceReason, eventResolved } from '../models/DailyEventRules.js';
+import { choiceReason, eventResolved, emergencyCleanAvailable } from '../models/DailyEventRules.js';
 import { escapeHtml } from './dom.js';
 import { LIGHT_ACTIONS } from '../models/ActionRules.js';
 import { Typewriter } from './Typewriter.js';
@@ -12,8 +12,8 @@ function choice(action,id,label,description='',disabled=false) {
 }
 
 export class TerminalView {
-  constructor(tools) {
-    this.tools = tools; this.dialog = document.querySelector('#terminal'); this.content = document.querySelector('#terminal-content');
+  constructor(tools,events = []) {
+    this.tools = tools; this.events = events; this.dialog = document.querySelector('#terminal'); this.content = document.querySelector('#terminal-content');
     this.writer = new Typewriter(); this.animation = null;
     this.batterySlot = new BatterySlotView();
     // Start at 90% opacity; evaluate inside/outside only once the mouse actually moves.
@@ -117,6 +117,16 @@ export class TerminalView {
       if (eventResolved(state,event)) {
         const result=event.choices.find(choice => choice.id === state.choiceId);
         decisions.insertAdjacentHTML('afterbegin',`<p class="terminal-note" role="status">${escapeHtml(i18n.t(result.summaryLine))}</p>`);
+      }
+      const emergency = this.events.find(item => item.id === 'emergency_clean');
+      if (emergency && state.history.emergency_clean === state.sol) {
+        const response = emergency.choices.find(item => state.daySummary.includes(item.summaryLine));
+        if (response) decisions.insertAdjacentHTML('beforeend',`<section class="emergency-event"><h2>${escapeHtml(i18n.t(emergency.title))}</h2><p role="status">${escapeHtml(i18n.t(response.summaryLine))}</p></section>`);
+      } else if (emergency && emergencyCleanAvailable(state,event)) {
+        decisions.insertAdjacentHTML('beforeend',`<section class="emergency-event"><h2>${escapeHtml(i18n.t(emergency.title))}</h2><p>${escapeHtml(i18n.t(emergency.text))}</p>${emergency.choices.map(item => {
+          const reason = choiceReason(state,item);
+          return choice('emergency_clean',item.id,item.label,reason || item.description,Boolean(reason));
+        }).join('')}</section>`);
       }
       if (!state.outcome) {
         const light = LIGHT_ACTIONS.find(action => action.id === (state.lightsOn ? 'lights_off' : 'lights_on'));

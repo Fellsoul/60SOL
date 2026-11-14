@@ -23,7 +23,7 @@ export class EventEngine {
     const tutorial = this.events.find(event => event.tutorialSol === state.sol);
     let selected = tutorial ?? this.events.find(event => event.environment === state.weather);
     if (!selected) {
-      const pool = this.events.filter(event => !event.tutorialSol && !event.environment && (event.minSol ?? 1) <= state.sol && (!event.requiresClean || !state.dusty) && (event.fallback || state.sol - (state.history[event.id] ?? -99) >= (event.cooldown ?? 3)));
+      const pool = this.events.filter(event => !event.opportunity && !event.tutorialSol && !event.environment && (event.minSol ?? 1) <= state.sol && (!event.requiresClean || !state.dusty) && (event.fallback || state.sol - (state.history[event.id] ?? -99) >= (event.cooldown ?? 3)));
       let draw = random(state) * pool.reduce((sum,event) => sum + event.weight,0);
       selected = pool.find(event => (draw -= event.weight) < 0) ?? this.events.find(event => event.fallback);
     }
