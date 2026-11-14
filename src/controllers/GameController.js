@@ -53,12 +53,8 @@ export class GameController {
       if (event.target.id === 'language-select') {
         i18n.setLanguage(event.target.value); this.view.terminal.renderSettings();
         this.showMenu();
-        document.querySelector('#skip-typing').textContent = i18n.t('显示全文');
-        document.querySelector('#restart').textContent = i18n.t('重新开始');
-        document.querySelector('#motion-label').textContent = i18n.t('静态显示');
-        document.querySelector('#terminal-close').setAttribute('aria-label',i18n.t('关闭终端'));
-        document.querySelector('#terminal-toggle').setAttribute('aria-label',i18n.t('打开终端'));
-        document.querySelector('#scene').setAttribute('aria-label',i18n.t('火星前哨站内部'));
+        i18n.translate(document.querySelector('#app'));
+        i18n.translate(document.querySelector('#terminal'));
       } else if (event.target.id === 'audio-volume') {
         this.view.config.volume = Number(event.target.value); this.view.terminal.volume = this.view.config.volume;
       } else this.view.terminal.updateSelection();

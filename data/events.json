@@ -1,58 +1,58 @@
 [
   {
     "id": "arrival",
-    "title": "第一束晨光",
-    "text": "气闸在身后合拢。窗外只有红色荒原，温室里是等待照料的种植槽。我们要在这里度过十四个火星日，把研究记录送回地球。今天，先从哪里开始？",
+    "title": "event.arrival.title",
+    "text": "event.arrival.text",
     "tutorialSol": 1,
     "choices": [
       {
         "id": "grow",
-        "label": "照料第一批作物",
-        "description": "把今天的工作和一部分电力用于照料作物。",
+        "label": "event.arrival.choice.grow.label",
+        "description": "choice.grow.description",
         "energy": 3,
         "work": true,
         "action": "grow",
-        "summaryLine": "我们把第一天留给了温室。种植槽里出现了嫩芽。"
+        "summaryLine": "event.arrival.choice.grow.summaryLine"
       },
       {
         "id": "plan",
-        "label": "先查看基地工作",
-        "description": "保留今天的工作机会，继续在终端安排任务。",
+        "label": "event.arrival.choice.plan.label",
+        "description": "choice.plan.description",
         "energy": 0,
-        "summaryLine": "我们查看了基地，随后安排了当天的工作。"
+        "summaryLine": "event.arrival.choice.plan.summaryLine"
       }
     ],
-    "summaryLine": "抵达后的第一天，我们开始安顿这座前哨站。"
+    "summaryLine": "event.arrival.summaryLine"
   },
   {
     "id": "delivery",
-    "title": "数据留在基地，还不算交付",
-    "text": "通信终端亮起了待发送的指示灯。留在基地的研究记录还不算交付，地球需要听到我们的声音。我们也需要为吃饭、休息和明天留出时间。",
+    "title": "event.delivery.title",
+    "text": "event.delivery.text",
     "tutorialSol": 2,
     "choices": [
       {
         "id": "review",
-        "label": "安排今天的工作",
-        "description": "保留今天的工作机会，继续在终端安排任务。",
+        "label": "event.delivery.choice.review.label",
+        "description": "choice.plan.description",
         "energy": 0,
-        "summaryLine": "我们检查通信链路后，继续安排基地工作。"
+        "summaryLine": "event.delivery.choice.review.summaryLine"
       },
       {
         "id": "rest",
-        "label": "先让队员休整",
-        "description": "让队员休息，今天不再开展其他工作。",
+        "label": "event.delivery.choice.rest.label",
+        "description": "event.delivery.choice.rest.description",
         "energy": 1,
         "work": true,
         "action": "rest",
-        "summaryLine": "我们暂缓了工作，让队员在生活舱里休息。"
+        "summaryLine": "event.delivery.choice.rest.summaryLine"
       }
     ],
-    "summaryLine": "我们检查了与地球的通信链路。"
+    "summaryLine": "event.delivery.summaryLine"
   },
   {
     "id": "dust",
-    "title": "太阳能板需要维护",
-    "text": "阳光照在面板上，却被薄薄的灰尘挡住。现在清洁，就得放下今天的其他工作；继续等下去，基地可用的电力会越来越紧张。",
+    "title": "event.dust.title",
+    "text": "event.dust.text",
     "minSol": 3,
     "weight": 2,
     "cooldown": 4,
@@ -60,97 +60,97 @@
     "choices": [
       {
         "id": "clean",
-        "label": "立即清洁",
-        "description": "投入电力和今天的工作，恢复后续供电。",
+        "label": "event.dust.choice.clean.label",
+        "description": "event.dust.choice.clean.description",
         "energy": 2,
         "work": true,
         "action": "clean",
-        "summaryLine": "我们清洁了面板，为接下来的日子保住供电。"
+        "summaryLine": "event.dust.choice.clean.summaryLine"
       },
       {
         "id": "defer",
-        "label": "推迟维护",
-        "description": "保留今天的工作机会，接受积尘的影响。",
+        "label": "event.dust.choice.defer.label",
+        "description": "event.dust.choice.defer.description",
         "energy": 0,
         "action": "dust",
-        "summaryLine": "我们推迟了面板维护，积尘仍然阻挡着阳光。"
+        "summaryLine": "event.dust.choice.defer.summaryLine"
       }
     ],
-    "summaryLine": "我们发现太阳能板上积满了灰尘。"
+    "summaryLine": "event.dust.summaryLine"
   },
   {
     "id": "supply",
-    "title": "补给检查",
-    "text": "队员打开了食物柜，随后望向温室。植物需要照料，研究也不能一直推迟。今天留给作物，还是继续原来的安排？",
+    "title": "event.supply.title",
+    "text": "event.supply.text",
     "minSol": 3,
     "weight": 2,
     "cooldown": 3,
     "choices": [
       {
         "id": "grow",
-        "label": "照料温室",
-        "description": "把今天的工作和一部分电力用于照料作物。",
+        "label": "action.grow.label",
+        "description": "choice.grow.description",
         "energy": 3,
         "work": true,
         "action": "grow",
-        "summaryLine": "我们照料了温室里的作物。"
+        "summaryLine": "event.supply.choice.grow.summaryLine"
       },
       {
         "id": "continue",
-        "label": "维持原计划",
-        "description": "保留今天的工作机会，继续在终端安排任务。",
+        "label": "event.supply.choice.continue.label",
+        "description": "choice.plan.description",
         "energy": 0,
-        "summaryLine": "我们检查了补给，决定继续原来的工作计划。"
+        "summaryLine": "event.supply.choice.continue.summaryLine"
       }
     ],
-    "summaryLine": "我们检查了温室和剩余补给。"
+    "summaryLine": "event.supply.summaryLine"
   },
   {
     "id": "routine",
-    "title": "来自基地的日常记录",
-    "text": "风声很远，舱内只剩设备低鸣。例行检查没有发现必须立刻处理的故障。这是难得可以自己安排的一天。",
+    "title": "event.routine.title",
+    "text": "event.routine.text",
     "weight": 1,
     "fallback": true,
     "choices": [
       {
         "id": "continue",
-        "label": "开始安排工作",
-        "description": "保留今天的工作机会，继续在终端安排任务。",
+        "label": "event.routine.choice.continue.label",
+        "description": "choice.plan.description",
         "energy": 0,
-        "summaryLine": "例行检查没有发现新问题，我们继续安排基地工作。"
+        "summaryLine": "event.routine.choice.continue.summaryLine"
       },
       {
         "id": "standby",
-        "label": "今天储能待命",
-        "description": "不再安排工作，把电力留在电池里。",
+        "label": "event.routine.choice.standby.label",
+        "description": "event.routine.choice.standby.description",
         "energy": 0,
         "work": true,
-        "summaryLine": "我们留在舱内待命，把电力留给接下来的日子。"
+        "summaryLine": "event.routine.choice.standby.summaryLine"
       }
     ],
-    "summaryLine": "队员完成了一次平静的例行检查。"
+    "summaryLine": "event.routine.summaryLine"
   },
   {
     "id": "sandstorm",
-    "title": "窗外的世界消失了",
-    "text": "沙尘吞没了远处的山脊，沙粒不停敲打观察窗。我们必须留在舱内。太阳能板的表面正在积尘，接下来每一次用电都需要仔细考虑。",
-    "summaryLine": "沙暴经过了前哨站，窗外只剩翻涌的沙尘。",
+    "title": "event.sandstorm.title",
+    "text": "event.sandstorm.text",
+    "summaryLine": "event.sandstorm.summaryLine",
     "environment": "sandstorm",
     "choices": [
       {
         "id": "shelter",
-        "label": "关闭生活舱照明，等待风暴",
-        "description": "今天不再工作，留在舱内避风；生命维持仍然运行。",
-        "summaryLine": "我们关闭了生活舱照明，留在舱内等待沙暴过去。",
+        "label": "event.sandstorm.choice.shelter.label",
+        "description": "event.sandstorm.choice.shelter.description",
+        "summaryLine": "event.sandstorm.choice.shelter.summaryLine",
         "energy": 0,
         "work": true,
         "action": "lights_off"
       },
       {
         "id": "inside",
-        "label": "保持照明，安排舱内工作",
-        "description": "留在基地内部，继续安排今天的任务。",
-        "summaryLine": "我们留在亮着灯的舱内，在风声中继续工作。",
+        "label": "event.sandstorm.choice.inside.label",
+        "description": "event.sandstorm.choice.inside.description",
+        "summaryLine": "event.sandstorm.choice.inside.summaryLine",
         "energy": 0,
         "action": "lights_on"
       }

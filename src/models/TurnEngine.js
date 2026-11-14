@@ -18,7 +18,7 @@ export function beginSol(state, events, environment = {}) {
 export function finishSol(state) {
   // 工作已在确认时结算；通信先于最终结局、收获先于食物消耗。
   if (state.pendingData) logEntry(state,`地球确认收到 ${state.pendingData} 点科研数据。`);
-  if (state.pendingData) state.daySummary.push('通信终端收到了地球的确认，昨天发送的研究记录已经送达。');
+  if (state.pendingData) state.daySummary.push('summary.transmissionConfirmed');
   state.sentData += state.pendingData;
   state.pendingData = 0;
   const hungry = state.food < 2;
@@ -26,9 +26,9 @@ export function finishSol(state) {
   if (hungry) { state.health = Math.max(0,state.health-12); logEntry(state,'食物不足，人员状态 −12。'); }
   state.powerFailures = state.lifeSupportPaid ? 0 : state.powerFailures+1;
   if (!state.lifeSupportPaid) { state.health = Math.max(0,state.health-15); logEntry(state,'生命维持供电不足，人员状态 −15。'); }
-  if (hungry) state.daySummary.push('食物不足，队员没能吃上一顿完整的晚餐。');
-  if (!state.lifeSupportPaid) state.daySummary.push('夜间的生命维持系统供电不足，队员的状态正在恶化。');
-  if (state.weather === 'sandstorm') state.daySummary.push('风沙持续拍打外墙，太阳能板上留下了积尘。');
+  if (hungry) state.daySummary.push('summary.foodShortage');
+  if (!state.lifeSupportPaid) state.daySummary.push('summary.lifeSupportFailure');
+  if (state.weather === 'sandstorm') state.daySummary.push('summary.stormDust');
   state.previousDaySummary = [...state.daySummary];
   state.summarySol = state.sol;
   logEntry(state,`日终：食物 ${state.food} F，人员状态 ${state.health}，已传回数据 ${state.sentData}。`);

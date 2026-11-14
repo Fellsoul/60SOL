@@ -54,6 +54,6 @@ python -m http.server 8000 --bind 127.0.0.1
 
 还未包含完整 20 张事件、全部工具损坏事件、多设施维修、NASA 来源页和最终美术。图片是否对齐、透明区域是否正确、真实沙暴帧是否连贯，要在提供 PNG 后验证。
 
-规则测试：`node --test tests/game.test.mjs`。浏览器检查脚本：`python tests/browser_smoke.py`，需要 Python Playwright 和本机 Edge；使用测试响应验证图片路径与状态切换，不提供游戏美术。
+规则与翻译测试：`npm test`。翻译表统一使用英文语义 key，具体规范见 [语言配置说明](locales/README.md)。浏览器检查脚本：`python tests/browser_smoke.py`，需要 Python Playwright 和本机 Edge；使用测试响应验证图片路径与状态切换，不提供游戏美术。
 
 https://docs.google.com/document/d/1ULwb509Fd4l8WoeZYRNe-yRgJkW4OErQ/edit

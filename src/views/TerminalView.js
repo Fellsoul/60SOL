@@ -67,27 +67,26 @@ export class TerminalView {
     document.querySelector('#terminal-title').setAttribute('aria-label',title);
     document.querySelector('#restart').hidden = !state;
     if (!state) {
-      this.content.innerHTML = this.copy('briefing-copy','气闸即将开启。只能带上两件工具。做好决定后，就进入前哨站。') + `<form id="loadout-form"><div class="loadout">${this.tools.map(tool => `<label><input type="checkbox" name="tool" value="${escapeHtml(tool.id)}"><span>${escapeHtml(tool.name)}<small>${escapeHtml(tool.description)}</small></span></label>`).join('')}</div><div class="terminal-choices"><button class="terminal-choice" type="submit" disabled>选择两件工具</button></div></form>`;
+      this.content.innerHTML = this.copy('briefing-copy','loadout.intro') + `<form id="loadout-form"><div class="loadout">${this.tools.map(tool => `<label><input type="checkbox" name="tool" value="${escapeHtml(tool.id)}"><span>${escapeHtml(i18n.t(tool.name))}<small>${escapeHtml(i18n.t(tool.description))}</small></span></label>`).join('')}</div><div class="terminal-choices"><button class="terminal-choice" type="submit" disabled>${escapeHtml(i18n.t('loadout.chooseTwo'))}</button></div></form>`;
     } else {
-      const previous = state.previousDaySummary.length ? state.previousDaySummary.map(line => i18n.t(line)).join('\n\n') : '航程结束。我们抵达了前哨站，还没有昨日的基地记录。';
+      const previous = state.previousDaySummary.length ? state.previousDaySummary.map(line => i18n.t(line)).join('\n\n') : 'summary.arrival';
       let today = event.text;
-      if (state.outcome) today = {success:'地球确认了我们的研究成果。任务完成，我们可以回家了。',incomplete:'队员安全度过了任务期。还有研究记录未能完成交付，但保护彼此的努力值得被记住。',unsafe:'基地已经无法安全继续任务。我们需要停止作业，优先保护队员。'}[state.outcome];
-      this.content.innerHTML = `<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('记录')}` : i18n.t('抵达记录')}</h2>${this.copy('summary-copy',previous)}<h2>${escapeHtml(i18n.t(state.outcome ? '任务结束' : event.title))}</h2>${this.copy('event-copy',today)}<div id="terminal-decisions" class="terminal-choices"></div>`;
+      if (state.outcome) today = {success:'outcome.success',incomplete:'outcome.incomplete',unsafe:'outcome.unsafe'}[state.outcome];
+      this.content.innerHTML = `<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}<div id="terminal-decisions" class="terminal-choices"></div>`;
       const decisions = this.content.querySelector('#terminal-decisions');
       if (state.phase === 'event') {
-        decisions.innerHTML = event.choices.map(item => choice('choose',item.id,item.label,state.energy < item.energy ? '目前的供电不足以执行这个决定。' : item.description,state.energy < item.energy)).join('');
+        decisions.innerHTML = event.choices.map(item => choice('choose',item.id,item.label,state.energy < item.energy ? 'choice.insufficientPower' : item.description,state.energy < item.energy)).join('');
       } else if (state.phase === 'work') {
-        decisions.innerHTML = `<h2>接下来的工作</h2>` + ACTIONS.filter(action => !action.tool || state.tools[action.tool]).map(action => {
+        decisions.innerHTML = `<h2>${escapeHtml(i18n.t('terminal.workHeading'))}</h2>` + ACTIONS.filter(action => !action.tool || state.tools[action.tool]).map(action => {
           const reason = unavailableReason(state,action);
           return choice('work',action.id,action.label,reason || action.narrative,Boolean(reason));
         }).join('');
       } else if (state.phase === 'end') {
-        decisions.innerHTML = `<p class="terminal-note">今天的安排已经执行。可以关闭终端看看基地，或让这一天结束。</p>${choice('next','',state.sol === 14 ? '结束任务，读取最后的记录' : '结束今天')}`;
+        decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('terminal.dayComplete'))}</p>${choice('next','',state.sol === 14 ? 'terminal.finishMission' : 'terminal.endDay')}`;
       }
-      if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','接入备用电池','一次性补充供电，储物位置将空出来。',state.energy === 20));
+      if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy === 20));
     }
     document.querySelector('#terminal-scroll').scrollTop = 0;
-    i18n.translate(this.content);
     this.jobs = [{node:document.querySelector('#terminal-title'),text:title},...Array.from(this.content.querySelectorAll('[data-copy]'),node => ({node,text:node.dataset.copy}))];
     if (this.dialog.open) this.writer.play(this.jobs,{reducedMotion:true});
   }
@@ -95,7 +94,7 @@ export class TerminalView {
     const form = document.querySelector('#loadout-form'); if (!form) return;
     const count = form.querySelectorAll('input:checked').length;
     const submit = form.querySelector('button[type=submit]'); submit.disabled = count !== 2;
-    submit.textContent = i18n.t(count === 2 ? '进入前哨站' : '选择两件工具');
+    submit.textContent = i18n.t(count === 2 ? 'loadout.enter' : 'loadout.chooseTwo');
     form.querySelectorAll('input:not(:checked)').forEach(input => { input.disabled = count === 2; });
   }
   setReducedMotion(value) { this.reducedMotion = value; if (value) this.writer.skip(); }

@@ -24,8 +24,8 @@
         <button data-menu="settings"></button>
       </nav>
     </section>
-    <div id="scene-viewport"><div id="scene" aria-label="火星前哨站内部"></div></div>
-    <button id="terminal-toggle" aria-label="打开终端" aria-haspopup="dialog" aria-controls="terminal" aria-expanded="false" disabled>
+    <div id="scene-viewport"><div id="scene" data-i18n-aria-label="scene.interior" aria-label="Mars outpost interior"></div></div>
+    <button id="terminal-toggle" data-i18n-aria-label="terminal.open" aria-label="Open terminal" aria-haspopup="dialog" aria-controls="terminal" aria-expanded="false" disabled>
       <img src="assets/scene/interior/outpost_console.png" alt="" draggable="false">
     </button>
     <div id="morning-veil" aria-hidden="true"><span id="sol-title"></span></div>
@@ -40,9 +40,9 @@
   <dialog id="terminal" aria-labelledby="terminal-title">
     <img class="console-frame" src="assets/scene/interior/outpost_console.png" alt="" draggable="false">
     <div class="terminal-shell">
-      <header class="terminal-header"><h1 id="terminal-title"></h1><button id="terminal-close" aria-label="关闭终端">×</button></header>
+      <header class="terminal-header"><h1 id="terminal-title"></h1><button id="terminal-close" data-i18n-aria-label="terminal.close" aria-label="Close terminal">×</button></header>
       <div id="terminal-scroll" tabindex="0"><div id="terminal-content"></div></div>
-      <footer class="terminal-footer"><button id="skip-typing" hidden>显示全文</button><label><input id="reduce-motion" type="checkbox"> <span id="motion-label">静态显示</span></label><button id="restart" hidden>重新开始</button></footer>
+      <footer class="terminal-footer"><button id="skip-typing" data-i18n="terminal.showFullText" hidden>Show full text</button><label><input id="reduce-motion" type="checkbox"> <span id="motion-label" data-i18n="settings.reduceMotion">Reduce motion</span></label><button id="restart" data-i18n="menu.return" hidden>Main menu</button></footer>
     </div>
   </dialog>
 </body>
