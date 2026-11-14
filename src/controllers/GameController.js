@@ -69,7 +69,7 @@ export class GameController {
       const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
-      const commands = {choose:() => this.model.choose(id),work:() => this.model.work(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery()};
+      const commands = {choose:() => this.model.choose(id),work:() => this.model.work(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery(),lights:() => this.model.setLights(id === 'lights_on')};
       if (commands[action]) void this.commit(commands[action],{morning:action === 'next'});
     });
     document.querySelector('#restart').addEventListener('click',() => {
