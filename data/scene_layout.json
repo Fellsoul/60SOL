@@ -151,6 +151,20 @@
       }
     },
     {
+      "id": "table",
+      "bind": "lighting",
+      "zIndex": 55,
+      "defaultState": "on",
+      "states": {
+        "on": {
+          "src": "assets/scene/interior/outpost_table.png"
+        },
+        "off": {
+          "src": "assets/scene/interior/outpost_table.png"
+        }
+      }
+    },
+    {
       "id": "transmission",
       "bind": "transmission",
       "zIndex": 65,

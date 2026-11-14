@@ -28,6 +28,7 @@ assets/scene/greenhouse/plants/mature.png
 assets/scene/greenhouse/plants/sprout.png
 assets/scene/greenhouse/room_base.png
 assets/scene/interior/outpost_base.png
+assets/scene/interior/outpost_table.png
 assets/scene/lighting/cabin_on.png
 assets/scene/tools/battery/damaged.png
 assets/scene/tools/battery/ready.png
