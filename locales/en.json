@@ -82,7 +82,7 @@
   "event.sandstorm.choice.shelter.label": "Turn off the lights and plan indoor work",
   "event.sandstorm.choice.inside.label": "Keep the lights on and work inside",
   "choice.grow.description": "Spend today's work and some power tending the crops.",
-  "choice.plan.description": "Keep today's work available and choose a task at the terminal.",
+  "choice.plan.description": "Keep today's work available and choose a task on the clipboard on the table.",
   "event.delivery.choice.rest.description": "Let the crew rest. No other work will be done today.",
   "event.dust.choice.clean.description": "Use power and today's work to restore future generation.",
   "event.dust.choice.defer.description": "Keep today's work available, accepting the effects of dust.",
@@ -240,7 +240,7 @@
   "tasks.title": "Task clipboard",
   "tasks.close": "Close task clipboard",
   "tasks.department": "OUTPOST / OPERATIONS",
-  "tasks.intro": "Choose an available task. Completed work is checked off here.",
+  "tasks.intro": "Complete tasks here. Checked tasks are finished; unchecked tasks show what remains. One work assignment per Sol.",
   "tasks.footer": "LAST LIGHT OUTPOST · CREW WORK SHEET",
   "tasks.open": "Open task clipboard",
   "tasks.ready": "Your work assignment is ready on the clipboard.",
@@ -256,9 +256,11 @@
   "tasks.work": "1 work assignment",
   "tasks.selected": "Completed assignment",
   "tasks.eventWork": "Work completed during the event response.",
-  "tasks.table": "Open the task clipboard on the table",
+  "tasks.table": "Open clipboard",
   "tasks.onTable": "Your task clipboard is on the table.",
   "tasks.checked": "Completed",
   "tasks.choose": "Select a task to complete.",
-  "tasks.empty": "No tasks are available right now."
+  "tasks.empty": "No tasks are available right now.",
+  "tasks.eventOptions": "Choose an event task here, or use the terminal to plan other work.",
+  "tasks.eventOnClipboard": "Tasks for this event are on the clipboard on the table. Complete work there."
 }

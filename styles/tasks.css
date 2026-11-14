@@ -1,11 +1,12 @@
 /* The work sheet is a separate physical object from the electronic console. */
 #tasks-toggle {
-  position: absolute; z-index: 85; left: 26%; top: 77.5%; width: 46.5%; height: 12.5%;
+  position: absolute; z-index: 85; left: 37%; top: 78%; width: 8%; height: 9.9%;
+  transform: rotate(-7deg) skewX(-12deg);
   padding: 0; border: 0; background: transparent;
-  clip-path: polygon(10% 0, 90% 0, 100% 85%, 99% 100%, 1% 100%, 0 85%);
+  clip-path: polygon(10% 8%, 35% 8%, 35% 7%, 65% 7%, 65% 8%, 90% 8%, 96% 92%, 4% 92%);
   cursor: pointer;
 }
-.table-clipboard { position: absolute; left: 21%; top: 4%; width: 23%; height: 79%; transform: rotate(-7deg) skewX(-12deg); filter: drop-shadow(2px 4px 2px #0006); }
+.table-clipboard { display: block; width: 100%; height: 100%; pointer-events: none; filter: drop-shadow(2px 4px 2px #0006); }
 #tasks-toggle:hover .table-clipboard, #tasks-toggle:focus-visible .table-clipboard { filter: drop-shadow(0 0 4px #fce2a5); }
 #tasks-toggle:focus-visible { outline: none; background: #ffe3a51a; }
 #tasks-toggle:disabled { opacity: 1; }

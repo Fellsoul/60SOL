@@ -71,15 +71,25 @@ export class GameController {
       void this.commit(() => this.model.start(ids),{morning:true,initial:true});
     });
     document.querySelector('#tasks-content').addEventListener('click',event => {
-      const target = event.target.closest('button[data-action=work]');
+      const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
-      void this.commit(() => this.model.work(target.dataset.id),{keepTasksOpen:true});
+      const {action,id} = target.dataset;
+      if (action === 'work') void this.commit(() => this.model.work(id),{keepTasksOpen:true});
+      else if (action === 'choose') {
+        const state = this.model.snapshot;
+        const choice = this.model.events.get(state.currentEventId).choices.find(choice => choice.id === id);
+        if (choice?.work) void this.commit(() => this.model.choose(id),{keepTasksOpen:true});
+      }
     });
     const handleDecision = event => {
       const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
-      const commands = {choose:() => this.model.choose(id),work:() => this.model.work(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery(),lights:() => this.model.setLights(id === 'lights_on')};
+      if (action === 'choose') {
+        const state = this.model.snapshot;
+        if (this.model.events.get(state.currentEventId).choices.find(choice => choice.id === id)?.work) return;
+      }
+      const commands = {choose:() => this.model.choose(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery(),lights:() => this.model.setLights(id === 'lights_on')};
       if (commands[action]) void this.commit(commands[action],{morning:action === 'next',keepTerminal:action !== 'next'});
     };
     document.querySelector('#terminal-content').addEventListener('click',handleDecision);

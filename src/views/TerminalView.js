@@ -102,7 +102,8 @@ export class TerminalView {
       this.content.innerHTML = `<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}<div id="terminal-decisions" class="terminal-choices"></div>`;
       const decisions = this.content.querySelector('#terminal-decisions');
       if (state.phase === 'event') {
-        decisions.innerHTML = event.choices.map(item => choice('choose',item.id,item.label,state.energy < item.energy ? 'choice.insufficientPower' : item.description,state.energy < item.energy)).join('');
+        decisions.innerHTML = event.choices.filter(item => !item.work).map(item => choice('choose',item.id,item.label,state.energy < item.energy ? 'choice.insufficientPower' : item.description,state.energy < item.energy)).join('');
+        if (event.choices.some(item => item.work)) decisions.insertAdjacentHTML('beforeend',`<p class="terminal-note">${escapeHtml(i18n.t('tasks.eventOnClipboard'))}</p>`);
       } else if (state.phase === 'work') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.onTable'))}</p>`;
       } else if (state.phase === 'end') {
