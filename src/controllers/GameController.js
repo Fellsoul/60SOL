@@ -26,6 +26,11 @@ export class GameController {
     }
     this.showSaves(result.message);
   }
+  async toggleLights() {
+    const state = this.model.snapshot;
+    if (this.busy || !state || state.phase === 'finished' || (!state.lightsOn && state.energy === 0)) return;
+    await this.commit(() => this.model.setLights(!state.lightsOn));
+  }
   async start() {
     this.showMenu();
     document.querySelector('#main-menu').addEventListener('click',event => {
@@ -48,6 +53,7 @@ export class GameController {
       if (button.hasAttribute('data-save-delete')) { this.deleteSave(button.dataset.saveDelete,button.dataset.saveLabel); return; }
       this.loadSave(button.dataset.saveId);
     });
+    this.view.lights.toggle.addEventListener('click',() => { void this.toggleLights(); });
     document.querySelector('#tasks-toggle').addEventListener('click',() => { if (!this.busy) void this.view.openTasks(); });
     document.querySelector('#tasks-close').addEventListener('click',() => this.view.tasks.close());
     document.querySelector('#terminal-toggle').addEventListener('click',() => { if (!this.busy) void this.view.openTerminal(); });
@@ -89,7 +95,7 @@ export class GameController {
         const state = this.model.snapshot;
         if (this.model.events.get(state.currentEventId).choices.find(choice => choice.id === id)?.work) return;
       }
-      const commands = {choose:() => this.model.choose(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery(),lights:() => this.model.setLights(id === 'lights_on')};
+      const commands = {choose:() => this.model.choose(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery()};
       if (commands[action]) void this.commit(commands[action],{morning:action === 'next',keepTerminal:action !== 'next'});
     };
     document.querySelector('#terminal-content').addEventListener('click',handleDecision);
@@ -133,6 +139,7 @@ export class GameController {
       document.querySelector('#morning-veil').style.opacity = '0';
       document.querySelector('#terminal-toggle').disabled = false;
       document.querySelector('#tasks-toggle').disabled = !this.model.snapshot;
+      this.view.lights.render(this.model.snapshot);
     } finally { this.busy = false; }
   }
 }

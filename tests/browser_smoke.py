@@ -53,6 +53,17 @@ try:
                 page.locator('#tasks-toggle').click()
             page.locator('#tasks[open]').wait_for()
 
+        def switch_lights(on):
+            if page.locator('#terminal[open]').count():
+                page.keyboard.press('Escape')
+                page.wait_for_function("!document.querySelector('#terminal').open")
+            if page.locator('#tasks[open]').count(): page.keyboard.press('Escape')
+            ready()
+            page.locator('#light-switch').click()
+            page.wait_for_function("(on) => document.querySelector('#light-switch').getAttribute('aria-pressed') === String(on)",arg=on)
+            assert page.locator('#terminal[open]').count() == 0
+            ready()
+
         def decide(selector, *, closes=False, appears=None, disappears=None):
             is_work = 'data-action=work' in selector
             if is_work:
@@ -127,17 +138,16 @@ try:
         terminal()
         page.locator('#reduce-motion').uncheck()
         terminal_before = page.locator('#terminal').bounding_box()
-        page.locator('[data-action=lights][data-id=lights_off]').click()
+        page.locator('[data-action=battery]').click()
         page.wait_for_function("Number(getComputedStyle(document.querySelector('#terminal-content')).opacity) < .8")
-        page.locator('[data-action=lights][data-id=lights_on]').wait_for()
+        page.locator('[data-action=battery]').wait_for(state='detached')
         assert page.locator('#terminal[open]').is_visible()
         terminal_after = page.locator('#terminal').bounding_box()
         assert all(abs(terminal_before[key]-terminal_after[key]) < 1 for key in ['x','y','width','height'])
         page.locator('#skip-typing').click()
         page.locator('#reduce-motion').check()
-        assert page.locator('#terminal .terminal-battery-slot').get_attribute('data-energy') == '6'
+        assert page.locator('#terminal .terminal-battery-slot').get_attribute('data-energy') == '12'
         assert page.locator('[data-layer=plants]').get_attribute('data-state') == 'sprout'
-        decide('[data-action=battery]',disappears='[data-action=battery]')
         assert page.locator('#terminal .terminal-battery-slot [data-lit=true]').count() == 12
         assert page.locator('[data-layer=tool-battery]').is_hidden()
         decide('[data-action=next]',closes=True)
@@ -217,7 +227,8 @@ try:
         assert page.locator('[data-action=work][data-id=research]').is_enabled()
         page.keyboard.press('Escape')
         terminal()
-        decide('[data-action=lights][data-id=lights_on]',appears='[data-action=lights][data-id=lights_off]')
+        assert page.locator('#terminal [data-action=lights]').count() == 0
+        switch_lights(True)
         clipboard()
         assert page.locator('[data-action=work][data-id=research]').is_enabled()
         sol_before = page.locator('#tasks-sol').inner_text()
@@ -229,9 +240,7 @@ try:
         page.keyboard.press('Escape')
         terminal()
         assert page.locator('[data-action=next]').is_visible()
-        decide('[data-action=lights][data-id=lights_off]',appears='[data-action=lights][data-id=lights_on]')
-        page.keyboard.press('Escape')
-        page.wait_for_function("!document.querySelector('#terminal').open")
+        switch_lights(False)
 
         for width in [390, 768, 1440]:
             page.set_viewport_size({'width': width, 'height': 800})
@@ -246,10 +255,23 @@ try:
                 assert bounds['x']+bounds['width'] <= scene_bounds['x']+scene_bounds['width']+1
                 assert bounds['y']+bounds['height'] <= scene_bounds['y']+scene_bounds['height']+1
             scene = page.locator('#scene').bounding_box()
-            page.mouse.move(scene['x'] + scene['width']*.55, scene['y'] + scene['height']*.82)
+            page.mouse.move(scene['x'] + scene['width']*.49, scene['y'] + scene['height']*.82)
             assert page.locator('#tasks-toggle').evaluate('(node) => !node.matches(":hover")')
-            page.mouse.click(scene['x'] + scene['width']*.55, scene['y'] + scene['height']*.82)
+            page.mouse.click(scene['x'] + scene['width']*.49, scene['y'] + scene['height']*.82)
             assert page.locator('#tasks[open]').count() == 0
+            # Nearby tabletop does not hover or activate the switch.
+            lights_before = page.locator('#light-switch').get_attribute('aria-pressed')
+            page.mouse.move(scene['x'] + scene['width']*.58, scene['y'] + scene['height']*.88)
+            assert page.locator('#light-switch').evaluate('(node) => !node.matches(":hover")')
+            page.mouse.click(scene['x'] + scene['width']*.58, scene['y'] + scene['height']*.88)
+            assert page.locator('#light-switch').get_attribute('aria-pressed') == lights_before
+            # Hovering each actual object changes its visual transform.
+            for selector in ['#tasks-toggle','#light-switch']:
+                page.mouse.move(scene['x'] + scene['width']*.49, scene['y'] + scene['height']*.82)
+                page.locator(selector).evaluate('(node) => node.blur()')
+                resting = page.locator(selector).evaluate('(node) => getComputedStyle(node).transform')
+                page.locator(selector).hover()
+                assert page.locator(selector).evaluate('(node) => getComputedStyle(node).transform') != resting
             clipboard()
             paper = page.locator('#tasks').bounding_box()
             assert paper['x'] >= 0 and paper['x'] + paper['width'] <= width

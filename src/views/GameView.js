@@ -1,4 +1,5 @@
 import { SceneView } from './SceneView.js';
+import { LightSwitchView } from './LightSwitchView.js';
 import { TaskView } from './TaskView.js';
 import { TerminalView } from './TerminalView.js';
 import { MenuView } from './MenuView.js';
@@ -11,6 +12,7 @@ export class GameView {
     this.scene = new SceneView(document.querySelector('#scene'),content.scene_layout);
     this.terminal = new TerminalView(content.tools);
     this.tasks = new TaskView();
+    this.lights = new LightSwitchView();
     this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelector('#reduce-motion').checked = this.reducedMotion;
     this.state = null; this.event = null;
@@ -18,7 +20,7 @@ export class GameView {
     document.body.classList.toggle('reduced-motion',this.reducedMotion);
     window.addEventListener('pagehide',() => this.audio.stop());
   }
-  async mount() { await this.scene.mount(); this.tasks.mount(); }
+  async mount() { await this.scene.mount(); this.tasks.mount(); this.lights.mount(); }
   coverScene() {
     const veil = document.querySelector('#morning-veil');
     const title = document.querySelector('#sol-title');
@@ -36,6 +38,7 @@ export class GameView {
     const title = document.querySelector('#sol-title');
     const toggle = document.querySelector('#terminal-toggle'); toggle.disabled = true;
     document.querySelector('#tasks-toggle').disabled = true;
+    this.lights.render(state,{busy:true});
     if (morning || initial) {
       this.tasks.close();
       await this.terminal.close(); veil.style.pointerEvents = 'auto';
@@ -57,6 +60,7 @@ export class GameView {
     }
     toggle.disabled = false;
     document.querySelector('#tasks-toggle').disabled = !state;
+    this.lights.render(state);
   }
   async fade(node,from,to,duration) {
     const animation = node.animate([{opacity:from},{opacity:to}],{duration:this.reducedMotion ? 0 : duration,easing:'ease-in-out',fill:'forwards'});
@@ -70,6 +74,7 @@ export class GameView {
     await this.terminal.fadeContentOut(this.reducedMotion);
     await this.scene.render(state,this.reducedMotion);
     this.tasks.render(state,event);
+    this.lights.render(state);
     this.terminal.render(state,event,{autoplay:false});
     this.terminal.typeContent(this.reducedMotion);
   }

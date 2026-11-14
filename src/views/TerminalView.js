@@ -1,4 +1,3 @@
-import { LIGHT_ACTIONS } from '../models/ActionRules.js';
 import { escapeHtml } from './dom.js';
 import { Typewriter } from './Typewriter.js';
 import { i18n } from '../services/I18n.js';
@@ -108,10 +107,6 @@ export class TerminalView {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.onTable'))}</p>`;
       } else if (state.phase === 'end') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('terminal.dayComplete'))}</p>${choice('next','',state.sol === 14 ? 'terminal.finishMission' : 'terminal.endDay')}`;
-      }
-      if (!state.outcome) {
-        const light = LIGHT_ACTIONS.find(action => action.id === (state.lightsOn ? 'lights_off' : 'lights_on'));
-        decisions.insertAdjacentHTML('beforeend',`<h2>${escapeHtml(i18n.t('terminal.lighting'))}</h2>` + choice('lights',light.id,light.label,light.narrative,!state.lightsOn && state.energy === 0));
       }
       if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy >= LIMITS.energy));
     }
