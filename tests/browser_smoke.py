@@ -54,15 +54,14 @@ try:
             page.locator('#tasks[open]').wait_for()
 
         def switch_lights(on):
-            if page.locator('#terminal[open]').count():
-                page.keyboard.press('Escape')
-                page.wait_for_function("!document.querySelector('#terminal').open")
             if page.locator('#tasks[open]').count(): page.keyboard.press('Escape')
-            ready()
-            page.locator('#light-switch').click()
-            page.wait_for_function("(on) => document.querySelector('#light-switch').getAttribute('aria-pressed') === String(on)",arg=on)
-            assert page.locator('#terminal[open]').count() == 0
-            ready()
+            if not page.locator('#terminal[open]').count(): terminal()
+            target = 'lights_on' if on else 'lights_off'
+            opposite = 'lights_off' if on else 'lights_on'
+            page.locator(f'#terminal [data-action=lights][data-id={target}]').click()
+            page.locator(f'#terminal [data-action=lights][data-id={opposite}]').wait_for()
+            assert page.locator('#terminal[open]').count() == 1
+            assert page.locator('#light-switch').count() == 0
 
         def decide(selector, *, closes=False, appears=None, disappears=None):
             is_work = 'data-action=work' in selector
@@ -227,7 +226,7 @@ try:
         assert page.locator('[data-action=work][data-id=research]').is_enabled()
         page.keyboard.press('Escape')
         terminal()
-        assert page.locator('#terminal [data-action=lights]').count() == 0
+        assert page.locator('#terminal [data-action=lights]').count() == 1
         switch_lights(True)
         clipboard()
         assert page.locator('[data-action=work][data-id=research]').is_enabled()
@@ -241,6 +240,8 @@ try:
         terminal()
         assert page.locator('[data-action=next]').is_visible()
         switch_lights(False)
+        page.keyboard.press('Escape')
+        page.wait_for_function("!document.querySelector('#terminal').open")
 
         for width in [390, 768, 1440]:
             page.set_viewport_size({'width': width, 'height': 800})
@@ -259,14 +260,9 @@ try:
             assert page.locator('#tasks-toggle').evaluate('(node) => !node.matches(":hover")')
             page.mouse.click(scene['x'] + scene['width']*.49, scene['y'] + scene['height']*.82)
             assert page.locator('#tasks[open]').count() == 0
-            # Nearby tabletop does not hover or activate the switch.
-            lights_before = page.locator('#light-switch').get_attribute('aria-pressed')
-            page.mouse.move(scene['x'] + scene['width']*.58, scene['y'] + scene['height']*.88)
-            assert page.locator('#light-switch').evaluate('(node) => !node.matches(":hover")')
-            page.mouse.click(scene['x'] + scene['width']*.58, scene['y'] + scene['height']*.88)
-            assert page.locator('#light-switch').get_attribute('aria-pressed') == lights_before
-            # Hovering each actual object changes its visual transform.
-            for selector in ['#tasks-toggle','#light-switch']:
+            assert page.locator('#light-switch').count() == 0
+            # Hovering the clipboard changes its visual transform.
+            for selector in ['#tasks-toggle']:
                 page.mouse.move(scene['x'] + scene['width']*.49, scene['y'] + scene['height']*.82)
                 page.locator(selector).evaluate('(node) => node.blur()')
                 resting = page.locator(selector).evaluate('(node) => getComputedStyle(node).transform')

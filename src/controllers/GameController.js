@@ -29,7 +29,7 @@ export class GameController {
   async toggleLights() {
     const state = this.model.snapshot;
     if (this.busy || !state || state.phase === 'finished' || (!state.lightsOn && state.energy === 0)) return;
-    await this.commit(() => this.model.setLights(!state.lightsOn));
+    await this.commit(() => this.model.setLights(!state.lightsOn),{keepTerminal:true});
   }
   async start() {
     this.showMenu();
@@ -53,7 +53,6 @@ export class GameController {
       if (button.hasAttribute('data-save-delete')) { this.deleteSave(button.dataset.saveDelete,button.dataset.saveLabel); return; }
       this.loadSave(button.dataset.saveId);
     });
-    this.view.lights.toggle.addEventListener('click',() => { void this.toggleLights(); });
     document.querySelector('#tasks-toggle').addEventListener('click',() => { if (!this.busy) void this.view.openTasks(); });
     document.querySelector('#tasks-close').addEventListener('click',() => this.view.tasks.close());
     document.querySelector('#terminal-toggle').addEventListener('click',() => { if (!this.busy) void this.view.openTerminal(); });
@@ -91,6 +90,7 @@ export class GameController {
       const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
+      if (action === 'lights') { void this.toggleLights(); return; }
       if (action === 'choose') {
         const state = this.model.snapshot;
         if (this.model.events.get(state.currentEventId).choices.find(choice => choice.id === id)?.work) return;
@@ -139,7 +139,6 @@ export class GameController {
       document.querySelector('#morning-veil').style.opacity = '0';
       document.querySelector('#terminal-toggle').disabled = false;
       document.querySelector('#tasks-toggle').disabled = !this.model.snapshot;
-      this.view.lights.render(this.model.snapshot);
     } finally { this.busy = false; }
   }
 }
