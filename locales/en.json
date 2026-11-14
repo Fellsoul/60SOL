@@ -552,5 +552,9 @@
   "events.fatigue.cue": "I need some rest…",
   "events.fatigue.description": "This astronaut is tired. Recovery continues each night; lighting affects its speed.",
   "events.fatigue.recover": "Let this astronaut recover",
-  "events.fatigue.summary": "The tired astronaut continues their scheduled recovery."
+  "events.fatigue.summary": "The tired astronaut continues their scheduled recovery.",
+  "tools.scene.toolkit": "View repair tasks",
+  "tools.scene.robot": "Collect a sample · 4 E · no crew fatigue or daily work used",
+  "tools.scene.battery": "Connect once · up to +6 E",
+  "tools.chargeAdded": "Battery connected:"
 }

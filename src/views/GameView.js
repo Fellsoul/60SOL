@@ -1,4 +1,5 @@
 import { SceneEventView } from './SceneEventView.js';
+import { SceneToolsView } from './SceneToolsView.js';
 import { SceneView } from './SceneView.js';
 import { TaskView } from './TaskView.js';
 import { TerminalView } from './TerminalView.js';
@@ -25,6 +26,7 @@ export class GameView {
     await this.scene.mount();
     this.tasks.mount();
     this.sceneEvent = new SceneEventView(this.scene.root);
+    this.sceneTools = new SceneToolsView(this.scene.root);
     this.sceneEvent.events = this.events;
   }
   coverScene() {
@@ -56,6 +58,7 @@ export class GameView {
     await this.scene.render(state,this.reducedMotion);
     this.terminal.render(state,event);
     this.tasks.render(state,event);
+    this.sceneTools?.render(state,event,{initial,morning});
     this.sceneEvent?.render(state,event,{reset:initial});
     if (morning || initial) {
       // The black layer stays fully opaque while the title animates independently.
@@ -79,6 +82,7 @@ export class GameView {
     await this.terminal.fadeContentOut(this.reducedMotion);
     await this.scene.render(state,this.reducedMotion);
     this.tasks.render(state,event);
+    this.sceneTools?.render(state,event);
     this.sceneEvent?.render(state,event);
     this.terminal.render(state,event,{autoplay:false});
     this.terminal.typeContent(this.reducedMotion);
