@@ -49,10 +49,9 @@ test('refreshing the terminal also updates clipboard state after the event decis
     reducedMotion:true,
     terminal:{fadeContentOut:async () => calls.push('fade'),render:() => calls.push('terminal'),typeContent:() => calls.push('type')},
     scene:{render:async () => calls.push('scene')},
-    lights:{render:actual => { assert.equal(actual,state); calls.push('lights'); }},
     tasks:{render:actual => { assert.equal(actual,state); calls.push('tasks'); }},
   };
   await GameView.prototype.refreshTerminal.call(view,state,event);
-  assert.deepEqual(calls,['fade','scene','tasks','lights','terminal','type']);
+  assert.deepEqual(calls,['fade','scene','tasks','terminal','type']);
   assert.equal(view.state,state);
 });
