@@ -43,10 +43,10 @@ try:
             page.locator('#terminal[open]').wait_for()
 
         def clipboard():
-            ready()
             if page.locator('#terminal[open]').count():
                 page.keyboard.press('Escape')
                 page.wait_for_function("!document.querySelector('#terminal').open")
+            ready()
             if not page.locator('#tasks[open]').count():
                 page.locator('#tasks-toggle').click()
             page.locator('#tasks[open]').wait_for()
@@ -70,6 +70,10 @@ try:
             if disappears: page.locator(disappears).wait_for(state='detached')
 
         page.goto(url)
+        page.locator('[data-layer=shelf] img').wait_for(state='attached')
+        page.locator('[data-layer=shelf-override] img').wait_for(state='attached')
+        assert page.locator('[data-layer=shelf]').get_attribute('data-state') == 'visible'
+        assert page.locator('[data-layer=shelf-override]').get_attribute('data-state') == 'visible'
         page.locator('[data-menu=new]').click()
         assert page.locator('progress, #resources, #journal').count() == 0
         page.locator('[value=toolkit]').check()
@@ -84,6 +88,9 @@ try:
         }""")
         decide('#loadout-form button',closes=True)
         assert page.evaluate('newSceneRevealOpacity.length === 1 && newSceneRevealOpacity[0] === 1'), 'New game scene appeared before the black veil'
+        assert page.locator('[data-layer=shelf]').is_visible()
+        assert page.locator('[data-layer=shelf-override]').is_visible()
+        assert page.evaluate("Number(getComputedStyle(document.querySelector('[data-layer=shelf]')).zIndex) < Number(getComputedStyle(document.querySelector('[data-layer=shelf-override]')).zIndex) < Number(getComputedStyle(document.querySelector('[data-layer=astronaut-a]')).zIndex)")
         collapsed = page.locator('#terminal-toggle').bounding_box()
         assert abs(collapsed['width'] - 1440 * .6) < 1
         assert abs((900-collapsed['y'])/collapsed['height'] - .1) < .01
@@ -334,6 +341,7 @@ try:
         # 素材全部缺失时不会自动拼图，终端仍可使用。
         missing = browser.new_context(reduced_motion='reduce')
         missing.route('**/assets/scene/**/*.png', lambda route: route.fulfill(status=404, body=''))
+        missing.route('**/assets/outpost_base_shelf*.png', lambda route: route.fulfill(status=404, body=''))
         missing_page = missing.new_page()
         missing_page.goto(url)
         missing_page.locator('[data-menu=settings]').click()

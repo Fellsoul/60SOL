@@ -1,3 +1,5 @@
+assets/outpost_base_shelf.png
+assets/outpost_base_shelfOverride.png
 assets/scene/crew/astronaut_a/exhausted.png
 assets/scene/crew/astronaut_a/resting.png
 assets/scene/crew/astronaut_a/seated.png

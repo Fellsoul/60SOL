@@ -251,6 +251,28 @@
       }
     },
     {
+      "id": "shelf",
+      "bind": "always",
+      "zIndex": 42,
+      "defaultState": "visible",
+      "states": {
+        "visible": {
+          "src": "assets/outpost_base_shelf.png"
+        }
+      }
+    },
+    {
+      "id": "shelf-override",
+      "bind": "always",
+      "zIndex": 46,
+      "defaultState": "visible",
+      "states": {
+        "visible": {
+          "src": "assets/outpost_base_shelfOverride.png"
+        }
+      }
+    },
+    {
       "id": "astronaut-a",
       "bind": "crew",
       "zIndex": 50,
