@@ -46,9 +46,12 @@ export class TerminalView {
     this.animation?.cancel();
     const frames = this.isConsole ? [{transform:'translateY(90%)'},{transform:'translateY(20%)'}] : [{transform:'translateX(-100%)'},{transform:'translateX(0)'}];
     this.animation = this.dialog.animate(frames,{duration:reducedMotion ? 0 : 560,easing:'cubic-bezier(.16,1,.3,1)'});
-    document.querySelector('#terminal-close').focus();
+    document.querySelector('#terminal-close').focus({preventScroll:true});
     const skip = document.querySelector('#skip-typing'); skip.hidden = reducedMotion;
     this.writer.play(this.jobs,{reducedMotion,onComplete:() => { skip.hidden = true; }});
+    // showModal can restore focus/scroll from the loadout form. Reset after it is visible
+    // and after the typewriter has changed the content height.
+    this.resetScroll();
   }
   async close() {
     if (!this.dialog.open) return;
@@ -63,6 +66,11 @@ export class TerminalView {
   copy(id,text) {
     text = i18n.t(text);
     return `<p class="terminal-copy"><span class="sr-only">${escapeHtml(text)}</span><span id="${id}" aria-hidden="true" data-copy="${escapeHtml(text)}"></span></p>`;
+  }
+  resetScroll() {
+    document.querySelector('#terminal-scroll').scrollTop = 0;
+    this.dialog.querySelector('.terminal-shell').scrollTop = 0;
+    this.dialog.scrollTop = 0;
   }
   async fadeContentOut(reducedMotion) {
     this.writer.cancel();
@@ -94,7 +102,8 @@ export class TerminalView {
       this.content.innerHTML = `<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}<div id="terminal-decisions" class="terminal-choices"></div>`;
       const decisions = this.content.querySelector('#terminal-decisions');
       if (state.phase === 'event') {
-        decisions.innerHTML = event.choices.map(item => choice('choose',item.id,item.label,state.energy < item.energy ? 'choice.insufficientPower' : item.description,state.energy < item.energy)).join('');
+        decisions.innerHTML = event.choices.filter(item => !item.work).map(item => choice('choose',item.id,item.label,state.energy < item.energy ? 'choice.insufficientPower' : item.description,state.energy < item.energy)).join('');
+        if (event.choices.some(item => item.work)) decisions.insertAdjacentHTML('beforeend',`<p class="terminal-note">${escapeHtml(i18n.t('tasks.eventOnClipboard'))}</p>`);
       } else if (state.phase === 'work') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.onTable'))}</p>`;
       } else if (state.phase === 'end') {
@@ -106,9 +115,9 @@ export class TerminalView {
       }
       if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy >= LIMITS.energy));
     }
-    document.querySelector('#terminal-scroll').scrollTop = 0;
     this.jobs = [{node:document.querySelector('#terminal-title'),text:title},...Array.from(this.content.querySelectorAll('[data-copy]'),node => ({node,text:node.dataset.copy}))];
     if (autoplay) this.writer.play(this.jobs,{reducedMotion:true});
+    this.resetScroll();
   }
   updateSelection() {
     const form = document.querySelector('#loadout-form'); if (!form) return;

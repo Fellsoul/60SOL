@@ -41,6 +41,8 @@ try:
             ready()
             page.locator('#terminal-toggle').click()
             page.locator('#terminal[open]').wait_for()
+            assert page.locator('#terminal-scroll').evaluate('(node) => node.scrollTop') == 0
+            assert page.locator('.is-console .terminal-shell').evaluate('(node) => node.scrollTop') == 0
 
         def clipboard():
             if page.locator('#terminal[open]').count():
@@ -95,8 +97,8 @@ try:
         assert abs(collapsed['width'] - 1440 * .6) < 1
         assert abs((900-collapsed['y'])/collapsed['height'] - .1) < .01
         clipboard()
-        assert page.locator('#tasks [data-action]').count() == 0
-        assert page.locator('#tasks [data-action=work]').count() == 0
+        assert page.locator('#tasks [data-action=choose][data-id=grow]').is_enabled()
+        assert page.locator('#tasks [data-action=work][data-id=research]').is_disabled()
         page.keyboard.press('Escape')
         assert page.locator('#tasks-toggle').evaluate('(node) => node === document.activeElement')
         terminal()
@@ -114,13 +116,21 @@ try:
         page.wait_for_function("!document.querySelector('#terminal').open")
         terminal()
         assert page.locator('#terminal-title').inner_text() == 'SOL 01'
+        assert page.locator('#terminal [data-action=choose][data-id=grow]').count() == 0
+        clipboard()
+        page.locator('#tasks [data-action=choose][data-id=grow]').click()
+        page.locator('#tasks .is-complete').wait_for()
+        assert page.locator('#tasks[open]').count() == 1
+        assert page.locator('#tasks .task-row:not(.is-complete)').count() > 0
+        assert page.locator('#tasks [data-action=next]').count() == 0
+        page.keyboard.press('Escape')
+        terminal()
         page.locator('#reduce-motion').uncheck()
         terminal_before = page.locator('#terminal').bounding_box()
-        page.locator('[data-action=choose][data-id=grow]').click()
+        page.locator('[data-action=lights][data-id=lights_off]').click()
         page.wait_for_function("Number(getComputedStyle(document.querySelector('#terminal-content')).opacity) < .8")
+        page.locator('[data-action=lights][data-id=lights_on]').wait_for()
         assert page.locator('#terminal[open]').is_visible()
-        page.locator('[data-action=next]').wait_for()
-        assert page.locator('.typing').count() > 0
         terminal_after = page.locator('#terminal').bounding_box()
         assert all(abs(terminal_before[key]-terminal_after[key]) < 1 for key in ['x','y','width','height'])
         page.locator('#skip-typing').click()
@@ -215,6 +225,7 @@ try:
         assert page.locator('#tasks-sol').inner_text() == sol_before
         assert page.locator('#tasks [data-action=next]').count() == 0
         assert page.locator('#tasks .is-complete').count() == 1
+        assert page.locator('#tasks .task-row:not(.is-complete)').count() > 0
         page.keyboard.press('Escape')
         terminal()
         assert page.locator('[data-action=next]').is_visible()
@@ -234,6 +245,11 @@ try:
                 assert bounds['x'] >= scene_bounds['x'] and bounds['y'] >= scene_bounds['y']
                 assert bounds['x']+bounds['width'] <= scene_bounds['x']+scene_bounds['width']+1
                 assert bounds['y']+bounds['height'] <= scene_bounds['y']+scene_bounds['height']+1
+            scene = page.locator('#scene').bounding_box()
+            page.mouse.move(scene['x'] + scene['width']*.55, scene['y'] + scene['height']*.82)
+            assert page.locator('#tasks-toggle').evaluate('(node) => !node.matches(":hover")')
+            page.mouse.click(scene['x'] + scene['width']*.55, scene['y'] + scene['height']*.82)
+            assert page.locator('#tasks[open]').count() == 0
             clipboard()
             paper = page.locator('#tasks').bounding_box()
             assert paper['x'] >= 0 and paper['x'] + paper['width'] <= width

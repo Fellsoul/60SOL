@@ -4,6 +4,19 @@ import { escapeHtml } from './dom.js';
 
 const text = key => escapeHtml(i18n.t(key));
 
+// Derive rows from saved state so completed and unfinished work survive reopening/reload.
+export function clipboardTasks(state,event) {
+  const eventChoices = (event?.choices ?? []).filter(choice => choice.work &&
+    (state.phase === 'event' || state.workId === `event:${choice.id}`));
+  const rows = eventChoices.map(choice => ({...choice,command:'choose',
+    done:state.workId === `event:${choice.id}`,
+    reason:state.phase !== 'event' ? 'error.workUsed' : state.energy < choice.energy ? 'error.powerInsufficient' : ''}));
+  return rows.concat(ACTIONS.filter(action => (!action.tool || state.tools[action.tool]) &&
+    !eventChoices.some(choice => choice.action === action.id)).map(action => ({...action,
+    description:action.narrative,command:'work',done:state.workId === action.id,
+    reason:unavailableReason(state,action)})));
+}
+
 export class TaskView {
   constructor() {
     this.dialog = document.querySelector('#tasks');
@@ -31,7 +44,7 @@ export class TaskView {
     this.dialog.close(); this.toggle.setAttribute('aria-expanded','false');
     this.toggle.focus({preventScroll:true});
   }
-  render(state) {
+  render(state,event) {
     this.state = state;
     i18n.translate(this.dialog);
     if (!state) { this.toggle.hidden = true; return; }
@@ -39,13 +52,12 @@ export class TaskView {
     document.querySelector('#tasks-power').textContent = `${i18n.t('tasks.energy')} · ${state.energy} E`;
     this.toggle.setAttribute('aria-label',i18n.t('tasks.table'));
     this.toggle.dataset.phase = state.phase;
-    const completed = ACTIONS.find(action => action.id === state.workId);
-    const tasks = completed ? [completed] : ACTIONS.filter(action => !unavailableReason(state,action));
-    this.content.innerHTML = `<div class="task-list">${tasks.map(action => {
-      const done = action.id === state.workId;
-      const unavailable = Boolean(unavailableReason(state,action));
-      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="work" data-id="${escapeHtml(action.id)}" ${done || unavailable ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(action.label)}</strong><small>${text(done ? 'tasks.checked' : action.narrative)}</small><span class="task-cost">${action.energy} E · ${text('tasks.work')}</span></span></button>`;
-    }).join('')}</div><p class="clipboard-note" role="status">${text(state.phase === 'event' ? 'tasks.eventFirst' : completed ? 'tasks.checked' : state.phase === 'end' ? 'tasks.eventWork' : state.phase === 'finished' ? 'tasks.finished' : tasks.length ? 'tasks.choose' : 'tasks.empty')}</p>`;
+    const tasks = clipboardTasks(state,event);
+    const completed = tasks.some(task => task.done);
+    this.content.innerHTML = `<div class="task-list">${tasks.map(task => {
+      const {done,reason} = task;
+      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${task.energy} E · ${text('tasks.work')}</span></span></button>`;
+    }).join('')}</div><p class="clipboard-note" role="status">${text(state.phase === 'event' ? (tasks.some(task => task.command === 'choose') ? 'tasks.eventOptions' : 'tasks.eventFirst') : completed ? 'tasks.checked' : state.phase === 'end' ? 'tasks.eventWork' : state.phase === 'finished' ? 'tasks.finished' : 'tasks.choose')}</p>`;
     if (this.dialog.open && completed) document.querySelector('#tasks-close').focus({preventScroll:true});
   }
 }

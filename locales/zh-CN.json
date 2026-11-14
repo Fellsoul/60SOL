@@ -82,7 +82,7 @@
   "event.sandstorm.choice.shelter.label": "关闭照明，安排舱内工作",
   "event.sandstorm.choice.inside.label": "保持照明，安排舱内工作",
   "choice.grow.description": "把今天的工作和一部分电力用于照料作物。",
-  "choice.plan.description": "保留今天的工作机会，继续在终端安排任务。",
+  "choice.plan.description": "保留今天的工作机会，在桌上的工作记录板选择任务。",
   "event.delivery.choice.rest.description": "让队员休息，今天不再开展其他工作。",
   "event.dust.choice.clean.description": "投入电力和今天的工作，恢复后续供电。",
   "event.dust.choice.defer.description": "保留今天的工作机会，接受积尘的影响。",
@@ -240,7 +240,7 @@
   "tasks.title": "工作记录板",
   "tasks.close": "关闭工作记录板",
   "tasks.department": "基地 / 工作安排",
-  "tasks.intro": "选择一项可执行的工作。完成后将在这里打勾。",
+  "tasks.intro": "在这里完成工作。打勾表示已完成，未打勾表示尚未完成。每个火星日只能安排一项工作。",
   "tasks.footer": "最后的曙光基地 · 队员工作单",
   "tasks.open": "打开工作记录板",
   "tasks.ready": "请在工作记录板上选择今天的工作。",
@@ -256,9 +256,11 @@
   "tasks.work": "占用今天的工作",
   "tasks.selected": "已完成的工作",
   "tasks.eventWork": "今天的工作已用于处理事件。",
-  "tasks.table": "打开桌上的工作记录板",
+  "tasks.table": "打开工作记录板",
   "tasks.onTable": "工作记录板放在桌上。",
   "tasks.checked": "已完成",
   "tasks.choose": "选择一项工作。",
-  "tasks.empty": "目前没有可执行的工作。"
+  "tasks.empty": "目前没有可执行的工作。",
+  "tasks.eventOptions": "可以在这里执行事件工作，或在终端选择规划其他工作。",
+  "tasks.eventOnClipboard": "本次事件的工作位于桌上的记录板。请在那里执行工作。"
 }
