@@ -47,6 +47,8 @@ export class SceneEventView {
 
   describe() {
     if (this.node.hidden || !this.eventID) return;
+    this.dismissedIdentity = this.identity;
+    this.node.hidden = true;
     this.clearDescription();
     this.description.textContent = i18n.t(this.descriptionKey ?? `scene.description.${this.eventID}`);
     this.description.hidden = false;
@@ -76,7 +78,7 @@ export class SceneEventView {
     this.node.dataset.tail = below ? 'top' : 'bottom';
   }
 
-  render(state, event) {
+  render(state, event, {reset = false} = {}) {
     if (this.events) {
       this.extraViews ??= new Map();
       const active = new Set();
@@ -85,7 +87,7 @@ export class SceneEventView {
         let view = this.extraViews.get(instance.id);
         if (!view) { view = new SceneEventView(this.root); this.extraViews.set(instance.id,view); }
         const extra = concurrentEvent(instance, { get: id => this.events.find(item => item.id === id) });
-        view.render({ ...state, choiceId: instance.choiceId, eventDone: Boolean(instance.choiceId) },extra);
+        view.render({ ...state, choiceId: instance.choiceId, eventDone: Boolean(instance.choiceId) },extra,{reset});
       }
       for (const [id,view] of this.extraViews) {
         if (active.has(id)) continue;
@@ -94,8 +96,9 @@ export class SceneEventView {
       }
     }
     const cue = event?.sceneCue;
-    this.node.hidden = !state || !cue || Boolean(state.outcome) || eventResolved(state, event);
     const identity = state && event ? `${state.sol}:${event.id}` : null;
+    if (reset) this.dismissedIdentity = null;
+    this.node.hidden = !state || !cue || Boolean(state.outcome) || eventResolved(state, event) || identity === this.dismissedIdentity;
     if (this.node.hidden || identity !== this.identity) this.clearDescription();
     this.identity = identity;
     this.eventID = event?.id;

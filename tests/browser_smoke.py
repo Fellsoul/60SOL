@@ -517,6 +517,7 @@ try:
         bubble = motion_page.locator('.scene-event-bubble[data-kind=sound][data-anchor=hatch]')
         assert bubble.is_visible()
         bubble.click()
+        assert bubble.is_hidden()
         assert motion_page.locator('.scene-event-description').is_visible()
         assert not motion_page.locator('#tasks').evaluate('(node) => node.open')
         motion_page.locator('#tasks-toggle').click()
