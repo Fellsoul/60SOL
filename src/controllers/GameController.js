@@ -95,7 +95,7 @@ export class GameController {
         const state = this.model.snapshot;
         if (this.model.events.get(state.currentEventId).choices.find(choice => choice.id === id)?.work) return;
       }
-      const commands = {choose:() => this.model.choose(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery()};
+      const commands = {choose:() => this.model.choose(id),emergency_clean:() => this.model.chooseEmergencyClean(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery()};
       if (commands[action]) void this.commit(commands[action],{morning:action === 'next',keepTerminal:action !== 'next'});
     };
     document.querySelector('#terminal-content').addEventListener('click',handleDecision);

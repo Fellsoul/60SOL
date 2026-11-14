@@ -386,5 +386,14 @@
   "dependency.labGuidance": "Confirm the lab setup or pause it while awaiting guidance before experimenting.",
   "dependency.antennaFault": "Repair the failed antenna before transmitting. Data remains stored locally.",
   "dependency.labSpill": "Isolate or clean the spill before powering the affected experiment rack.",
-  "dependency.shelter": "Take shelter before starting other work during the radiation warning."
+  "dependency.shelter": "Take shelter before starting other work during the radiation warning.",
+  "event.emergency_clean.title": "A dangerous trip outside",
+  "event.emergency_clean.text": "Dust is choking the solar panels. A storm or a shortage of power prevents normal cleaning. The crew could go outside and clear them by hand, at the cost of injury and exhaustion.",
+  "event.emergency_clean.summaryLine": "The crew considered an emergency manual cleaning trip.",
+  "event.emergency_clean.choice.force_clean.label": "Force an outside cleaning trip",
+  "event.emergency_clean.choice.force_clean.description": "0 E, −20 health, uses today's work. Clear panel dust and remove the dust-related generation limit. No immediate power gain; further storms can cover the panels again.",
+  "event.emergency_clean.choice.force_clean.summaryLine": "We forced a manual cleaning trip: no power spent, 20 health lost, and today's work used. The panels are clear for now.",
+  "event.emergency_clean.choice.stay_inside.label": "Stay inside",
+  "event.emergency_clean.choice.stay_inside.description": "No power, health or work cost. Leave the panels as they are; give up this emergency trip for today.",
+  "event.emergency_clean.choice.stay_inside.summaryLine": "We gave up the emergency cleaning trip and kept the crew inside."
 }

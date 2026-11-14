@@ -10,6 +10,12 @@ export function eventEligible(state,event) {
     (!event.dailyRequires?.data || state.localData >= event.dailyRequires.data) &&
     (!event.dailyRequires?.greenhouse || !dailyState(state).greenhouseDisabled);
 }
+export function emergencyCleanAvailable(state,event = null) {
+  return Boolean(state && state.phase !== 'finished' &&
+    !(state.phase === 'event' && event?.blockedWork?.includes('clean')) &&
+    (state.dusty || dailyState(state).generationCap < 6) &&
+    (state.weather === 'sandstorm' || state.energy < 2));
+}
 export function choiceReason(state,choice) {
   if (choice.work && state.workId) return 'error.workUsed';
   if (state.energy < choice.energy) return 'error.powerInsufficient';

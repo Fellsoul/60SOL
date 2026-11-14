@@ -386,5 +386,14 @@
   "dependency.labGuidance": "先确认实验室配置，或在等待指导时暂停使用，再进行实验。",
   "dependency.antennaFault": "修复失效的天线后才能传输，数据仍保存在本地。",
   "dependency.labSpill": "先隔离或清理泄漏液体，再启动受影响的实验架。",
-  "dependency.shelter": "辐射警报期间，必须先进入防护区，再进行其他工作。"
+  "dependency.shelter": "辐射警报期间，必须先进入防护区，再进行其他工作。",
+  "event.emergency_clean.title": "冒险走出气闸",
+  "event.emergency_clean.text": "积尘压低了太阳能板的发电量，沙暴或电力短缺又让常规清理无法进行。队员提出徒手外出清理，但强行作业会造成受伤和体力透支。",
+  "event.emergency_clean.summaryLine": "队员讨论了冒险外出清理太阳能板的方案。",
+  "event.emergency_clean.choice.force_clean.label": "强行外出清理太阳能板",
+  "event.emergency_clean.choice.force_clean.description": "不耗电，扣除 20 点生命值，占用今天的工作。清除积尘及积尘造成的发电限制；不会立即补电，后续沙暴仍可能重新造成积尘。",
+  "event.emergency_clean.choice.force_clean.summaryLine": "我们强行外出清理了太阳能板，没有耗电，但损失了 20 点生命值并用掉了今天的工作。面板暂时恢复洁净。",
+  "event.emergency_clean.choice.stay_inside.label": "留在舱内，放弃冒险",
+  "event.emergency_clean.choice.stay_inside.description": "不消耗电力、生命值或工作机会。维持面板现状，今天不再尝试这次冒险清理。",
+  "event.emergency_clean.choice.stay_inside.summaryLine": "我们放弃了冒险清理，让队员留在舱内。"
 }

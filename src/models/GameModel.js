@@ -1,4 +1,4 @@
-import { applyDailyChoice, choiceReason, eventResolved, dailyState } from './DailyEventRules.js';
+import { applyDailyChoice, choiceReason, eventResolved, dailyState, emergencyCleanAvailable } from './DailyEventRules.js';
 import { createState, logEntry, LIMITS } from './state.js';
 import { ACTIONS, LIGHT_ACTIONS, applyEffect, unavailableReason } from './ActionRules.js';
 import { EventEngine } from './EventEngine.js';
@@ -31,6 +31,22 @@ export class GameModel {
     if (choice.work) s.workId = `event:${choice.id}`;
     s.phase = s.workId ? 'end' : 'work';
     logEntry(s,`事件决策：${choice.label}；消耗 ${choice.energy} E${choice.work ? '，占用今日工作' : ''}。`);
+  }
+  chooseEmergencyClean(choiceId) {
+    const s = this.#state;
+    const event = this.events.get('emergency_clean');
+    const choice = event?.choices.find(item => item.id === choiceId);
+    if (!emergencyCleanAvailable(s,s ? this.events.get(s.currentEventId) : null) || s.history.emergency_clean === s.sol || !choice || choiceReason(s,choice)) throw new Error('error.choiceUnavailable');
+    const before = resourceSnapshot(s);
+    s.energy -= choice.energy;
+    applyDailyChoice(s,choice);
+    recordResourceChange(s,before,`event.${event.id}.${choice.id}`,this.resourceLog,choice.summaryLine);
+    s.history.emergency_clean = s.sol;
+    s.daySummary.push(choice.summaryLine);
+    if (choice.work) {
+      s.workId = `event:${choice.id}`;
+      s.phase = eventResolved(s,this.events.get(s.currentEventId)) ? 'end' : 'event';
+    }
   }
   work(actionId) {
     const s = this.#state;

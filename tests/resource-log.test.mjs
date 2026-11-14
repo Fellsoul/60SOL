@@ -65,3 +65,18 @@ test('descriptions are bilingual; selected variants survive saving and leave eve
   const saved=repo.save(model.snapshot);
   assert.deepEqual(repo.load(saved.id).state,model.snapshot);
 });
+
+test('emergency cleaning records health loss once and keeps it in the saved resource history',() => {
+  const model=game(),state=model.snapshot;
+  Object.assign(state,{sol:4,currentEventId:'E07',weather:'sandstorm',dusty:true,health:90,energy:0,resourceLog:[]});
+  model.restore(state);model.chooseEmergencyClean('force_clean');
+  const entries=model.snapshot.resourceLog;
+  assert.equal(entries.length,1);
+  assert.equal(entries[0].source,'event.emergency_clean.force_clean');
+  assert.deepEqual(entries[0].changes,{health:-20});
+  assert.equal(entries[0].fallback,'event.emergency_clean.choice.force_clean.summaryLine');
+  assert.throws(()=>model.chooseEmergencyClean('force_clean'));
+  assert.deepEqual(model.snapshot.resourceLog,entries);
+  model.choose('close');model.nextSol();
+  assert.deepEqual(model.snapshot.previousResourceLog.find(entry=>entry.source==='event.emergency_clean.force_clean'),entries[0]);
+});
