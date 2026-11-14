@@ -35,3 +35,46 @@ body.reduced-motion #terminal-toggle { transition: none; }
 .crew-status-panel li + li { margin-top:5px; }
 .scene-layer[data-state="exhausted"] img { filter:saturate(.6) brightness(.88); }
 @media (max-width:600px) { .crew-status-panel { padding:10px 12px; width:180px; } }
+.scene-event-bubble {
+  position: absolute;
+  z-index: 90;
+  left: 70%;
+  top: 30%;
+  transform: translate(-50%, -100%);
+  width: max-content;
+  max-width: 26%;
+  padding: .6em .85em;
+  border: 2px solid #42392d;
+  border-radius: 1em;
+  background: #fff5d9;
+  color: #302b24;
+  box-shadow: 0 3px 9px #0005;
+  font: 600 clamp(12px, 1.35vw, 22px)/1.4 system-ui, sans-serif;
+  text-align: center;
+  cursor: pointer;
+}
+.scene-event-bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  width: 13px;
+  height: 13px;
+  border-right: 2px solid #42392d;
+  border-bottom: 2px solid #42392d;
+  background: #fff5d9;
+  transform: rotate(45deg);
+}
+.scene-event-bubble[data-kind=sound] {
+  border-style: dashed;
+  border-radius: .3em;
+  font-weight: 800;
+}
+.scene-event-bubble[data-anchor=hatch] { left: 86%; top: 48%; }
+.scene-event-bubble[data-anchor=panels] { left: 55%; top: 37%; }
+.scene-event-bubble[data-anchor=antenna] { left: 79%; top: 31%; }
+.scene-event-bubble[data-anchor=vent] { left: 59%; top: 67%; }
+.scene-event-bubble[data-anchor=greenhouse] { left: 86%; top: 59%; }
+.scene-event-bubble[data-anchor=terminal] { left: 69%; top: 79%; }
+.scene-event-bubble:hover { background: #fffbe9; }
+.scene-event-bubble:focus-visible { outline: 3px solid #b7e988; outline-offset: 4px; }

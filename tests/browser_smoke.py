@@ -514,9 +514,13 @@ try:
         motion_page.locator('[value=toolkit]').check();motion_page.locator('[value=battery]').check()
         motion_page.locator('#loadout-form button').click()
         motion_page.locator('#terminal-toggle:enabled').wait_for()
-        motion_page.locator('#tasks-toggle').click()
+        bubble = motion_page.locator('.scene-event-bubble[data-kind=sound][data-anchor=hatch]')
+        assert bubble.is_visible()
+        bubble.click()
+        assert motion_page.locator('#tasks .clipboard-event p').count() == 0
         motion_page.locator('#tasks [data-action=choose][data-id=secure]').click()
         motion_page.locator('#tasks .is-complete').wait_for()
+        assert motion_page.locator('.scene-event-bubble').is_hidden()
         motion_key=motion_page.evaluate("() => Object.keys(localStorage).find(key=>key.includes('.slot.'))")
         committed=motion_page.evaluate('(key)=>localStorage.getItem(key)',motion_key)
         assert motion_page.locator('.motion-card').count() == 0
