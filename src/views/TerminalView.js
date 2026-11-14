@@ -1,4 +1,3 @@
-import { snapshotSelector, snapshotComparison } from './SpaceEvidence.js';
 import { choiceReason, eventResolved, emergencyCleanAvailable } from '../models/DailyEventRules.js';
 import { escapeHtml } from './dom.js';
 import { LIGHT_ACTIONS } from '../models/ActionRules.js';
@@ -13,9 +12,9 @@ function choice(action,id,label,description='',disabled=false) {
 }
 
 export class TerminalView {
-  constructor(tools,events = [],resourceLog = {}) {
+  constructor(tools,resourceLog = {}) {
     this.resourceLog = resourceLog;
-    this.tools = tools; this.events = events; this.dialog = document.querySelector('#terminal'); this.content = document.querySelector('#terminal-content');
+    this.tools = tools; this.dialog = document.querySelector('#terminal'); this.content = document.querySelector('#terminal-content');
     this.writer = new Typewriter(); this.animation = null;
     this.batterySlot = new BatterySlotView();
     // Start at 90% opacity; evaluate inside/outside only once the mouse actually moves.
@@ -70,38 +69,22 @@ export class TerminalView {
     text = i18n.t(text);
     return `<p class="terminal-copy"><span class="sr-only">${escapeHtml(text)}</span><span id="${id}" aria-hidden="true" data-copy="${escapeHtml(text)}"></span>${suffix}</p>`;
   }
-  resourceSummary(entries = [],prefix = 'resource-copy') {
+  resourceSummary(entries = []) {
     const localize = values => values?.[i18n.language] ?? values?.en;
     return entries.map((entry,index) => {
       const variants = localize(this.resourceLog.sources?.[entry.source]?.descriptions);
       const description = variants?.[entry.variant % variants.length] ?? i18n.t(entry.fallback || entry.source);
-      // Generation is a daily rate, not another resource gain. Show only power
-      // actually stored, including a zero when the batteries were already full.
-      const deltas = entry.source === 'generation' ? {energy:entry.changes.energy ?? 0} : entry.changes;
-      const changes = Object.entries(deltas).map(([resource,delta]) => {
+      const changes = Object.entries(entry.changes).map(([resource,delta]) => {
         const label = localize(this.resourceLog.resources?.[resource]) ?? resource;
-        const sign = delta >= 0 ? '+' : '−';
+        const sign = delta > 0 ? '+' : '−';
         const amount = Math.abs(delta);
         const accessible = escapeHtml(`${label} ${sign}${amount}`);
-        if (resource === 'energy') {
-          const battery = '<img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">';
-          const icons = amount > 4 ? `${battery}<span aria-hidden="true">× ${amount}</span>`
-            : amount > 0 ? battery.repeat(amount) : '<span aria-hidden="true">0</span>';
-          return `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}</span>${icons}</span>`;
-        }
-        return `<span class="summary-resource-change">${escapeHtml(label)} ${sign}${amount}</span>`;
+        return resource === 'energy'
+          ? `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}</span>${'<img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">'.repeat(amount)}</span>`
+          : `<span class="summary-resource-change">${escapeHtml(label)} ${sign}${amount}</span>`;
       }).join(' ');
-      return this.copy(`${prefix}-${index}`,description,` <span class="summary-resource-changes">${changes}</span>`);
+      return this.copy(`resource-copy-${index}`,description,` <span class="summary-resource-changes">${changes}</span>`);
     }).join('');
-  }
-  todayRecords(state) {
-    if (state.outcome) return ''; // The final Sol is already shown as the completed day's log.
-    const entries = state.resourceLog ?? [];
-    const detailed = new Set(entries.filter(entry => entry.fallback).map(entry => i18n.t(entry.fallback)));
-    const lines = state.daySummary.map(line => i18n.t(line)).filter(line => !detailed.has(line));
-    const narrative = lines.length ? this.copy('today-summary-copy',lines.join('\n\n')) : '';
-    const empty = !lines.length && !entries.length ? this.copy('today-empty-copy','terminal.noRecords') : '';
-    return `<section id="today-records"><h2>SOL ${String(state.sol).padStart(2,'0')} / ${escapeHtml(i18n.t('terminal.todayRecords'))}</h2>${narrative}${this.resourceSummary(entries,'today-resource-copy')}${empty}</section>`;
   }
   resetScroll() {
     document.querySelector('#terminal-scroll').scrollTop = 0;
@@ -134,25 +117,30 @@ export class TerminalView {
     document.querySelector('#terminal-title').setAttribute('aria-label',title);
     document.querySelector('#restart').hidden = !state;
     if (!state) {
-      this.content.innerHTML = this.copy('briefing-copy','loadout.intro') + `<form id="loadout-form">${snapshotSelector()}<div class="loadout">${this.tools.map(tool => `<label><input type="checkbox" name="tool" value="${escapeHtml(tool.id)}"><span>${escapeHtml(i18n.t(tool.name))}<small>${escapeHtml(i18n.t(tool.description))}</small></span></label>`).join('')}</div><div class="terminal-choices"><button class="terminal-choice" type="submit" disabled>${escapeHtml(i18n.t('loadout.chooseTwo'))}</button></div></form>`;
+      this.content.innerHTML = this.copy('briefing-copy','loadout.intro') + `<form id="loadout-form"><div class="loadout">${this.tools.map(tool => `<label><input type="checkbox" name="tool" value="${escapeHtml(tool.id)}"><span>${escapeHtml(i18n.t(tool.name))}<small>${escapeHtml(i18n.t(tool.description))}</small></span></label>`).join('')}</div><div class="terminal-choices"><button class="terminal-choice" type="submit" disabled>${escapeHtml(i18n.t('loadout.chooseTwo'))}</button></div></form>`;
     } else {
-      const hasLightingDetail = state.previousResourceLog?.some(entry => entry.source === 'lighting');
-      const previousLines = state.previousDaySummary.filter(line => !(hasLightingDetail && i18n.t(line) === i18n.t('summary.lightingCost')));
-      const previous = state.previousDaySummary.length ? previousLines.map(line => i18n.t(line)).join('\n\n') : 'summary.arrival';
+      const previous = state.previousDaySummary.length ? state.previousDaySummary.map(line => i18n.t(line)).join('\n\n') : 'summary.arrival';
       let today = event.text;
       if (state.outcome) today = {success:'outcome.success',incomplete:'outcome.incomplete',unsafe:'outcome.unsafe'}[state.outcome];
-      const todayCopy = event.sceneCue && !state.outcome ? '' : `<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}`;
-      this.content.innerHTML = `${this.todayRecords(state)}<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}${todayCopy}<div id="terminal-decisions" class="terminal-choices"></div>`;
+      this.content.innerHTML = `<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}<div id="terminal-decisions" class="terminal-choices"></div>`;
       const decisions = this.content.querySelector('#terminal-decisions');
       if (state.phase === 'event') {
-        decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.eventOnClipboard'))}</p>`;
+        decisions.innerHTML = event.choices.filter(item => !item.work).map(item => choice('choose',item.id,item.label,choiceReason(state,item) || item.description,Boolean(choiceReason(state,item)))).join('');
+        if (event.choices.some(item => item.work)) decisions.insertAdjacentHTML('beforeend',`<p class="terminal-note">${escapeHtml(i18n.t('tasks.eventOnClipboard'))}</p>`);
       } else if (state.phase === 'work') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.onTable'))}</p>`;
       } else if (state.phase === 'end') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('terminal.dayComplete'))}</p>${choice('next','',state.sol === 14 ? 'terminal.finishMission' : 'terminal.endDay',eventResolved(state,event) ? '' : 'error.eventUnresolved',!eventResolved(state,event))}`;
       }
+      if (eventResolved(state,event)) {
+        const result=event.choices.find(choice => choice.id === state.choiceId);
+        decisions.insertAdjacentHTML('afterbegin',`<p class="terminal-note" role="status">${escapeHtml(i18n.t(result.summaryLine))}</p>`);
+      }
       const emergency = this.events.find(item => item.id === 'emergency_clean');
-      if (emergency && state.history.emergency_clean !== state.sol && emergencyCleanAvailable(state,event)) {
+      if (emergency && state.history.emergency_clean === state.sol) {
+        const response = emergency.choices.find(item => state.daySummary.includes(item.summaryLine));
+        if (response) decisions.insertAdjacentHTML('beforeend',`<section class="emergency-event"><h2>${escapeHtml(i18n.t(emergency.title))}</h2><p role="status">${escapeHtml(i18n.t(response.summaryLine))}</p></section>`);
+      } else if (emergency && emergencyCleanAvailable(state,event)) {
         decisions.insertAdjacentHTML('beforeend',`<section class="emergency-event"><h2>${escapeHtml(i18n.t(emergency.title))}</h2><p>${escapeHtml(i18n.t(emergency.text))}</p>${emergency.choices.map(item => {
           const reason = choiceReason(state,item);
           return choice('emergency_clean',item.id,item.label,reason || item.description,Boolean(reason));
@@ -164,7 +152,6 @@ export class TerminalView {
       }
       if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy >= LIMITS.energy));
     }
-    if(state?.outcome)this.content.insertAdjacentHTML('beforeend',snapshotComparison(state));
     this.jobs = [{node:document.querySelector('#terminal-title'),text:title},...Array.from(this.content.querySelectorAll('[data-copy]'),node => ({node,text:node.dataset.copy}))];
     if (autoplay) this.writer.play(this.jobs,{reducedMotion:true});
     this.resetScroll();

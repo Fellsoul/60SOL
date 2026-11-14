@@ -1,5 +1,3 @@
-import { SceneEventView } from './SceneEventView.js';
-import { MovementView } from './MovementView.js';
 import { SceneView } from './SceneView.js';
 import { TaskView } from './TaskView.js';
 import { TerminalView } from './TerminalView.js';
@@ -11,26 +9,16 @@ export class GameView {
   constructor(content) {
     this.config = content.presentation; this.menu = new MenuView(this.config.menu); this.audio = new TransitionAudio(this.config);
     this.scene = new SceneView(document.querySelector('#scene'),content.scene_layout);
-    this.terminal = new TerminalView(content.tools,content.events,content.resource_log);
+    this.terminal = new TerminalView(content.tools,content.resource_log);
     this.tasks = new TaskView();
-    this.movement = new MovementView(content.movement,this.scene);
     this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelector('#reduce-motion').checked = this.reducedMotion;
-    this.state = null; this.event = null; this.lastVisualAction = null;
+    this.state = null; this.event = null;
     i18n.translate(document.querySelector('#terminal')); i18n.translate(document.querySelector('#app'));
     document.body.classList.toggle('reduced-motion',this.reducedMotion);
-    window.addEventListener('pagehide',() => { this.audio.stop();this.movement.clear(); });
-    window.addEventListener('pageshow',event => {
-      if (!event.persisted) return;
-      if (document.querySelector('#main-menu').hidden) this.movement.restore(this.lastVisualAction);
-      else this.movement.clear();
-    });
+    window.addEventListener('pagehide',() => this.audio.stop());
   }
-  async mount() {
-    await this.scene.mount();
-    this.tasks.mount();
-    this.sceneEvent = new SceneEventView(this.scene.root);
-  }
+  async mount() { await this.scene.mount(); this.tasks.mount(); }
   coverScene() {
     const veil = document.querySelector('#morning-veil');
     const title = document.querySelector('#sol-title');
@@ -49,8 +37,6 @@ export class GameView {
     const toggle = document.querySelector('#terminal-toggle'); toggle.disabled = true;
     document.querySelector('#tasks-toggle').disabled = true;
     if (morning || initial) {
-      this.lastVisualAction = state?.visualAction?.sol===state?.sol ? state?.visualAction : null;
-      this.movement.restore(this.lastVisualAction);
       this.tasks.close();
       await this.terminal.close(); veil.style.pointerEvents = 'auto';
       // Keep the title invisible throughout both scene fades.
@@ -62,7 +48,6 @@ export class GameView {
     await this.scene.render(state,this.reducedMotion);
     this.terminal.render(state,event);
     this.tasks.render(state,event);
-    this.sceneEvent?.render(state,event,{reset:initial});
     if (morning || initial) {
       // The black layer stays fully opaque while the title animates independently.
       if (state) await this.fade(title,0,1,this.config.titleFadeInMs ?? 700);
@@ -77,8 +62,6 @@ export class GameView {
     const animation = node.animate([{opacity:from},{opacity:to}],{duration:this.reducedMotion ? 0 : duration,easing:'ease-in-out',fill:'forwards'});
     await animation.finished; node.style.opacity = to; animation.cancel();
   }
-  presentActivity(plan) { this.lastVisualAction=plan;this.movement.present(plan,this.reducedMotion); }
-  stopActivity() { this.movement.clear();this.lastVisualAction=null; }
   openTerminal() { this.tasks.close(); return this.terminal.open(this.state,this.event,this.reducedMotion); }
   async openTasks() { await this.terminal.close(); if (this.state) this.tasks.open(); }
   async closeTerminal() { await this.terminal.close(); }
@@ -87,14 +70,12 @@ export class GameView {
     await this.terminal.fadeContentOut(this.reducedMotion);
     await this.scene.render(state,this.reducedMotion);
     this.tasks.render(state,event);
-    this.sceneEvent?.render(state,event);
     this.terminal.render(state,event,{autoplay:false});
     this.terminal.typeContent(this.reducedMotion);
   }
   async reduceMotion(value) {
     document.body.classList.toggle('reduced-motion',value);
     this.reducedMotion = value; this.terminal.setReducedMotion(value);
-    if(value)this.movement.skip();
     await this.scene.render(this.state,value);
   }
   startTransitionAudio(previousState) {
