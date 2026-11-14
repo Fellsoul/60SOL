@@ -3,25 +3,28 @@ import { createState, logEntry, LIMITS } from './state.js';
 import { ACTIONS, LIGHT_ACTIONS, applyEffect, unavailableReason } from './ActionRules.js';
 import { EventEngine } from './EventEngine.js';
 import { beginSol, finishSol } from './TurnEngine.js';
+import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
 
 export class GameModel {
   #state = null;
-  constructor({ events, tools, environment = {} }) { this.events = new EventEngine(events); this.tools = tools; this.environment = environment; }
+  constructor({ events, tools, environment = {}, resource_log = {} }) { this.events = new EventEngine(events); this.tools = tools; this.environment = environment; this.resourceLog = resource_log; }
   get snapshot() { return this.#state ? structuredClone(this.#state) : null; }
   restore(state) { this.#state = structuredClone(state); }
   start(toolIds) {
     if (toolIds.length !== 2 || new Set(toolIds).size !== 2 || !toolIds.every(id => this.tools.some(tool => tool.id === id))) throw new Error('error.chooseTwoTools');
     this.#state = createState(toolIds);
-    beginSol(this.#state,this.events,this.environment);
+    beginSol(this.#state,this.events,this.environment,this.resourceLog);
   }
   choose(choiceId) {
     const s = this.#state;
     if (s?.phase !== 'event') throw new Error('error.notEventPhase');
     const choice = this.events.get(s.currentEventId).choices.find(item => item.id === choiceId);
     if (!choice || choiceReason(s,choice)) throw new Error('error.choiceUnavailable');
+    const before = resourceSnapshot(s);
     s.energy -= choice.energy;
     applyEffect(s,choice.action);
     applyDailyChoice(s,choice);
+    recordResourceChange(s,before,`event.${s.currentEventId}.${choice.id}`,this.resourceLog,choice.summaryLine);
     s.eventDone = true;
     s.choiceId = choiceId;
     s.daySummary.push(choice.summaryLine ?? this.events.get(s.currentEventId).summaryLine);
@@ -34,8 +37,10 @@ export class GameModel {
     const event = this.events.get('emergency_clean');
     const choice = event?.choices.find(item => item.id === choiceId);
     if (!emergencyCleanAvailable(s,s ? this.events.get(s.currentEventId) : null) || s.history.emergency_clean === s.sol || !choice || choiceReason(s,choice)) throw new Error('error.choiceUnavailable');
+    const before = resourceSnapshot(s);
     s.energy -= choice.energy;
     applyDailyChoice(s,choice);
+    recordResourceChange(s,before,`event.${event.id}.${choice.id}`,this.resourceLog,choice.summaryLine);
     s.history.emergency_clean = s.sol;
     s.daySummary.push(choice.summaryLine);
     if (choice.work) {
@@ -52,8 +57,10 @@ export class GameModel {
     if (reason) throw new Error(reason);
     const response = s.phase === 'event' ? event.workResolutions?.[actionId] : null;
     if (response) { this.choose(response); return; }
+    const before = resourceSnapshot(s);
     s.energy -= action.id === 'grow' ? dailyState(s).careCost : action.energy;
     applyEffect(s,actionId);
+    recordResourceChange(s,before,`work.${actionId}`,this.resourceLog,action.summaryLine);
     s.daySummary.push(action.summaryLine);
     s.workId = actionId;
     s.phase = eventResolved(s,event) ? 'end' : 'event';
@@ -74,7 +81,9 @@ export class GameModel {
     if (!s || s.phase === 'finished' || s.tools.battery !== 'ready') throw new Error('error.noBattery');
     const gain = Math.min(6,LIMITS.energy-s.energy);
     if (!gain) throw new Error('error.batteryFull');
+    const before = resourceSnapshot(s);
     s.energy += gain;
+    recordResourceChange(s,before,'battery',this.resourceLog,'summary.batteryConnected');
     s.tools.battery = 'consumed';
     s.daySummary.push('summary.batteryConnected');
     logEntry(s,`使用一次性备用电池，实际补充 ${gain} E。`);
@@ -82,7 +91,7 @@ export class GameModel {
   nextSol() {
     if (this.#state && !eventResolved(this.#state,this.events.get(this.#state.currentEventId))) throw new Error('error.eventUnresolved');
     if (this.#state?.phase !== 'end') throw new Error('error.finishDayFirst');
-    finishSol(this.#state);
-    if (!this.#state.outcome) { this.#state.sol += 1; beginSol(this.#state,this.events,this.environment); }
+    finishSol(this.#state,this.resourceLog);
+    if (!this.#state.outcome) { this.#state.sol += 1; beginSol(this.#state,this.events,this.environment,this.resourceLog); }
   }
 }

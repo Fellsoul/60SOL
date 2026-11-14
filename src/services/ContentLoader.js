@@ -1,5 +1,5 @@
 export async function loadContent() {
-  const names = ['events','tools','scene_layout','environment','presentation'];
+  const names = ['events','tools','scene_layout','environment','presentation','resource_log'];
   const values = await Promise.all(names.map(async name => {
     const response = await fetch(new URL(`../../data/${name}.json`,import.meta.url));
     if (!response.ok) throw new Error(`无法加载 ${name}.json（${response.status}）`);
