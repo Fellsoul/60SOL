@@ -44,7 +44,7 @@ body.console-open #terminal-toggle { visibility: hidden; }
 .terminal-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 26px; border-bottom: 1px solid var(--line); flex: none; }
 .terminal-header h1 { font: 500 1.2rem "Courier New", monospace; letter-spacing: .18em; margin: 0; }
 #terminal-close { background: none; border: 1px solid var(--line); width: 40px; height: 40px; font-size: 1.6rem; border-radius: 4px; }
-#terminal-scroll { overflow-y: auto; overscroll-behavior: contain; flex: 1; min-height: 0; padding: 26px; scrollbar-color: #667c5c #17251b; }
+#terminal-scroll { overflow-y: auto; overflow-anchor: none; overscroll-behavior: contain; flex: 1; min-height: 0; padding: 26px; scrollbar-color: #667c5c #17251b; }
 #terminal-content { line-height: 1.9; font-size: .96rem; }
 #terminal-content h2 { font-size: 1rem; font-weight: 500; letter-spacing: .1em; margin: 28px 0 12px; color: #e2e9d8; }
 #terminal-content h2:first-child { margin-top: 0; }

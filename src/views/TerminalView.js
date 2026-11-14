@@ -46,9 +46,12 @@ export class TerminalView {
     this.animation?.cancel();
     const frames = this.isConsole ? [{transform:'translateY(90%)'},{transform:'translateY(20%)'}] : [{transform:'translateX(-100%)'},{transform:'translateX(0)'}];
     this.animation = this.dialog.animate(frames,{duration:reducedMotion ? 0 : 560,easing:'cubic-bezier(.16,1,.3,1)'});
-    document.querySelector('#terminal-close').focus();
+    document.querySelector('#terminal-close').focus({preventScroll:true});
     const skip = document.querySelector('#skip-typing'); skip.hidden = reducedMotion;
     this.writer.play(this.jobs,{reducedMotion,onComplete:() => { skip.hidden = true; }});
+    // showModal can restore focus/scroll from the loadout form. Reset after it is visible
+    // and after the typewriter has changed the content height.
+    this.resetScroll();
   }
   async close() {
     if (!this.dialog.open) return;
@@ -63,6 +66,11 @@ export class TerminalView {
   copy(id,text) {
     text = i18n.t(text);
     return `<p class="terminal-copy"><span class="sr-only">${escapeHtml(text)}</span><span id="${id}" aria-hidden="true" data-copy="${escapeHtml(text)}"></span></p>`;
+  }
+  resetScroll() {
+    document.querySelector('#terminal-scroll').scrollTop = 0;
+    this.dialog.querySelector('.terminal-shell').scrollTop = 0;
+    this.dialog.scrollTop = 0;
   }
   async fadeContentOut(reducedMotion) {
     this.writer.cancel();
@@ -106,9 +114,9 @@ export class TerminalView {
       }
       if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy >= LIMITS.energy));
     }
-    document.querySelector('#terminal-scroll').scrollTop = 0;
     this.jobs = [{node:document.querySelector('#terminal-title'),text:title},...Array.from(this.content.querySelectorAll('[data-copy]'),node => ({node,text:node.dataset.copy}))];
     if (autoplay) this.writer.play(this.jobs,{reducedMotion:true});
+    this.resetScroll();
   }
   updateSelection() {
     const form = document.querySelector('#loadout-form'); if (!form) return;

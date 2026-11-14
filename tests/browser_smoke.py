@@ -41,6 +41,8 @@ try:
             ready()
             page.locator('#terminal-toggle').click()
             page.locator('#terminal[open]').wait_for()
+            assert page.locator('#terminal-scroll').evaluate('(node) => node.scrollTop') == 0
+            assert page.locator('.is-console .terminal-shell').evaluate('(node) => node.scrollTop') == 0
 
         def clipboard():
             ready()
