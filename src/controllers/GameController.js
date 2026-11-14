@@ -91,11 +91,7 @@ export class GameController {
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
       if (action === 'lights') { void this.toggleLights(); return; }
-      if (action === 'choose') {
-        const state = this.model.snapshot;
-        if (this.model.events.get(state.currentEventId).choices.find(choice => choice.id === id)?.work) return;
-      }
-      const commands = {choose:() => this.model.choose(id),emergency_clean:() => this.model.chooseEmergencyClean(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery()};
+      const commands = {emergency_clean:() => this.model.chooseEmergencyClean(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery()};
       if (commands[action]) void this.commit(commands[action],{morning:action === 'next',keepTerminal:action !== 'next'});
     };
     document.querySelector('#terminal-content').addEventListener('click',handleDecision);

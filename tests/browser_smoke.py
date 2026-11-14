@@ -45,6 +45,7 @@ try:
             ready()
             page.locator('#terminal-toggle').click()
             page.locator('#terminal[open]').wait_for()
+            assert page.locator('#terminal [data-action=choose]').count() == 0
             assert page.locator('#terminal-scroll').evaluate('(node) => node.scrollTop') == 0
             assert page.locator('.is-console .terminal-shell').evaluate('(node) => node.scrollTop') == 0
 
@@ -56,6 +57,7 @@ try:
             if not page.locator('#tasks[open]').count():
                 page.locator('#tasks-toggle').click()
             page.locator('#tasks[open]').wait_for()
+            assert page.locator('#tasks .clipboard-event').count() == 1
 
         def switch_lights(on):
             if page.locator('#tasks[open]').count(): page.keyboard.press('Escape')
@@ -69,7 +71,8 @@ try:
 
         def decide(selector, *, closes=False, appears=None, disappears=None):
             is_work = 'data-action=work' in selector
-            if is_work:
+            is_choice = 'data-action=choose' in selector
+            if is_work or is_choice:
                 clipboard()
             page.locator(selector).click()
             if is_work:
@@ -77,6 +80,10 @@ try:
                 assert page.locator('#tasks[open]').count() == 1
                 assert page.locator('#tasks [data-action=next]').count() == 0
                 assert page.locator(selector).is_disabled()
+            elif is_choice:
+                page.locator('#tasks .is-complete').wait_for()
+                page.keyboard.press('Escape')
+                terminal()
             elif closes:
                 page.wait_for_function("!document.querySelector('#terminal').open")
                 ready()
@@ -485,14 +492,12 @@ try:
             state=daily_page.evaluate("() => JSON.parse(Object.entries(localStorage).find(([key])=>key.includes('.slot.'))[1]).state")
             event=next(event for event in events if event['id']==state['currentEventId'])
             response=next(choice for choice in event['choices'] if choice['energy']==0)
-            daily_page.locator('#tasks-toggle' if response.get('work') else '#terminal-toggle').click()
+            daily_page.locator('#tasks-toggle').click()
             daily_page.locator(f"[data-action=choose][data-id={response['id']}]").click()
             daily_page.wait_for_function("() => JSON.parse(Object.entries(localStorage).find(([key])=>key.includes('.slot.'))[1]).state.eventDone===true")
             if response.get('work'):
                 daily_page.keyboard.press('Escape')
             else:
-                daily_page.keyboard.press('Escape');daily_page.wait_for_function("!document.querySelector('#terminal').open")
-                daily_page.locator('#tasks-toggle').click()
                 state=daily_page.evaluate("() => JSON.parse(Object.entries(localStorage).find(([key])=>key.includes('.slot.'))[1]).state")
                 work='clean' if state['dusty'] and state['weather']!='sandstorm' and state['energy']>=2 else 'grow' if state['food']<=8 and state['energy']>=state['dailySystems']['careCost']+2 and not state['dailySystems']['greenhouseDisabled'] else 'standby'
                 daily_page.locator(f'[data-action=work][data-id={work}]').click()

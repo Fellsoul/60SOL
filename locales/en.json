@@ -264,7 +264,7 @@
   "tasks.choose": "Select a task to complete.",
   "tasks.empty": "No tasks are available right now.",
   "tasks.eventOptions": "Choose a response here. Unrelated work does not require finishing the event first.",
-  "tasks.eventOnClipboard": "Tasks for this event are on the clipboard on the table. Complete work there.",
+  "tasks.eventOnClipboard": "Today's event and its choices are on the clipboard on the table.",
   "event.E01.daily.secure.label": "Secure the supply case",
   "event.E01.daily.secure.description": "2 E + today’s work. Recover one repair spare.",
   "event.E01.daily.secure.summaryLine": "Secure the supply case. 2 E + today’s work. Recover one repair spare.",

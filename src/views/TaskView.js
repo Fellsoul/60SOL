@@ -60,7 +60,8 @@ export class TaskView {
     this.toggle.dataset.phase = state.phase;
     const tasks = clipboardTasks(state,event);
     const completed = tasks.some(task => task.done);
-    this.content.innerHTML = `<div class="task-list">${tasks.map(task => {
+    const eventCopy = event?.choices.length ? `<section class="clipboard-event"><h2>${text(event.title)}</h2><p>${text(event.text)}</p></section>` : '';
+    this.content.innerHTML = `${eventCopy}<div class="task-list">${tasks.map(task => {
       const {done,reason} = task;
       return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></span></button>`;
     }).join('')}</div><p class="clipboard-note" role="status">${text(state.phase === 'event' ? (event?.blockedWork?.length === ACTIONS.length ? event.blockReason : 'tasks.pendingIndependent') : completed ? 'tasks.checked' : state.phase === 'end' ? 'tasks.eventWork' : state.phase === 'finished' ? 'tasks.finished' : 'tasks.choose')}</p>`;

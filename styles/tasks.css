@@ -40,6 +40,9 @@
 .clipboard-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 22px 0 14px; padding: 12px 0; border-block: 1px solid #bdb49b; font: 600 .8rem 'Courier New', monospace; }
 #tasks-intro { font-size: .86rem; line-height: 1.6; color: #69624f; margin: 0 0 18px; }
 .task-list { display: grid; }
+.clipboard-event { margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid #bdb49b; }
+.clipboard-event h2 { margin:0 0 8px; font-size:1rem; }
+.clipboard-event p { margin:0; font-size:.86rem; line-height:1.65; color:#69624f; }
 .task-row { display: flex; align-items: flex-start; gap: 14px; width: 100%; padding: 17px 8px; text-align: left; background: transparent; border: 0; border-bottom: 1px solid #c6bea7; min-height: 72px; }
 .task-row:not(:disabled):hover { background: #ddd4b580; }
 .task-row:disabled { opacity: .55; }

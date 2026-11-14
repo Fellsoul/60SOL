@@ -264,7 +264,7 @@
   "tasks.choose": "选择一项工作。",
   "tasks.empty": "目前没有可执行的工作。",
   "tasks.eventOptions": "可以在这里选择应对方案，无关工作不需要先处理事件。",
-  "tasks.eventOnClipboard": "本次事件的工作位于桌上的记录板。请在那里执行工作。",
+  "tasks.eventOnClipboard": "今日事件和处理选项位于桌上的工作记录板。",
   "event.E01.daily.secure.label": "固定补给箱",
   "event.E01.daily.secure.description": "2 电力并占用今天的工作，获得一个维修备件。",
   "event.E01.daily.secure.summaryLine": "固定补给箱：2 电力并占用今天的工作，获得一个维修备件。",
