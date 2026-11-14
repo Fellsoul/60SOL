@@ -1,8 +1,7 @@
-import { CREW_IDS, crewAway, crewFatigued } from '../models/ExpeditionRules.js';
+import { CREW_IDS, crewAway } from '../models/ExpeditionRules.js';
 import { i18n } from '../services/I18n.js';
 import { escapeHtml } from './dom.js';
 
-const t = key => escapeHtml(i18n.t(key));
 export function crewHead(id) {
   // Hair and face outlines follow the two seated crew portraits.
   const hair = id === 'astronaut-a'
@@ -11,22 +10,7 @@ export function crewHead(id) {
   return `<svg class="crew-head" viewBox="0 0 82 90" aria-hidden="true"><path d="${hair}"/><path d="M23 34L25 51Q29 65 41 67Q54 65 59 51L61 34M32 64L31 73L18 79L9 87M51 64L52 73L65 79L74 87M31 73Q41 83 52 73"/>${id === 'astronaut-b' ? '<path d="M25 38Q31 33 38 38L37 45Q30 49 26 43ZM44 38Q51 33 58 38L56 44Q49 49 45 44ZM38 39H44"/>' : '<path d="M29 39H35M47 39H53"/>'}<path d="M36 55Q41 58 46 55"/></svg>`;
 }
 export function crewStatuses(state,id) {
-  const c=state.crew[id],away=crewAway(state,id),statuses=[];
-  statuses.push(i18n.t(away ? 'crew.away' : crewFatigued(state,id) ? 'crew.recovering' : 'crew.ready'));
-  if (away) statuses.push(`${i18n.t('crew.returnSol')} ${c.returnSol}`);
-  if (c.fatigue) {
-    statuses.push(`${i18n.t('crew.fatigue')}: ${c.fatigue*25}%`);
-    statuses.push(`${i18n.t('crew.recoveryEstimate')}: ${Math.ceil(c.fatigue/2)} / ${c.fatigue} ${i18n.t('crew.recoveryDays')}`);
-  }
-  if (state.expeditionPlan?.crewId === id) statuses.push(`${i18n.t('crew.planned')}: SOL ${state.expeditionPlan.departSol}`);
-  statuses.push(`${i18n.t('crew.teamHealth')}: ${state.health}/100`);
-  if (state.health < 45) statuses.push(i18n.t('crew.lowHealth'));
-  if (!state.lifeSupportPaid) statuses.push(i18n.t('crew.supportShortage'));
-  if (state.food < 2) statuses.push(i18n.t('crew.foodShortage'));
-  statuses.push(i18n.t(state.lightsOn && state.energy > 0 ? 'crew.lightsOn' : 'crew.lightsOff'));
-  if (state.shielded) statuses.push(i18n.t('crew.shielded'));
-  if (state.visualAction?.sol === state.sol && state.visualAction.actorId === id && !away) statuses.push(`${i18n.t('crew.assignment')}: ${i18n.t(state.visualAction.label)}`);
-  return statuses;
+  return [`${i18n.t('crew.fatigue')} ${state.crew[id].fatigue*25}%`];
 }
 export class CrewStatus {
   constructor(root) { this.root=root; this.nodes=[]; }
@@ -43,7 +27,7 @@ export class CrewStatus {
       if (!state) continue;
       const label=i18n.t(`crew.${id.replaceAll('-','_')}.name`);
       node.querySelector('button').setAttribute('aria-label',`${label} · ${i18n.t('crew.status')}`);
-      node.querySelector('aside').innerHTML=`<strong>${t(`crew.${id.replaceAll('-','_')}.name`)}</strong><ul>${crewStatuses(state,id).map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`;
+      node.querySelector('aside').innerHTML=`<span>${escapeHtml(crewStatuses(state,id)[0])}</span>`;
     }
   }
 }

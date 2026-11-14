@@ -482,7 +482,7 @@
   "crew.ready": "At base · rested",
   "crew.recovering": "At base · recovering from fatigue",
   "crew.returnSol": "Returns on Sol",
-  "crew.fatigue": "Fatigue remaining",
+  "crew.fatigue": "Fatigue",
   "crew.recoveryEstimate": "Recovery days, lights on / off",
   "crew.recoveryDays": "days",
   "crew.planned": "Expedition planned",

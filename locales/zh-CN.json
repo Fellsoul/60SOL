@@ -482,7 +482,7 @@
   "crew.ready": "基地内 · 状态良好",
   "crew.recovering": "基地内 · 疲劳休整中",
   "crew.returnSol": "返回 SOL",
-  "crew.fatigue": "剩余疲劳",
+  "crew.fatigue": "疲劳",
   "crew.recoveryEstimate": "预计恢复天数，开灯 / 关灯",
   "crew.recoveryDays": "天",
   "crew.planned": "已安排出行",

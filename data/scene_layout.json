@@ -289,6 +289,9 @@
         },
         "away": {
           "hidden": true
+        },
+        "injured": {
+          "src": "assets/scene/crew/astronaut_a/injured.png"
         }
       }
     },
@@ -309,6 +312,9 @@
         },
         "away": {
           "hidden": true
+        },
+        "injured": {
+          "src": "assets/scene/crew/astronaut_b/injured.png"
         }
       }
     },
