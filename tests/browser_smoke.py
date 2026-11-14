@@ -105,8 +105,16 @@ try:
         page.locator('#save-picker[open]').wait_for()
         assert page.locator('#main-menu').is_visible()
         assert page.locator('#save-list [data-save-id]:enabled').count() == 1
+        page.evaluate("""() => {
+          window.sceneRevealOpacity = [];
+          new MutationObserver(() => {
+            const scene = document.querySelector('#scene-viewport');
+            if (!scene.hidden) sceneRevealOpacity.push(Number(getComputedStyle(document.querySelector('#morning-veil')).opacity));
+          }).observe(document.querySelector('#scene-viewport'),{attributes:true,attributeFilter:['hidden']});
+        }""")
         page.locator('#save-list [data-save-id]:enabled').click()
         ready()
+        assert page.evaluate('sceneRevealOpacity.length === 1 && sceneRevealOpacity[0] === 1'), 'Saved scene appeared before the black veil'
         terminal()
         page.locator('#reduce-motion').uncheck()
         page.keyboard.press('Escape')

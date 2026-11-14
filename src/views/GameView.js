@@ -17,6 +17,12 @@ export class GameView {
     window.addEventListener('pagehide',() => this.audio.stop());
   }
   async mount() { await this.scene.mount(); }
+  coverScene() {
+    const veil = document.querySelector('#morning-veil');
+    const title = document.querySelector('#sol-title');
+    veil.style.opacity = '1'; veil.style.pointerEvents = 'auto';
+    title.style.opacity = '0';
+  }
   notify(message) {
     const notice = document.querySelector('#notice');
     clearTimeout(this.noticeTimer); notice.textContent = i18n.t(message); notice.hidden = !message;

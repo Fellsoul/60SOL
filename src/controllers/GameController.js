@@ -13,7 +13,9 @@ export class GameController {
   loadSave(id) {
     const loaded = this.repository.load(id);
     if (!loaded.state) { this.showSaves('save.unavailable'); return; }
-    void this.commit(() => { this.model.restore(loaded.state); this.activeSaveId = id; },{morning:true,save:false});
+    // Cover the scene before closing the menu so a saved scene can never flash onscreen.
+    this.view.coverScene();
+    void this.commit(() => { this.model.restore(loaded.state); this.activeSaveId = id; },{morning:true,initial:true,save:false});
   }
   deleteSave(id,label) {
     if (!confirm(`${i18n.t('save.confirmDelete')}\n\n${label}`)) return;
@@ -84,7 +86,7 @@ export class GameController {
     const state = this.model.snapshot;
     return this.view.render(state,state ? this.model.events.get(state.currentEventId) : null,options);
   }
-  async commit(command,{morning=false,save=true}={}) {
+  async commit(command,{morning=false,initial=false,save=true}={}) {
     if (this.busy) return;
     this.busy = true; const before = this.model.snapshot;
     try {
@@ -98,7 +100,7 @@ export class GameController {
       this.view.menu.closeSaves();
       await this.view.closeTerminal();
       this.view.menu.hide();
-      await this.render({morning});
+      await this.render({morning,initial});
       if (!result.ok) this.view.notify(result.message);
     } catch (error) {
       this.view.notify(`画面更新失败，任务决定已保留：${error.message}`);
