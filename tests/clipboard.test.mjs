@@ -11,15 +11,20 @@ const rows = model => clipboardTasks(model.snapshot,model.events.get(model.snaps
 
 test('event work is offered on the clipboard before making a terminal decision',() => {
   const model = game();
+  assert.ok(rows(model).every(task => task.command === 'choose'));
   const task = rows(model).find(task => task.id === 'grow' && task.command === 'choose');
   assert.ok(task); assert.equal(task.reason,''); assert.equal(task.done,false);
   model.choose(task.id);
   assert.equal(rows(model).find(task => task.command === 'choose').done,true);
+  const daily = rows(model).filter(task => task.command === 'work');
+  assert.ok(daily.length); assert.ok(daily.every(task => task.reason === 'error.workUsed'));
   assert.equal(model.snapshot.sol,1);
 });
 
 test('completed and unfinished tasks coexist after completion and restoring a save',() => {
-  const model = game(); model.choose('plan'); model.work('research');
+  const model = game(); model.choose('plan');
+  assert.equal(rows(model).find(task => task.command === 'work' && task.id === 'research').reason,'');
+  model.work('research');
   const state = model.snapshot; const restored = new GameModel({events,tools}); restored.restore(state);
   for (const current of [model,restored]) {
     const tasks = rows(current);
@@ -40,4 +45,5 @@ test('unfinished tasks expose resource restrictions and reset for the next Sol',
   assert.equal(rows(model).find(task => task.id === 'standby').reason,'');
   model.work('standby'); model.nextSol();
   assert.ok(rows(model).every(task => !task.done));
+  assert.ok(rows(model).every(task => task.command === 'choose'));
 });

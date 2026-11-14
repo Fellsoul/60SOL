@@ -1,0 +1,9 @@
+.space-evidence { margin: 14px 0; padding: 10px 12px; border: 1px solid #788967; border-radius: 4px; font-size: .8rem; line-height: 1.6; }
+.space-evidence summary { cursor: pointer; font-weight: 600; }
+.space-evidence article { padding: 12px 0; border-bottom: 1px solid #89987855; }
+.space-evidence p { margin: 6px 0; }
+.space-evidence small { display: block; overflow-wrap: anywhere; }
+.space-evidence a { color: inherit; text-decoration: underline; }
+.space-evidence pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 240px; overflow-y: auto; font-size: .68rem; }
+.space-comparison table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.space-comparison td,.space-comparison th { padding: 10px; border: 1px solid #89987855; text-align: left; }

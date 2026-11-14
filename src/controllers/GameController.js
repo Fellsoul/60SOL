@@ -1,7 +1,20 @@
 import { i18n } from '../services/I18n.js';
+import { eventResolved } from '../models/DailyEventRules.js';
 export class GameController {
-  constructor(model,view,repository) { this.model = model; this.view = view; this.repository = repository; this.busy = false; this.activeSaveId = null; }
+  constructor(model,view,repository,snapshots=null) { this.snapshots=snapshots; this.model = model; this.view = view; this.repository = repository; this.busy = false; this.activeSaveId = null; }
+  async startMission(ids,mode='current') {
+    if(this.busy)return;
+    this.busy=true;
+    let snapshot;
+    try { snapshot=this.snapshots ? await this.snapshots.select(mode) : null; }
+    catch { this.view.notify('space.unavailable');this.busy=false;return; }
+    this.busy=false;
+    this.activeSaveId=null;
+    this.view.coverScene();
+    await this.commit(()=>this.model.start(ids,snapshot),{morning:true,initial:true});
+  }
   showMenu() {
+    this.view.stopActivity?.();
     const result = this.repository.list();
     this.view.menu.show(result.saves.some(save => save.state));
     if (result.message) this.view.notify(result.message);
@@ -72,14 +85,17 @@ export class GameController {
       if (event.target.id !== 'loadout-form') return;
       event.preventDefault();
       const ids = new FormData(event.target).getAll('tool');
-      this.view.coverScene();
-      void this.commit(() => this.model.start(ids),{morning:true,initial:true});
+      const mode=event.target.querySelector('[name=snapshot]')?.value ?? 'current';
+      void this.startMission(ids,mode);
     });
     document.querySelector('#tasks-content').addEventListener('click',event => {
       const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
-      if (action === 'work') void this.commit(() => this.model.work(id),{keepTasksOpen:true});
+      if (action === 'work') {
+        const state = this.model.snapshot;
+        if (state && eventResolved(state,this.model.events.get(state.currentEventId))) void this.commit(() => this.model.work(id),{keepTasksOpen:true});
+      }
       else if (action === 'choose') {
         const state = this.model.snapshot;
         const choice = this.model.events.get(state.currentEventId).choices.find(choice => choice.id === id);
@@ -90,6 +106,7 @@ export class GameController {
       const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
+      if(action==='replay' && this.model.snapshot?.outcome && this.snapshots && ['case-mars-impact','case-mars-glancing'].includes(id)) { void this.startMission(Object.keys(this.model.snapshot.tools),id);return; }
       if (action === 'lights') { void this.toggleLights(); return; }
       const commands = {emergency_clean:() => this.model.chooseEmergencyClean(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery()};
       if (commands[action]) void this.commit(commands[action],{morning:action === 'next',keepTerminal:action !== 'next'});
@@ -118,6 +135,8 @@ export class GameController {
     if (save && result.ok) this.activeSaveId = result.id;
     if (morning) this.view.startTransitionAudio(before);
     try {
+      const visual=this.model.snapshot?.visualAction;
+      if (visual && visual.id!==before?.visualAction?.id) this.view.presentActivity?.(visual);
       if (keepTerminal && this.view.terminal.dialog.open && this.view.terminal.isConsole) {
         await this.view.refreshTerminal(this.model.snapshot,this.model.events.get(this.model.snapshot.currentEventId));
         if (!result.ok) this.view.notify(result.message);

@@ -17,11 +17,10 @@ function pending(id,toolIds=['robot','battery'],energy=3) {
 }
 const rows=model=>clipboardTasks(model.snapshot,model.events.get(model.snapshot.currentEventId));
 
-test('missing toolkit blocks lab repair, not greenhouse, rest or transmission; fallback is on clipboard',() => {
+test('pending lab event keeps tool restrictions and a free response on the clipboard',() => {
   const model=pending('E07');const tasks=rows(model);
   assert.equal(tasks.find(task=>task.command==='choose'&&task.id==='repair').reason,'error.toolUnavailable');
-  for(const id of ['grow','rest','transmit'])assert.equal(tasks.find(task=>task.command==='work'&&task.id===id).reason,'');
-  assert.equal(tasks.find(task=>task.command==='work'&&task.id==='research').reason,'dependency.labThermal');
+  assert.ok(tasks.every(task=>task.command==='choose'));
   const fallback=tasks.find(task=>task.command==='choose'&&task.id==='close');
   assert.equal(fallback.reason,'');assert.equal(fallback.energy,0);assert.equal(fallback.work,false);
   assert.throws(()=>model.work('research'),{message:'dependency.labThermal'});

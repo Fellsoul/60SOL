@@ -1,5 +1,6 @@
-import { choiceReason, dailyState } from '../models/DailyEventRules.js';
-import { ACTIONS, unavailableReason } from '../models/ActionRules.js';
+import { spaceEvidence } from './SpaceEvidence.js';
+import { choiceReason, choiceEnergy, eventResolved } from '../models/DailyEventRules.js';
+import { ACTIONS, unavailableReason, workEnergy } from '../models/ActionRules.js';
 import { i18n } from '../services/I18n.js';
 import { escapeHtml } from './dom.js';
 
@@ -9,14 +10,14 @@ const energyCost = energy => `<span class="task-energy-cost" role="img" aria-lab
 
 // Derive rows from saved state so completed and unfinished work survive reopening/reload.
 export function clipboardTasks(state,event) {
-  const eventChoices = (event?.choices ?? []).filter(choice => state.phase === 'event' || state.choiceId === choice.id);
-  const rows = eventChoices.map(choice => ({...choice,command:'choose',
+  const pending = Boolean(event?.choices.length && !eventResolved(state,event));
+  const eventChoices = (event?.choices ?? []).filter(choice => pending || state.choiceId === choice.id);
+  const rows = eventChoices.map(choice => ({...choice,energy:choiceEnergy(state,choice),command:'choose',
     done:state.choiceId === choice.id,
     reason:state.phase !== 'event' ? 'error.workUsed' : choiceReason(state,choice)}));
-  return rows.concat(ACTIONS.filter(action => (!action.tool || state.tools[action.tool]) &&
-    !eventChoices.some(choice => choice.action === action.id) &&
-    !(state.phase === 'event' && event?.workResolutions?.[action.id])).map(action => ({...action,
-    energy:action.id === 'grow' ? dailyState(state).careCost : action.energy,
+  if (pending) return rows;
+  return rows.concat(ACTIONS.filter(action => !action.tool || state.tools[action.tool]).map(action => ({...action,
+    energy:workEnergy(state,action),
     description:action.narrative,command:'work',done:state.workId === action.id,
     reason:unavailableReason(state,action,event)})));
 }
@@ -60,11 +61,12 @@ export class TaskView {
     this.toggle.dataset.phase = state.phase;
     const tasks = clipboardTasks(state,event);
     const completed = tasks.some(task => task.done);
+    const note = !eventResolved(state,event) ? 'tasks.eventFirst' : state.phase === 'finished' ? 'tasks.finished' : state.workId ? (state.workId.startsWith('event:') ? 'tasks.eventWork' : 'tasks.checked') : 'tasks.choose';
     const eventCopy = event?.choices.length ? `<section class="clipboard-event"><h2>${text(event.title)}</h2><p>${text(event.text)}</p></section>` : '';
-    this.content.innerHTML = `${eventCopy}<div class="task-list">${tasks.map(task => {
+    this.content.innerHTML = `${spaceEvidence(state)}${eventCopy}<div class="task-list">${tasks.map(task => {
       const {done,reason} = task;
       return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></span></button>`;
-    }).join('')}</div><p class="clipboard-note" role="status">${text(state.phase === 'event' ? (event?.blockedWork?.length === ACTIONS.length ? event.blockReason : 'tasks.pendingIndependent') : completed ? 'tasks.checked' : state.phase === 'end' ? 'tasks.eventWork' : state.phase === 'finished' ? 'tasks.finished' : 'tasks.choose')}</p>`;
+    }).join('')}</div><p class="clipboard-note" role="status">${text(note)}</p>`;
     if (this.dialog.open && completed) document.querySelector('#tasks-close').focus({preventScroll:true});
   }
 }

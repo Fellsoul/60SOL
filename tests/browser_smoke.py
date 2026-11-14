@@ -46,6 +46,7 @@ try:
             page.locator('#terminal-toggle').click()
             page.locator('#terminal[open]').wait_for()
             assert page.locator('#terminal [data-action=choose]').count() == 0
+            assert page.locator('#event-copy').count() == 1
             assert page.locator('#terminal-scroll').evaluate('(node) => node.scrollTop') == 0
             assert page.locator('.is-console .terminal-shell').evaluate('(node) => node.scrollTop') == 0
 
@@ -119,7 +120,7 @@ try:
         assert abs((900-collapsed['y'])/collapsed['height'] - .1) < .01
         clipboard()
         assert page.locator('#tasks [data-action=choose][data-id=grow]').is_enabled()
-        assert page.locator('#tasks [data-action=work][data-id=research]').is_enabled()
+        assert page.locator('#tasks [data-action=work]').count() == 0
         page.keyboard.press('Escape')
         assert page.locator('#tasks-toggle').evaluate('(node) => node === document.activeElement')
         terminal()
@@ -464,12 +465,13 @@ try:
         dependency_page.locator('#terminal-toggle:enabled').wait_for();dependency_page.locator('#tasks-toggle').click()
         assert dependency_page.locator('[data-action=choose][data-id=repair]').is_disabled()
         assert dependency_page.locator('[data-action=choose][data-id=close]').is_enabled()
+        assert dependency_page.locator('#tasks [data-action=work]').count() == 0
+        dependency_page.locator('[data-action=choose][data-id=close]').click()
+        dependency_page.locator('#tasks [data-id=close].is-complete').wait_for()
         assert dependency_page.locator('[data-action=work][data-id=grow]').is_enabled()
         assert dependency_page.locator('[data-action=work][data-id=research]').is_disabled()
         dependency_page.locator('[data-action=work][data-id=rest]').click()
         dependency_page.locator('#tasks [data-id=rest].is-complete').wait_for()
-        dependency_page.locator('[data-action=choose][data-id=close]').click()
-        dependency_page.locator('#tasks [data-id=close].is-complete').wait_for()
         assert dependency_page.locator('[data-action=work][data-id=grow]').is_disabled()
         dependency_page.keyboard.press('Escape');dependency_page.locator('#terminal-toggle').click()
         assert dependency_page.locator('[data-action=next]').is_enabled()
@@ -506,6 +508,25 @@ try:
         daily_page.locator('#terminal-toggle:enabled').wait_for()
         daily_page.locator('#terminal-toggle').click()
         assert daily_page.locator('#terminal [data-action=next]').count()==0
+        motion_context=browser.new_context(reduced_motion='no-preference')
+        motion_page=motion_context.new_page();motion_page.goto(url)
+        motion_page.locator('[data-menu=new]').click(force=True)
+        motion_page.locator('[value=toolkit]').check();motion_page.locator('[value=battery]').check()
+        motion_page.locator('#loadout-form button').click()
+        motion_page.locator('#terminal-toggle:enabled').wait_for()
+        motion_page.locator('#tasks-toggle').click()
+        motion_page.locator('#tasks [data-action=choose][data-id=secure]').click()
+        motion_page.locator('#tasks .is-complete').wait_for()
+        motion_key=motion_page.evaluate("() => Object.keys(localStorage).find(key=>key.includes('.slot.'))")
+        committed=motion_page.evaluate('(key)=>localStorage.getItem(key)',motion_key)
+        motion_page.locator('#tasks .motion-skip:visible').click()
+        motion_page.locator('#tasks .motion-card[data-checkpoint=complete]').wait_for()
+        assert motion_page.evaluate('(key)=>localStorage.getItem(key)',motion_key)==committed
+        assert motion_page.locator('#tasks .motion-skip').is_hidden()
+        motion_page.reload();motion_page.locator('[data-menu=continue]').click()
+        motion_page.locator('#terminal-toggle:enabled').wait_for()
+        assert motion_page.locator('.motion-stage[data-checkpoint=complete]').is_visible()
+        assert motion_page.evaluate('(key)=>localStorage.getItem(key)',motion_key)==committed
         browser.close()
         print('Browser smoke passed: terminal, summaries, PNG states, dust parallax, reduced motion, missing assets, 3 viewport sizes.')
 finally:

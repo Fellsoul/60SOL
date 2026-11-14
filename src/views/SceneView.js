@@ -1,3 +1,4 @@
+import { CrewMotion } from './CrewMotion.js';
 import { SceneAssets } from './SceneAssets.js';
 import { sceneState, layerState } from './SceneState.js';
 
@@ -5,7 +6,8 @@ export class SceneView {
   constructor(root,layout) {
     this.root = root; this.layout = layout; this.assets = new SceneAssets(); this.layers = [];
     this.reducedMotion = false; this.generation = 0;
-    this.onVisibility = () => this.layers.forEach(layer => this.animate(layer));
+    this.crewMotion = new CrewMotion(root);
+    this.onVisibility = () => { this.layers.forEach(layer => this.animate(layer));this.crewMotion.sync(this.reducedMotion); };
   }
   async mount() {
     this.root.replaceChildren();
@@ -23,6 +25,8 @@ export class SceneView {
     for (const config of this.layout.layers) {
       const node = document.createElement('div'); node.className = 'scene-layer'; node.dataset.layer = config.id;
       node.style.zIndex = config.zIndex;
+      // The table source contains baked-in crew outside its foreground footprint.
+      if (config.clipPath) node.style.clipPath = config.clipPath;
       if (config.viewport) {
         const {x,y,width,height} = config.viewport;
         Object.assign(node.style,{left:`${x}%`,top:`${y}%`,width:`${width}%`,height:`${height}%`});
@@ -44,10 +48,16 @@ export class SceneView {
       const key = layerState(layer.config,appearance);
       const config = layer.config.states[key] ?? layer.config.states[layer.config.defaultState];
       if (layer.key !== key) {
-        const asset = await this.assets.state(config);
+        let asset = await this.assets.state(config);
+        let renderedKey = key;
+        if (!asset && !config?.hidden && key !== layer.config.defaultState) {
+          asset = await this.assets.state(layer.config.states[layer.config.defaultState]);
+          renderedKey = layer.config.defaultState;
+        }
         if (generation !== this.generation) return; // 丢弃过时的异步加载。
         this.stop(layer); layer.node.replaceChildren(); layer.key = key; layer.track = null; layer.drift = null;
         layer.node.dataset.state = key;
+        layer.node.dataset.renderedState = renderedKey;
         layer.node.hidden = !asset;
         if (asset) {
           const image = document.createElement('img'); image.alt = ''; image.draggable = false;
@@ -65,6 +75,7 @@ export class SceneView {
       layer.playback = config;
       this.animate(layer);
     }));
+    if (generation === this.generation) this.crewMotion.sync(reducedMotion);
   }
   animate(layer) {
     if (!layer.track) return;
@@ -117,5 +128,5 @@ export class SceneView {
     if (layer.variation) { layer.variation.onfinish = null; layer.variation.cancel(); }
     layer.animation?.cancel(); layer.animation = null; layer.variation = null;
   }
-  dispose() { this.generation++; this.layers.forEach(layer => this.stop(layer)); window.removeEventListener('resize',this.resize); document.removeEventListener('visibilitychange',this.onVisibility); }
+  dispose() { this.crewMotion.dispose();this.generation++; this.layers.forEach(layer => this.stop(layer)); window.removeEventListener('resize',this.resize); document.removeEventListener('visibilitychange',this.onVisibility); }
 }

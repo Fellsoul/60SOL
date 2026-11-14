@@ -1,3 +1,4 @@
+import { spaceHeating } from './SpaceData.js';
 import { dailyState } from './DailyEventRules.js';
 import { LIMITS, logEntry } from './state.js';
 import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
@@ -13,7 +14,7 @@ export function beginSol(state, events, environment = {}, resourceLog = {}) {
   state.generation = Math.min(systems.generationCap,systems.trackingCap,state.dusty ? 3 : 6);
   state.energy = Math.min(LIMITS.energy,state.energy + state.generation);
   recordResourceChange(state,before,'generation',resourceLog);
-  const support = 3 + systems.supportExtra;
+  const support = 3 + systems.supportExtra + spaceHeating(state,systems);
   state.lifeSupportPaid = state.energy >= support;
   before = resourceSnapshot(state);
   state.energy = Math.max(0,state.energy - support);
