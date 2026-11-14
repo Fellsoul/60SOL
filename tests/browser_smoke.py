@@ -42,44 +42,32 @@ try:
             page.locator('#terminal-toggle').click()
             page.locator('#terminal[open]').wait_for()
 
-<<<<<<< HEAD
         def clipboard():
             ready()
             if page.locator('#terminal[open]').count():
                 page.keyboard.press('Escape')
                 page.wait_for_function("!document.querySelector('#terminal').open")
-                page.locator('#tasks-toggle').click()
-            elif not page.locator('#tasks[open]').count():
+            if not page.locator('#tasks[open]').count():
                 page.locator('#tasks-toggle').click()
             page.locator('#tasks[open]').wait_for()
 
-        def decide(selector):
+        def decide(selector, *, closes=False, appears=None, disappears=None):
             is_work = 'data-action=work' in selector
             if is_work:
                 clipboard()
-            elif 'data-action=next' in selector and page.locator('#tasks[open]').count():
-                page.keyboard.press('Escape')
-                terminal()
             page.locator(selector).click()
             if is_work:
                 page.locator('#tasks .is-complete').wait_for()
                 assert page.locator('#tasks[open]').count() == 1
                 assert page.locator('#tasks [data-action=next]').count() == 0
                 assert page.locator(selector).is_disabled()
-                page.keyboard.press('Escape')
-            page.wait_for_function("!document.querySelector('#terminal').open && !document.querySelector('#tasks').open")
-            ready()
-=======
-        def decide(selector, *, closes=False, appears=None, disappears=None):
-            page.locator(selector).click()
-            if closes:
+            elif closes:
                 page.wait_for_function("!document.querySelector('#terminal').open")
                 ready()
             else:
                 assert page.locator('#terminal').is_visible()
-                if appears: page.locator(appears).wait_for()
-                if disappears: page.locator(disappears).wait_for(state='detached')
->>>>>>> 9ca661c6f0529034f3490f6570492bf929863177
+            if appears: page.locator(appears).wait_for()
+            if disappears: page.locator(disappears).wait_for(state='detached')
 
         page.goto(url)
         page.locator('[data-menu=new]').click()
@@ -205,35 +193,27 @@ try:
         assert frozen == tracks.evaluate_all('(nodes) => nodes.map(node => getComputedStyle(node).transform)')
         assert tracks.evaluate_all('(nodes) => nodes.every(node => node.getAnimations()[0].playState === "paused")')
         assert page.locator('.scene-dust-motion').evaluate_all('(nodes) => nodes.every(node => Number(getComputedStyle(node).opacity) === 0.5 && node.getAnimations().every(animation => animation.playState === "paused"))')
-        decide('[data-action=choose][data-id=shelter]',appears='[data-action=work][data-id=research]')
+        decide('[data-action=choose][data-id=shelter]',appears='#terminal .terminal-note')
         assert page.locator('[data-layer=cabin-lights]').is_hidden()
-<<<<<<< HEAD
-        terminal()
         assert page.locator('#terminal [data-action=work]').count() == 0
         clipboard()
         assert page.locator('[data-action=work][data-id=research]').is_enabled()
         page.keyboard.press('Escape')
         terminal()
-        decide('[data-action=lights][data-id=lights_on]')
+        decide('[data-action=lights][data-id=lights_on]',appears='[data-action=lights][data-id=lights_off]')
         clipboard()
         assert page.locator('[data-action=work][data-id=research]').is_enabled()
+        sol_before = page.locator('#tasks-sol').inner_text()
         decide('[data-action=work][data-id=research]')
-        clipboard()
+        assert page.locator('#tasks-sol').inner_text() == sol_before
         assert page.locator('#tasks [data-action=next]').count() == 0
         assert page.locator('#tasks .is-complete').count() == 1
         page.keyboard.press('Escape')
         terminal()
-        decide('[data-action=lights][data-id=lights_off]')
-=======
-        assert page.locator('[data-action=work][data-id=research]').is_enabled()
-        decide('[data-action=lights][data-id=lights_on]',appears='[data-action=lights][data-id=lights_off]')
-        assert page.locator('[data-action=work][data-id=research]').is_enabled()
-        decide('[data-action=work][data-id=research]',appears='[data-action=next]')
         assert page.locator('[data-action=next]').is_visible()
         decide('[data-action=lights][data-id=lights_off]',appears='[data-action=lights][data-id=lights_on]')
         page.keyboard.press('Escape')
         page.wait_for_function("!document.querySelector('#terminal').open")
->>>>>>> 9ca661c6f0529034f3490f6570492bf929863177
 
         for width in [390, 768, 1440]:
             page.set_viewport_size({'width': width, 'height': 800})

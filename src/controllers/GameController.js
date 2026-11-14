@@ -80,14 +80,9 @@ export class GameController {
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
       const commands = {choose:() => this.model.choose(id),work:() => this.model.work(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery(),lights:() => this.model.setLights(id === 'lights_on')};
-<<<<<<< HEAD
-      if (commands[action]) void this.commit(commands[action],{morning:action === 'next'});
+      if (commands[action]) void this.commit(commands[action],{morning:action === 'next',keepTerminal:action !== 'next'});
     };
     document.querySelector('#terminal-content').addEventListener('click',handleDecision);
-=======
-      if (commands[action]) void this.commit(commands[action],{morning:action === 'next',keepTerminal:action !== 'next'});
-    });
->>>>>>> 9ca661c6f0529034f3490f6570492bf929863177
     document.querySelector('#restart').addEventListener('click',() => {
       if (this.busy) return;
       void this.view.closeTerminal().then(() => {
@@ -100,11 +95,7 @@ export class GameController {
     const state = this.model.snapshot;
     return this.view.render(state,state ? this.model.events.get(state.currentEventId) : null,options);
   }
-<<<<<<< HEAD
-  async commit(command,{morning=false,initial=false,save=true,keepTasksOpen=false}={}) {
-=======
-  async commit(command,{morning=false,initial=false,save=true,keepTerminal=false}={}) {
->>>>>>> 9ca661c6f0529034f3490f6570492bf929863177
+  async commit(command,{morning=false,initial=false,save=true,keepTasksOpen=false,keepTerminal=false}={}) {
     if (this.busy) return;
     this.busy = true; const before = this.model.snapshot;
     try {

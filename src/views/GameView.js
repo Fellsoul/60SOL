@@ -69,6 +69,7 @@ export class GameView {
     this.state = state; this.event = event;
     await this.terminal.fadeContentOut(this.reducedMotion);
     await this.scene.render(state,this.reducedMotion);
+    this.tasks.render(state);
     this.terminal.render(state,event,{autoplay:false});
     this.terminal.typeContent(this.reducedMotion);
   }
