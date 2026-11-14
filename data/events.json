@@ -175,7 +175,8 @@
         ],
         "label": "event.E01.daily.secure.label",
         "description": "event.E01.daily.secure.description",
-        "summaryLine": "event.E01.daily.secure.summaryLine"
+        "summaryLine": "event.E01.daily.secure.summaryLine",
+        "outside": true
       },
       {
         "id": "abandon",
@@ -2720,7 +2721,8 @@
         "costH": 2,
         "label": "event.E15.daily.replace.label",
         "description": "event.E15.daily.replace.description",
-        "summaryLine": "event.E15.daily.replace.summaryLine"
+        "summaryLine": "event.E15.daily.replace.summaryLine",
+        "outside": true
       },
       {
         "id": "composition",

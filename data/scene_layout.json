@@ -291,7 +291,7 @@
     },
     {
       "id": "astronaut-b",
-      "bind": "crew",
+      "bind": "crewIdle",
       "zIndex": 50,
       "defaultState": "seated",
       "states": {
@@ -318,7 +318,8 @@
         "off": {
           "src": "assets/scene/interior/outpost_table.png"
         }
-      }
+      },
+      "clipPath": "polygon(30% 77.5%, 67% 77.5%, 72.5% 87.5%, 72.5% 100%, 26% 100%, 26% 87.5%)"
     },
     {
       "id": "tool-toolkit",

@@ -1,8 +1,9 @@
 // 将唯一 Model 状态投影为素材状态名；纯函数，不改变游戏或保存第二套库存。
 export function sceneState(state) {
-  if (!state) return { always:'visible', weather:'clear', lighting:'on', plants:'seed', crew:'seated', panels:'clean', transmission:'idle', tools:{} };
+  if (!state) return { always:'visible', crewIdle:'seated', weather:'clear', lighting:'on', plants:'seed', crew:'seated', panels:'clean', transmission:'idle', tools:{} };
   return {
     always: 'visible',
+    crewIdle: 'seated',
     weather: state.weather,
     lighting: state.lightsOn && state.lifeSupportPaid && state.energy > 0 ? 'on' : 'off',
     plants: state.plantStage,

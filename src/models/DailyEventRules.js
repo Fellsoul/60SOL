@@ -1,3 +1,4 @@
+import { outsideBlocked, spaceEnergyCost } from './SpaceData.js';
 import { LIMITS } from './state.js';
 
 export const DAILY_DEFAULTS = Object.freeze({spares:2,generationCap:6,trackingCap:6,supportExtra:0,careCost:3,harvestFood:8,labUntil:0,greenhouseDisabled:false,antennaLimit:30});
@@ -11,18 +12,22 @@ export function eventEligible(state,event) {
     (!event.dailyRequires?.greenhouse || !dailyState(state).greenhouseDisabled);
 }
 export function emergencyCleanAvailable(state,event = null) {
+  if (state && outsideBlocked(state)) return false;
   return Boolean(state && state.phase !== 'finished' &&
     !(state.phase === 'event' && event?.blockedWork?.includes('clean')) &&
     (state.dusty || dailyState(state).generationCap < 6) &&
     (state.weather === 'sandstorm' || state.energy < 2));
 }
+const outdoorChoice=choice=>choice.outside || ['clean','repair'].includes(choice.action) || choice.id==='force_clean';
+export function choiceEnergy(state,choice) { return spaceEnergyCost(state,choice.energy,Boolean(outdoorChoice(choice))); }
 export function choiceReason(state,choice) {
   if (choice.work && state.workId) return 'error.workUsed';
-  if (state.energy < choice.energy) return 'error.powerInsufficient';
+  if (outdoorChoice(choice) && outsideBlocked(state)) return 'dependency.spaceAdvisory';
+  if (state.energy < choiceEnergy(state,choice)) return 'error.powerInsufficient';
   if (choice.tool && state.tools[choice.tool] !== 'ready') return 'error.toolUnavailable';
   if (state.health <= (choice.costH ?? 0)) return 'error.conditionInsufficient';
   if (dailyState(state).spares < (choice.costQ ?? 0)) return 'error.sparesInsufficient';
-  if (choice.outside && state.weather === 'sandstorm') return 'error.stormOutside';
+  if ((choice.outside || ['clean','repair'].includes(choice.action)) && state.weather === 'sandstorm') return 'error.stormOutside';
   return '';
 }
 export function applyDailyChoice(state,choice) {
@@ -41,7 +46,7 @@ export function applyDailyChoice(state,choice) {
       case 'generation': systems.generationCap = Math.min(systems.generationCap,effect.value); break;
       case 'spare': systems.spares = Math.min(20,systems.spares+effect.amount); break;
       case 'cropReset': state.growth=0; state.plantStage='seed'; break;
-      case 'labPause': systems.labUntil=state.sol+effect.days; break;
+      case 'labPause': systems.labUntil=state.sol+(state.currentEventId==='E12'&&choice.id==='ask'&&state.missionSnapshot ? state.missionSnapshot.rules.replySols : effect.days); break;
       case 'clean': state.dusty=false; systems.generationCap=6; break;
       case 'transfer': {
         const amount = Math.min(effect.limit,state.localData,30-state.pendingData);

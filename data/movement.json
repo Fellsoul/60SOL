@@ -1,0 +1,29 @@
+{
+  "sceneID": "outpost-interior",
+  "assetVersion": "movement-v1",
+  "aspectRatio": [1672, 940],
+  "calibration": {
+    "status": "pending-art-and-geometry-validation",
+    "camera": null,
+    "nearClip": 0.1,
+    "floorUnits": "metres",
+    "walkablePolygon": [],
+    "obstacleEnvelopes": [],
+    "exitBoundary": "near-foreground-toward-camera"
+  },
+  "routes": [],
+  "fallback": {"location": "desk", "pose": "seated", "mode": "status-only"},
+  "actor": {"active": "astronaut-a", "idle": "astronaut-b", "idleMovement": false},
+  "stations": ["desk", "greenhouse", "lab", "communications", "shelter", "exterior"],
+  "art": {
+    "src": "assets/scene/crew/active/action-atlas-v1.png",
+    "columns": 2,
+    "rows": 2,
+    "frames": {"idle": [0, 0], "walk": [1, 0], "work": [0, 1], "eva": [1, 1]},
+    "use": "action-status-illustration-only",
+    "evaVisuallyReviewed": true
+  },
+  "interiorMaxMs": 1800,
+  "evaMaxMs": 4800,
+  "exteriorWalkingEnabled": false
+}
