@@ -1,3 +1,4 @@
+import { applyDailyChoice, choiceReason, eventResolved, dailyState } from './DailyEventRules.js';
 import { createState, logEntry, LIMITS } from './state.js';
 import { ACTIONS, LIGHT_ACTIONS, applyEffect, unavailableReason } from './ActionRules.js';
 import { EventEngine } from './EventEngine.js';
@@ -17,27 +18,32 @@ export class GameModel {
     const s = this.#state;
     if (s?.phase !== 'event') throw new Error('error.notEventPhase');
     const choice = this.events.get(s.currentEventId).choices.find(item => item.id === choiceId);
-    if (!choice || s.energy < choice.energy) throw new Error('error.choiceUnavailable');
+    if (!choice || choiceReason(s,choice)) throw new Error('error.choiceUnavailable');
     s.energy -= choice.energy;
     applyEffect(s,choice.action);
+    applyDailyChoice(s,choice);
+    s.eventDone = true;
     s.choiceId = choiceId;
     s.daySummary.push(choice.summaryLine ?? this.events.get(s.currentEventId).summaryLine);
-    s.workId = choice.work ? `event:${choice.id}` : null;
-    s.phase = choice.work ? 'end' : 'work';
+    if (choice.work) s.workId = `event:${choice.id}`;
+    s.phase = s.workId ? 'end' : 'work';
     logEntry(s,`事件决策：${choice.label}；消耗 ${choice.energy} E${choice.work ? '，占用今日工作' : ''}。`);
   }
   work(actionId) {
     const s = this.#state;
     const action = ACTIONS.find(item => item.id === actionId);
     if (!s || !action) throw new Error('error.unknownWork');
-    const reason = unavailableReason(s,action);
+    const event = this.events.get(s.currentEventId);
+    const reason = unavailableReason(s,action,event);
     if (reason) throw new Error(reason);
-    s.energy -= action.energy;
+    const response = s.phase === 'event' ? event.workResolutions?.[actionId] : null;
+    if (response) { this.choose(response); return; }
+    s.energy -= action.id === 'grow' ? dailyState(s).careCost : action.energy;
     applyEffect(s,actionId);
     s.daySummary.push(action.summaryLine);
     s.workId = actionId;
-    s.phase = 'end';
-    logEntry(s,`基地工作：${action.label}；消耗 ${action.energy} E。${action.description ?? action.narrative}`);
+    s.phase = eventResolved(s,event) ? 'end' : 'event';
+    logEntry(s,`基地工作：${action.label}；消耗 ${action.id === 'grow' ? dailyState(s).careCost : action.energy} E。${action.description ?? action.narrative}`);
   }
   setLights(on) {
     const s = this.#state;
@@ -60,6 +66,7 @@ export class GameModel {
     logEntry(s,`使用一次性备用电池，实际补充 ${gain} E。`);
   }
   nextSol() {
+    if (this.#state && !eventResolved(this.#state,this.events.get(this.#state.currentEventId))) throw new Error('error.eventUnresolved');
     if (this.#state?.phase !== 'end') throw new Error('error.finishDayFirst');
     finishSol(this.#state);
     if (!this.#state.outcome) { this.#state.sol += 1; beginSol(this.#state,this.events,this.environment); }

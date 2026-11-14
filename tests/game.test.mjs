@@ -6,7 +6,7 @@ import { SaveRepository } from '../src/repositories/SaveRepository.js';
 import { finishSol } from '../src/models/TurnEngine.js';
 import { sceneState } from '../src/views/SceneState.js';
 
-const events = JSON.parse(await readFile(new URL('../data/events.json',import.meta.url),'utf8'));
+const events = JSON.parse(await readFile(new URL('../data/events.json',import.meta.url),'utf8')).filter(event => !event.dailySol);
 const tools = JSON.parse(await readFile(new URL('../data/tools.json',import.meta.url),'utf8'));
 const content = { events,tools };
 function model(toolIds = ['toolkit','battery']) { const game = new GameModel(content); game.start(toolIds); return game; }
@@ -30,14 +30,14 @@ test('事件和工作不可重复结算，一次性电池不可重复使用',() 
 
 test('三次照料的收获先于当天食物消耗',() => {
   const game = model(); const state = game.snapshot;
-  Object.assign(state,{phase:'work',choiceId:'plan',growth:2,food:0}); game.restore(state);
+  Object.assign(state,{phase:'work',choiceId:'plan',eventDone:true,growth:2,food:0}); game.restore(state);
   game.work('grow'); assert.equal(game.snapshot.food,8);
   game.nextSol(); assert.equal(game.snapshot.food,6); assert.equal(game.snapshot.health,100);
 });
 
 test('最后一天传输先确认，再检查任务成功',() => {
   const game = model(); const state = game.snapshot;
-  Object.assign(state,{sol:14,phase:'work',choiceId:'plan',localData:30,sentData:30}); game.restore(state);
+  Object.assign(state,{sol:14,phase:'work',choiceId:'plan',eventDone:true,localData:30,sentData:30}); game.restore(state);
   game.work('transmit'); assert.equal(game.snapshot.sentData,30); assert.equal(game.snapshot.pendingData,30);
   game.nextSol(); assert.equal(game.snapshot.sentData,60); assert.equal(game.snapshot.outcome,'success');
   assert.throws(() => game.nextSol());
@@ -75,7 +75,8 @@ test('积尘影响后续发电；恢复不会重算今日发电',() => {
   Object.assign(s,{sol:3,currentEventId:'dust'}); game.restore(s);
   game.choose('defer'); game.work('standby'); game.nextSol();
   assert.equal(game.snapshot.generation,3);
-  const workState = game.snapshot; workState.phase = 'work'; game.restore(workState);
+  const nextEvent = game.events.get(game.snapshot.currentEventId);
+  game.choose(nextEvent.choices.find(choice => !choice.work).id);
   const energy = game.snapshot.energy; game.work('clean');
   assert.equal(game.snapshot.energy,energy-2); assert.equal(game.snapshot.dusty,false);
   game.nextSol(); assert.equal(game.snapshot.generation,6);

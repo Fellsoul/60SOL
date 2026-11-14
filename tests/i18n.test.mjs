@@ -38,8 +38,8 @@ test('事件、选项、工具、工作和静态界面的翻译引用均可解�
 });
 
 test('新游戏的简报和规则提示保存英文 key',() => {
-  const game = new GameModel({events,tools}); game.start(['toolkit','battery']);
-  assert.equal(unavailableReason(game.snapshot,ACTIONS[0]),'error.eventFirst');
+  const game = new GameModel({events:events.filter(event => !event.dailySol),tools}); game.start(['toolkit','battery']);
+  assert.equal(unavailableReason(game.snapshot,ACTIONS[0]),'');
   game.choose('grow'); game.useBattery(); game.nextSol();
   for (const key of game.snapshot.previousDaySummary) assert.ok(Object.hasOwn(catalogs.en,key));
   const state = game.snapshot;
@@ -50,7 +50,7 @@ test('新游戏的简报和规则提示保存英文 key',() => {
 });
 
 test('旧存档的中文简报仍可翻译，未知旧文本保留且不重写存档',() => {
-  const game = new GameModel({events,tools}); game.start(['toolkit','battery']); game.choose('grow'); game.nextSol();
+  const game = new GameModel({events:events.filter(event => !event.dailySol),tools}); game.start(['toolkit','battery']); game.choose('grow'); game.nextSol();
   const legacy = game.snapshot;
   legacy.previousDaySummary = ['我们把第一天留给了温室。种植槽里出现了嫩芽。','我们照料了作物，种植槽中的叶片舒展开来。','旧存档中的自定义记录'];
   const raw = JSON.stringify(legacy);

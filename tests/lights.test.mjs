@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { GameModel } from '../src/models/GameModel.js';
 import { GameController } from '../src/controllers/GameController.js';
 
-const events = JSON.parse(await readFile(new URL('../data/events.json',import.meta.url),'utf8'));
+const events = JSON.parse(await readFile(new URL('../data/events.json',import.meta.url),'utf8')).filter(event => !event.dailySol);
 const tools = JSON.parse(await readFile(new URL('../data/tools.json',import.meta.url),'utf8'));
 
 test('terminal light switch saves immediately and keeps the terminal open without consuming work, energy, or a Sol',async () => {

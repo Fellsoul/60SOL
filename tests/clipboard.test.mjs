@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { GameModel } from '../src/models/GameModel.js';
 import { clipboardTasks } from '../src/views/TaskView.js';
 
-const events = JSON.parse(await readFile(new URL('../data/events.json',import.meta.url),'utf8'));
+const events = JSON.parse(await readFile(new URL('../data/events.json',import.meta.url),'utf8')).filter(event => !event.dailySol);
 const tools = JSON.parse(await readFile(new URL('../data/tools.json',import.meta.url),'utf8'));
 const game = () => { const model = new GameModel({events,tools}); model.start(['toolkit','battery']); return model; };
 const rows = model => clipboardTasks(model.snapshot,model.events.get(model.snapshot.currentEventId));
@@ -26,7 +26,7 @@ test('completed and unfinished tasks coexist after completion and restoring a sa
     assert.equal(tasks.find(task => task.id === 'research').done,true);
     assert.equal(tasks.find(task => task.id === 'grow').done,false);
     assert.equal(tasks.find(task => task.id === 'grow').reason,'error.workUsed');
-    assert.equal(tasks.filter(task => task.done).length,1);
+    assert.equal(tasks.filter(task => task.done && task.command === 'work').length,1);
     assert.ok(!tasks.some(task => task.id === 'robot'));
     assert.throws(() => current.work('research'));
     assert.deepEqual(current.snapshot,state);
