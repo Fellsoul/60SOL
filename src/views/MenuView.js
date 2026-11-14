@@ -20,6 +20,7 @@ export class MenuView {
     this.root.hidden = false;
     document.querySelector('#scene-viewport').hidden = true;
     document.querySelector('#terminal-toggle').hidden = true;
+    document.querySelector('#tasks-toggle').hidden = true;
     const veil = document.querySelector('#morning-veil'); veil.style.opacity = '0'; veil.style.pointerEvents = 'none';
     this.root.querySelector('[data-menu=continue]').hidden = !hasSave;
     this.root.querySelectorAll('[data-menu]').forEach(button => { button.textContent = i18n.t(`menu.${button.dataset.menu}`); });
@@ -56,5 +57,6 @@ export class MenuView {
     else if (deleting) (list.querySelector('[data-save-delete]') ?? document.querySelector('#save-picker-close')).focus();
   }
   closeSaves() { if (this.saveDialog.open) this.saveDialog.close(); }
-  hide() { this.root.hidden = true; document.querySelector('#scene-viewport').hidden = false; document.querySelector('#terminal-toggle').hidden = false; }
+  hide() { this.root.hidden = true; document.querySelector('#scene-viewport').hidden = false; document.querySelector('#terminal-toggle').hidden = false;
+    document.querySelector('#tasks-toggle').hidden = false; }
 }

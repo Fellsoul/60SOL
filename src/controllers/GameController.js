@@ -48,6 +48,8 @@ export class GameController {
       if (button.hasAttribute('data-save-delete')) { this.deleteSave(button.dataset.saveDelete,button.dataset.saveLabel); return; }
       this.loadSave(button.dataset.saveId);
     });
+    document.querySelector('#tasks-toggle').addEventListener('click',() => { if (!this.busy) void this.view.openTasks(); });
+    document.querySelector('#tasks-close').addEventListener('click',() => this.view.tasks.close());
     document.querySelector('#terminal-toggle').addEventListener('click',() => { if (!this.busy) void this.view.openTerminal(); });
     document.querySelector('#terminal-close').addEventListener('click',() => { void this.view.closeTerminal(); });
     document.querySelector('#skip-typing').addEventListener('click',() => this.view.terminal.writer.skip());
@@ -67,13 +69,19 @@ export class GameController {
       const ids = new FormData(event.target).getAll('tool');
       void this.commit(() => this.model.start(ids),{morning:true});
     });
-    document.querySelector('#terminal-content').addEventListener('click',event => {
+    document.querySelector('#tasks-content').addEventListener('click',event => {
+      const target = event.target.closest('button[data-action=work]');
+      if (!target || target.disabled || this.busy) return;
+      void this.commit(() => this.model.work(target.dataset.id),{keepTasksOpen:true});
+    });
+    const handleDecision = event => {
       const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
       const commands = {choose:() => this.model.choose(id),work:() => this.model.work(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery(),lights:() => this.model.setLights(id === 'lights_on')};
       if (commands[action]) void this.commit(commands[action],{morning:action === 'next'});
-    });
+    };
+    document.querySelector('#terminal-content').addEventListener('click',handleDecision);
     document.querySelector('#restart').addEventListener('click',() => {
       if (this.busy) return;
       void this.view.closeTerminal().then(() => {
@@ -86,7 +94,7 @@ export class GameController {
     const state = this.model.snapshot;
     return this.view.render(state,state ? this.model.events.get(state.currentEventId) : null,options);
   }
-  async commit(command,{morning=false,initial=false,save=true}={}) {
+  async commit(command,{morning=false,initial=false,save=true,keepTasksOpen=false}={}) {
     if (this.busy) return;
     this.busy = true; const before = this.model.snapshot;
     try {
@@ -98,6 +106,7 @@ export class GameController {
     if (morning) this.view.startTransitionAudio(before);
     try {
       this.view.menu.closeSaves();
+      if (!keepTasksOpen) this.view.tasks.close();
       await this.view.closeTerminal();
       this.view.menu.hide();
       await this.render({morning,initial});
@@ -107,6 +116,7 @@ export class GameController {
       document.querySelector('#morning-veil').style.pointerEvents = 'none';
       document.querySelector('#morning-veil').style.opacity = '0';
       document.querySelector('#terminal-toggle').disabled = false;
+      document.querySelector('#tasks-toggle').disabled = !this.model.snapshot;
     } finally { this.busy = false; }
   }
 }

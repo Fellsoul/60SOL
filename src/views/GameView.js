@@ -1,4 +1,5 @@
 import { SceneView } from './SceneView.js';
+import { TaskView } from './TaskView.js';
 import { TerminalView } from './TerminalView.js';
 import { MenuView } from './MenuView.js';
 import { TransitionAudio } from './TransitionAudio.js';
@@ -9,6 +10,7 @@ export class GameView {
     this.config = content.presentation; this.menu = new MenuView(this.config.menu); this.audio = new TransitionAudio(this.config);
     this.scene = new SceneView(document.querySelector('#scene'),content.scene_layout);
     this.terminal = new TerminalView(content.tools);
+    this.tasks = new TaskView();
     this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelector('#reduce-motion').checked = this.reducedMotion;
     this.state = null; this.event = null;
@@ -16,7 +18,7 @@ export class GameView {
     document.body.classList.toggle('reduced-motion',this.reducedMotion);
     window.addEventListener('pagehide',() => this.audio.stop());
   }
-  async mount() { await this.scene.mount(); }
+  async mount() { await this.scene.mount(); this.tasks.mount(); }
   coverScene() {
     const veil = document.querySelector('#morning-veil');
     const title = document.querySelector('#sol-title');
@@ -33,7 +35,9 @@ export class GameView {
     const veil = document.querySelector('#morning-veil');
     const title = document.querySelector('#sol-title');
     const toggle = document.querySelector('#terminal-toggle'); toggle.disabled = true;
+    document.querySelector('#tasks-toggle').disabled = true;
     if (morning || initial) {
+      this.tasks.close();
       await this.terminal.close(); veil.style.pointerEvents = 'auto';
       // Keep the title invisible throughout both scene fades.
       title.style.opacity = '0';
@@ -43,6 +47,7 @@ export class GameView {
     }
     await this.scene.render(state,this.reducedMotion);
     this.terminal.render(state,event);
+    this.tasks.render(state);
     if (morning || initial) {
       // The black layer stays fully opaque while the title animates independently.
       if (state) await this.fade(title,0,1,this.config.titleFadeInMs ?? 700);
@@ -51,12 +56,14 @@ export class GameView {
       await Promise.all([this.fade(veil,1,0,this.config.fadeOutMs),this.audio.finish()]); veil.style.pointerEvents = 'none';
     }
     toggle.disabled = false;
+    document.querySelector('#tasks-toggle').disabled = !state;
   }
   async fade(node,from,to,duration) {
     const animation = node.animate([{opacity:from},{opacity:to}],{duration:this.reducedMotion ? 0 : duration,easing:'ease-in-out',fill:'forwards'});
     await animation.finished; node.style.opacity = to; animation.cancel();
   }
-  openTerminal() { return this.terminal.open(this.state,this.event,this.reducedMotion); }
+  openTerminal() { this.tasks.close(); return this.terminal.open(this.state,this.event,this.reducedMotion); }
+  async openTasks() { await this.terminal.close(); if (this.state) this.tasks.open(); }
   async closeTerminal() { await this.terminal.close(); }
   async reduceMotion(value) {
     document.body.classList.toggle('reduced-motion',value);

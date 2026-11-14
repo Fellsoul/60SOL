@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="styles/scene.css">
   <link rel="stylesheet" href="styles/terminal.css">
   <link rel="stylesheet" href="styles/menu.css">
+  <link rel="stylesheet" href="styles/tasks.css">
   <script type="module" src="src/app.js"></script>
 </head>
 <body>
@@ -36,6 +37,16 @@
     <p id="save-picker-description"></p>
     <p id="save-picker-message" role="status"></p>
     <div id="save-list"></div>
+  </dialog>
+  <dialog id="tasks" aria-labelledby="tasks-title" aria-describedby="tasks-intro">
+    <div class="clipboard-clip" aria-hidden="true"></div>
+    <div class="clipboard-paper">
+      <header class="clipboard-header"><div><p class="clipboard-eyebrow" data-i18n="tasks.department">OUTPOST / OPERATIONS</p><h1 id="tasks-title" data-i18n="tasks.title">Task clipboard</h1></div><button id="tasks-close" type="button" data-i18n-aria-label="tasks.close" aria-label="Close task clipboard">×</button></header>
+      <div class="clipboard-meta"><span id="tasks-sol"></span><span id="tasks-power"></span></div>
+      <p id="tasks-intro" data-i18n="tasks.intro">Choose an available task. Completed work is checked off here.</p>
+      <div id="tasks-content"></div>
+      <footer class="clipboard-footer"><span data-i18n="tasks.footer">LAST LIGHT OUTPOST · CREW WORK SHEET</span><span aria-hidden="true">///</span></footer>
+    </div>
   </dialog>
   <dialog id="terminal" aria-labelledby="terminal-title">
     <img class="console-frame" src="assets/scene/interior/outpost_console.png" alt="" draggable="false">

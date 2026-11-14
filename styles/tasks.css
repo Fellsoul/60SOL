@@ -1,0 +1,63 @@
+/* The work sheet is a separate physical object from the electronic console. */
+#tasks-toggle {
+  position: absolute; z-index: 85; left: 26%; top: 77.5%; width: 46.5%; height: 12.5%;
+  padding: 0; border: 0; background: transparent;
+  clip-path: polygon(10% 0, 90% 0, 100% 85%, 99% 100%, 1% 100%, 0 85%);
+  cursor: pointer;
+}
+.table-clipboard { position: absolute; left: 21%; top: 4%; width: 23%; height: 79%; transform: rotate(-7deg) skewX(-12deg); filter: drop-shadow(2px 4px 2px #0006); }
+#tasks-toggle:hover .table-clipboard, #tasks-toggle:focus-visible .table-clipboard { filter: drop-shadow(0 0 4px #fce2a5); }
+#tasks-toggle:focus-visible { outline: none; background: #ffe3a51a; }
+#tasks-toggle:disabled { opacity: 1; }
+#tasks {
+  color-scheme: light; color: #302f28; background: #69503a;
+  width: min(560px, calc(100vw - 28px)); max-width: none;
+  max-height: calc(100dvh - 40px); margin: auto; padding: 32px 14px 14px;
+  border: 1px solid #a58a61; border-radius: 14px;
+  overflow: auto; box-shadow: 0 24px 100px #0009, inset 0 0 0 5px #785d41;
+}
+#tasks::backdrop { background: #080d12a6; backdrop-filter: blur(4px); }
+.clipboard-clip {
+  position: absolute; z-index: 1; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 132px; height: 39px; border: 1px solid #65645d; border-radius: 6px 6px 11px 11px;
+  background: linear-gradient(#c5c4b9, #81877f 48%, #bec0b4 52%, #92968d);
+  box-shadow: 0 3px 5px #0005;
+}
+.clipboard-clip::after { content: ''; position: absolute; top: 8px; left: 45%; width: 14px; height: 7px; border-radius: 8px; background: #4f514c; box-shadow: inset 0 1px 2px #0006; }
+.clipboard-paper {
+  padding: 32px 24px 18px; background: #f1ecd9;
+  background-image: repeating-linear-gradient(0deg, transparent 0 27px, #b4b09b1a 27px 28px);
+  box-shadow: 1px 3px 8px #0004; min-height: 360px;
+}
+.clipboard-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.clipboard-eyebrow { font: 600 .65rem 'Courier New', monospace; letter-spacing: .15em; color: #706b59; margin: 0 0 8px; }
+#tasks-title { font-size: clamp(1.4rem, 5vw, 1.9rem); font-weight: 650; letter-spacing: -.04em; margin: 0; }
+#tasks-close { flex: none; width: 36px; height: 36px; border: 1px solid #aaa38c; border-radius: 50%; background: transparent; font-size: 1.4rem; }
+.clipboard-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 22px 0 14px; padding: 12px 0; border-block: 1px solid #bdb49b; font: 600 .8rem 'Courier New', monospace; }
+#tasks-intro { font-size: .86rem; line-height: 1.6; color: #69624f; margin: 0 0 18px; }
+.task-list { display: grid; }
+.task-row { display: flex; align-items: flex-start; gap: 14px; width: 100%; padding: 17px 8px; text-align: left; background: transparent; border: 0; border-bottom: 1px solid #c6bea7; min-height: 72px; }
+.task-row:not(:disabled):hover { background: #ddd4b580; }
+.task-row:disabled { opacity: .55; }
+.task-checkbox { width: 19px; height: 19px; border: 1.5px solid #8c846c; border-radius: 2px; flex: none; margin-top: 2px; }
+.task-row:not(:disabled):hover .task-checkbox { border-color: #3f654b; box-shadow: inset 0 0 0 4px #f1ecd9; background: #53765a; }
+.task-details { display: grid; gap: 5px; flex: 1; min-width: 0; }
+.task-details strong { font-size: .94rem; font-weight: 600; }
+.task-details small { font-size: .78rem; line-height: 1.55; color: #6a624f; }
+.task-cost { font: .69rem 'Courier New', monospace; color: #5d674f; }
+.task-arrow { color: #7d775f; }
+.clipboard-note { padding: 16px 0 24px; font-size: .94rem; line-height: 1.7; }
+.task-completed { font-weight: 600; }
+.task-completed span { color: #446b4b; margin-right: 8px; }
+.clipboard-primary { padding: 14px 18px; min-height: 48px; background: #344e3e; color: #f5f0dd; border: 1px solid #344e3e; border-radius: 3px; text-align: left; width: 100%; }
+.clipboard-primary:hover { background: #45634c; }
+.clipboard-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 30px; padding-top: 14px; border-top: 1px solid #bdb49b; font: .6rem 'Courier New', monospace; letter-spacing: .08em; color: #837963; }
+#tasks :focus-visible { outline: 2px solid #344e3e; outline-offset: 3px; }
+@media (max-width: 600px) {
+  .clipboard-paper { padding: 28px 16px 16px; }
+  #tasks { max-height: calc(100dvh - 24px); }
+}
+
+.task-row.is-complete:disabled { opacity: 1; }
+.task-row.is-complete strong { text-decoration: line-through; color: #6e725c; }
+.task-row.is-complete .task-checkbox { color: #355e3e; border-color: #527452; font-weight: bold; text-align: center; line-height: 16px; }

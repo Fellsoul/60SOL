@@ -42,9 +42,31 @@ try:
             page.locator('#terminal-toggle').click()
             page.locator('#terminal[open]').wait_for()
 
+        def clipboard():
+            ready()
+            if page.locator('#terminal[open]').count():
+                page.keyboard.press('Escape')
+                page.wait_for_function("!document.querySelector('#terminal').open")
+                page.locator('#tasks-toggle').click()
+            elif not page.locator('#tasks[open]').count():
+                page.locator('#tasks-toggle').click()
+            page.locator('#tasks[open]').wait_for()
+
         def decide(selector):
+            is_work = 'data-action=work' in selector
+            if is_work:
+                clipboard()
+            elif 'data-action=next' in selector and page.locator('#tasks[open]').count():
+                page.keyboard.press('Escape')
+                terminal()
             page.locator(selector).click()
-            page.wait_for_function("!document.querySelector('#terminal').open")
+            if is_work:
+                page.locator('#tasks .is-complete').wait_for()
+                assert page.locator('#tasks[open]').count() == 1
+                assert page.locator('#tasks [data-action=next]').count() == 0
+                assert page.locator(selector).is_disabled()
+                page.keyboard.press('Escape')
+            page.wait_for_function("!document.querySelector('#terminal').open && !document.querySelector('#tasks').open")
             ready()
 
         page.goto(url)
@@ -57,6 +79,11 @@ try:
         collapsed = page.locator('#terminal-toggle').bounding_box()
         assert abs(collapsed['width'] - 1440 * .6) < 1
         assert abs((900-collapsed['y'])/collapsed['height'] - .1) < .01
+        clipboard()
+        assert page.locator('#tasks [data-action]').count() == 0
+        assert page.locator('#tasks [data-action=work]').count() == 0
+        page.keyboard.press('Escape')
+        assert page.locator('#tasks-toggle').evaluate('(node) => node === document.activeElement')
         terminal()
         expanded = page.locator('#terminal').bounding_box()
         slot = page.locator('#terminal .terminal-battery-slot')
@@ -153,13 +180,20 @@ try:
         decide('[data-action=choose][data-id=shelter]')
         assert page.locator('[data-layer=cabin-lights]').is_hidden()
         terminal()
+        assert page.locator('#terminal [data-action=work]').count() == 0
+        clipboard()
         assert page.locator('[data-action=work][data-id=research]').is_enabled()
-        decide('[data-action=lights][data-id=lights_on]')
+        page.keyboard.press('Escape')
         terminal()
+        decide('[data-action=lights][data-id=lights_on]')
+        clipboard()
         assert page.locator('[data-action=work][data-id=research]').is_enabled()
         decide('[data-action=work][data-id=research]')
+        clipboard()
+        assert page.locator('#tasks [data-action=next]').count() == 0
+        assert page.locator('#tasks .is-complete').count() == 1
+        page.keyboard.press('Escape')
         terminal()
-        assert page.locator('[data-action=next]').is_visible()
         decide('[data-action=lights][data-id=lights_off]')
 
         for width in [390, 768, 1440]:
@@ -174,6 +208,11 @@ try:
                 assert bounds['x'] >= scene_bounds['x'] and bounds['y'] >= scene_bounds['y']
                 assert bounds['x']+bounds['width'] <= scene_bounds['x']+scene_bounds['width']+1
                 assert bounds['y']+bounds['height'] <= scene_bounds['y']+scene_bounds['height']+1
+            clipboard()
+            paper = page.locator('#tasks').bounding_box()
+            assert paper['x'] >= 0 and paper['x'] + paper['width'] <= width
+            assert paper['y'] >= 0 and paper['y'] + paper['height'] <= 800
+            page.keyboard.press('Escape')
             terminal()
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
             bounds = page.locator('#terminal').bounding_box()

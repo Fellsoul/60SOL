@@ -1,4 +1,4 @@
-import { ACTIONS, LIGHT_ACTIONS, unavailableReason } from '../models/ActionRules.js';
+import { LIGHT_ACTIONS } from '../models/ActionRules.js';
 import { escapeHtml } from './dom.js';
 import { Typewriter } from './Typewriter.js';
 import { i18n } from '../services/I18n.js';
@@ -81,10 +81,7 @@ export class TerminalView {
       if (state.phase === 'event') {
         decisions.innerHTML = event.choices.map(item => choice('choose',item.id,item.label,state.energy < item.energy ? 'choice.insufficientPower' : item.description,state.energy < item.energy)).join('');
       } else if (state.phase === 'work') {
-        decisions.innerHTML = `<h2>${escapeHtml(i18n.t('terminal.workHeading'))}</h2>` + ACTIONS.filter(action => !action.tool || state.tools[action.tool]).map(action => {
-          const reason = unavailableReason(state,action);
-          return choice('work',action.id,action.label,reason || action.narrative,Boolean(reason));
-        }).join('');
+        decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.onTable'))}</p>`;
       } else if (state.phase === 'end') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('terminal.dayComplete'))}</p>${choice('next','',state.sol === 14 ? 'terminal.finishMission' : 'terminal.endDay')}`;
       }
