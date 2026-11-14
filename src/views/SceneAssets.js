@@ -14,15 +14,7 @@ export class SceneAssets {
     return this.cache.get(url);
   }
   async state(config) {
-    if (!config || config.hidden) return [];
-    let sources = config.frames ?? (config.src ? [config.src] : []);
-    if (config.sequence) {
-      const { pattern,start = 1,count,pad = 2 } = config.sequence;
-      sources = Array.from({length:count},(_,i) => pattern.replace('{index}',String(start+i).padStart(pad,'0')));
-    }
-    const images = await Promise.all(sources.map(src => this.load(src)));
-    if (images.length && images.every(Boolean)) return images;
-    // 序列不完整时显示首个可用帧，不将残缺序列当作完整动画播放。
-    return images.filter(Boolean).slice(0,1);
+    if (!config || config.hidden) return null;
+    return this.load(config.src);
   }
 }

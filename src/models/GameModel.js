@@ -1,5 +1,5 @@
 import { createState, logEntry, LIMITS } from './state.js';
-import { ACTIONS, applyEffect, unavailableReason } from './ActionRules.js';
+import { ACTIONS, LIGHT_ACTIONS, applyEffect, unavailableReason } from './ActionRules.js';
 import { EventEngine } from './EventEngine.js';
 import { beginSol, finishSol } from './TurnEngine.js';
 
@@ -38,6 +38,16 @@ export class GameModel {
     s.workId = actionId;
     s.phase = 'end';
     logEntry(s,`基地工作：${action.label}；消耗 ${action.energy} E。${action.description ?? action.narrative}`);
+  }
+  setLights(on) {
+    const s = this.#state;
+    if (!s || !['event','work','end'].includes(s.phase) || typeof on !== 'boolean') throw new Error('error.lightsUnavailable');
+    if (s.lightsOn === on) throw new Error(on ? 'error.lightsAlreadyOn' : 'error.lightsAlreadyOff');
+    if (on && s.energy === 0) throw new Error('error.powerInsufficient');
+    s.lightsOn = on;
+    // Repeated switching records only the final choice, keeping save summaries bounded.
+    s.daySummary = s.daySummary.filter(line => !LIGHT_ACTIONS.some(action => action.summaryLine === line));
+    s.daySummary.push(LIGHT_ACTIONS.find(action => action.id === (on ? 'lights_on' : 'lights_off')).summaryLine);
   }
   useBattery() {
     const s = this.#state;

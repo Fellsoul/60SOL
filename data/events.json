@@ -143,7 +143,6 @@
         "description": "event.sandstorm.choice.shelter.description",
         "summaryLine": "event.sandstorm.choice.shelter.summaryLine",
         "energy": 0,
-        "work": true,
         "action": "lights_off"
       },
       {

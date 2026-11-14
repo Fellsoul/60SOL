@@ -1,7 +1,7 @@
 """终端和素材读取冒烟测试。需要 Playwright + 本机 Edge。
 
 PNG 响应使用内存中的单像素测试样本，不向素材文件夹写入图片。
-实际美术构图与序列流畅度需要用户提供素材后另行验收。
+实际美术构图与纹理接缝需要用户提供素材后另行验收。
 """
 import base64
 import io
@@ -29,7 +29,7 @@ try:
     with sync_playwright() as p:
         browser = p.chromium.launch(channel='msedge', headless=True)
         context = browser.new_context(viewport={'width': 1440, 'height': 900}, reduced_motion='reduce')
-        context.route('**/assets/scene/**/*.png', lambda route: route.continue_() if route.request.url.endswith('/outpost_console.png') else route.fulfill(status=200, content_type='image/png', body=PIXEL))
+        context.route('**/assets/scene/**/*.png', lambda route: route.continue_() if route.request.url.endswith(('/outpost_console.png', '/outpost_baseMain.png', '/outpost_baseRight.png')) else route.fulfill(status=200, content_type='image/png', body=PIXEL))
         page = context.new_page()
         errors = []
         page.on('pageerror', lambda error: errors.append(str(error)))
@@ -85,7 +85,7 @@ try:
         ready()
         assert before == page.evaluate('(key) => localStorage.getItem(key)', active_key)
 
-        # 注入合法天气状态，验证路径、往返帧播放和减少动画。
+        # 注入合法天气状态，验证连续位移、远近速度和减少动画。
         page.evaluate("""(key) => {
           const record = JSON.parse(localStorage.getItem(key));
           const s = record.state;
@@ -105,22 +105,59 @@ try:
         page.wait_for_function("!document.querySelector('#terminal').open")
         image = page.locator('[data-layer=exterior-main] img')
         first = image.get_attribute('src')
-        page.wait_for_function("(src) => document.querySelector('[data-layer=exterior-main] img').src !== src", arg=first)
+        assert first.endswith('/main/clear.png')
+        assert page.locator('.scene-dust:visible').count() == 4
+        # Each window's exterior, dust and cabin frame form a complete stack.
+        stack = ['exterior-main','sandstorm-main-far','sandstorm-main-near','outpost-main',
+                 'exterior-right','sandstorm-right-far','sandstorm-right-near','outpost-right']
+        z_order = page.evaluate('(ids) => ids.map(id => Number(getComputedStyle(document.querySelector(`[data-layer="${id}"]`)).zIndex))', stack)
+        assert all(left < right for left, right in zip(z_order, z_order[1:])), z_order
+        assert page.locator('[data-layer=outpost]').count() == 0
+        assert page.locator('.scene-dust-track img').count() == 8
+        tracks = page.locator('.scene-dust-track')
+        movement = tracks.first.evaluate('(node) => getComputedStyle(node).transform')
+        page.wait_for_function("(before) => getComputedStyle(document.querySelector('.scene-dust-track')).transform !== before", arg=movement)
+        timing = tracks.evaluate_all('(nodes) => nodes.map(node => node.getAnimations()[0].effect.getTiming().duration)')
+        assert abs(timing[0] / timing[1] - 3) < .001
+        assert abs(timing[2] / timing[3] - 3) < .001
+        assert image.get_attribute('src') == first
+        # A normal render must preserve running animation objects and their phase.
+        page.evaluate("window.dustAnimations = [...document.querySelectorAll('.scene-dust-track')].map(node => node.getAnimations()[0])")
         terminal()
         page.locator('#reduce-motion').check()
+        page.locator('#reduce-motion').uncheck()
+        assert tracks.evaluate_all('(nodes) => nodes.every((node,i) => node.getAnimations()[0] === window.dustAnimations[i])')
+        page.locator('#reduce-motion').check()
         page.wait_for_timeout(50)
-        first = image.get_attribute('src')
+        frozen = tracks.evaluate_all('(nodes) => nodes.map(node => getComputedStyle(node).transform)')
         page.wait_for_timeout(400)
-        assert image.get_attribute('src') == first
+        assert frozen == tracks.evaluate_all('(nodes) => nodes.map(node => getComputedStyle(node).transform)')
+        assert tracks.evaluate_all('(nodes) => nodes.every(node => node.getAnimations()[0].playState === "paused")')
+        assert page.locator('.scene-dust-motion').evaluate_all('(nodes) => nodes.every(node => Number(getComputedStyle(node).opacity) === 0.5 && node.getAnimations().every(animation => animation.playState === "paused"))')
         decide('[data-action=choose][data-id=shelter]')
         assert page.locator('[data-layer=cabin-lights]').is_hidden()
+        terminal()
+        assert page.locator('[data-action=work][data-id=research]').is_enabled()
+        decide('[data-action=lights][data-id=lights_on]')
+        terminal()
+        assert page.locator('[data-action=work][data-id=research]').is_enabled()
+        decide('[data-action=work][data-id=research]')
+        terminal()
+        assert page.locator('[data-action=next]').is_visible()
+        decide('[data-action=lights][data-id=lights_off]')
 
         for width in [390, 768, 1440]:
             page.set_viewport_size({'width': width, 'height': 800})
+            page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
             scene_bounds = page.locator('#scene').bounding_box()
-            for layer in page.locator('.scene-layer:visible').all():
+            for layer in page.locator('.scene-layer:visible:not(.scene-dust)').all():
                 bounds = layer.bounding_box()
                 assert all(abs(bounds[key]-scene_bounds[key]) < 1 for key in ['x','y','width','height'])
+            for layer in page.locator('.scene-dust:visible').all():
+                bounds = layer.bounding_box()
+                assert bounds['x'] >= scene_bounds['x'] and bounds['y'] >= scene_bounds['y']
+                assert bounds['x']+bounds['width'] <= scene_bounds['x']+scene_bounds['width']+1
+                assert bounds['y']+bounds['height'] <= scene_bounds['y']+scene_bounds['height']+1
             terminal()
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
             bounds = page.locator('#terminal').bounding_box()
@@ -133,10 +170,13 @@ try:
         terminal()
         page.locator('#restart').click()
         page.locator('#main-menu').wait_for(state='visible')
+        assert page.locator('.scene-dust:visible').count() == 0
         older = page.evaluate('(key) => localStorage.getItem(key)', active_key)
         page.locator('[data-menu=new]').click()
         page.locator('[value=robot]').check(); page.locator('[value=shield]').check()
         decide('#loadout-form button')
+        assert page.locator('.scene-dust:visible').count() == 0
+        assert page.evaluate('window.dustAnimations.every(animation => animation.playState === "idle")')
         assert page.evaluate('(key) => localStorage.getItem(key)', active_key) == older
         terminal(); page.locator('#restart').click()
         page.locator('#main-menu').wait_for(state='visible')
@@ -176,6 +216,47 @@ try:
         assert page.locator('#save-picker-message').inner_text().endswith('Start a new game to create one.')
         assert not errors, errors
 
+        # Exercise visibility, stale loads and disposal on an isolated scene.
+        lifecycle = page.evaluate("""async () => {
+          const {SceneView} = await import('/src/views/SceneView.js');
+          const layout = await (await fetch('/data/scene_layout.json')).json();
+          const root = document.createElement('div');
+          root.style.position = 'relative'; document.body.append(root);
+          const scene = new SceneView(root,layout); await scene.mount();
+          const storm = {weather:'sandstorm',tools:{}};
+          await scene.render(storm,false);
+          const dust = scene.layers.filter(layer => layer.track);
+          const animations = dust.flatMap(layer => [layer.animation,layer.variation]);
+          const breaths = dust.map(layer => layer.variation);
+          const initialOpacity = breaths.every(animation => Number(animation.effect.getKeyframes()[0].opacity) === 0.5);
+          const independent = new Set(breaths.map(animation => animation.effect.getTiming().duration)).size === 4;
+          // Seek to a breath peak, then finish it to verify a new cycle is generated.
+          const breath = breaths[0]; const frames = breath.effect.getKeyframes();
+          breath.currentTime = breath.effect.getTiming().duration * frames[2].offset;
+          const style = getComputedStyle(dust[0].drift);
+          const breathing = Number(style.opacity) > 0.5 && Number(style.opacity) <= 0.7;
+          const matrix = new DOMMatrix(style.transform);
+          const scaling = matrix.a >= 1.04 && matrix.a <= 1.16;
+          await new Promise(resolve => { breath.addEventListener('finish',resolve,{once:true}); breath.finish(); });
+          const renewed = dust[0].variation !== breath && dust[0].variation.playState === 'running';
+          animations[1] = dust[0].variation;
+          animations.forEach(animation => { animation.currentTime = 1000; });
+          await scene.render(storm,false);
+          const retained = dust.every((layer,i) => layer.animation === animations[i*2] && layer.variation === animations[i*2+1] && layer.animation.currentTime >= 1000);
+          Object.defineProperty(document,'hidden',{configurable:true,value:true});
+          document.dispatchEvent(new Event('visibilitychange'));
+          const paused = animations.every(animation => animation.playState === 'paused');
+          delete document.hidden; document.dispatchEvent(new Event('visibilitychange'));
+          const resumed = animations.every(animation => animation.playState === 'running');
+          await Promise.all([scene.render(null,false),scene.render(storm,false),scene.render(null,false)]);
+          const clear = scene.layers.filter(layer => layer.config.viewport).every(layer => layer.node.hidden && !layer.animation && !layer.variation);
+          await scene.render(storm,false);
+          const finalAnimations = scene.layers.filter(layer => layer.animation).flatMap(layer => [layer.animation,layer.variation]);
+          scene.dispose(); root.remove();
+          return {initialOpacity,independent,breathing,scaling,renewed,retained,paused,resumed,clear,disposed:finalAnimations.length === 8 && finalAnimations.every(animation => animation.playState === 'idle')};
+        }""")
+        assert all(lifecycle.values()), lifecycle
+
         # 素材全部缺失时不会自动拼图，终端仍可使用。
         missing = browser.new_context(reduced_motion='reduce')
         missing.route('**/assets/scene/**/*.png', lambda route: route.fulfill(status=404, body=''))
@@ -195,6 +276,15 @@ try:
         missing_page.locator('[data-menu=new]').wait_for()
         assert missing_page.locator('[data-menu=new]').inner_text() == '新游戏'
         assert missing_page.locator('#scene img').count() == 0
+        assert missing_page.evaluate("""async () => {
+          const {SceneView} = await import('/src/views/SceneView.js');
+          const layout = await (await fetch('/data/scene_layout.json')).json();
+          const root = document.createElement('div'); document.body.append(root);
+          const scene = new SceneView(root,layout); await scene.mount();
+          await scene.render({weather:'sandstorm',tools:{}},false);
+          const hidden = scene.layers.filter(layer => layer.config.viewport).every(layer => layer.node.hidden && !layer.animation);
+          scene.dispose(); root.remove(); return hidden;
+        }""")
         missing_page.locator('[data-menu=new]').click()
         missing_page.locator('#loadout-form').wait_for()
         # Real transition timing and volume envelope, using silent WAV test data in memory.
@@ -232,7 +322,7 @@ try:
         assert any(0 < item['title'] < 1 and item['veil'] == 1 for item in samples), 'Title fade on full black was not observed'
         assert all(item['title'] == 0 for item in samples if item['veil'] < 1), 'Title appeared during a scene fade'
         browser.close()
-        print('Browser smoke passed: terminal, summaries, PNG states, sequence timing, reduced motion, missing assets, 3 viewport sizes.')
+        print('Browser smoke passed: terminal, summaries, PNG states, dust parallax, reduced motion, missing assets, 3 viewport sizes.')
 finally:
     server.shutdown()
     server.server_close()

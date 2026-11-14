@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { I18n } from '../src/services/I18n.js';
-import { ACTIONS, unavailableReason } from '../src/models/ActionRules.js';
+import { ACTIONS, LIGHT_ACTIONS, unavailableReason } from '../src/models/ActionRules.js';
 import { GameModel } from '../src/models/GameModel.js';
 import { SaveRepository } from '../src/repositories/SaveRepository.js';
 import { finishSol } from '../src/models/TurnEngine.js';
@@ -27,6 +27,7 @@ test('事件、选项、工具、工作和静态界面的翻译引用均可解�
     ...events.flatMap(event => [event.title,event.text,event.summaryLine,...event.choices.flatMap(choice => [choice.label,choice.description,choice.summaryLine])]),
     ...tools.flatMap(tool => [tool.name,tool.description]),
     ...ACTIONS.flatMap(action => [action.label,action.narrative,action.summaryLine]),
+    ...LIGHT_ACTIONS.flatMap(action => [action.label,action.narrative,action.summaryLine]),
   ];
   const html = await readFile(new URL('../index.html',import.meta.url),'utf8');
   references.push(...Array.from(html.matchAll(/data-i18n(?:-aria-label)?="([^"]+)"/g),match => match[1]));
