@@ -92,6 +92,10 @@ export class TerminalView {
     this.writer.cancel();
     this.batterySlot.render(state);
     const title = state ? `SOL ${String(state.sol).padStart(2,'0')}` : 'OUTPOST / LINK';
+    const generation = document.querySelector('#terminal-generation');
+    generation.hidden = !state;
+    generation.textContent = state ? `${i18n.t('terminal.generation')} +${state.generation} E` : '';
+    generation.title = i18n.t('terminal.generationHint');
     document.querySelector('#terminal-title').setAttribute('aria-label',title);
     document.querySelector('#restart').hidden = !state;
     if (!state) {
@@ -134,6 +138,7 @@ export class TerminalView {
   setReducedMotion(value) { this.reducedMotion = value; if (value) this.writer.skip(); }
   renderSettings() {
     this.writer.cancel();
+    document.querySelector('#terminal-generation').hidden = true;
     const title = i18n.t('menu.settings');
     document.querySelector('#terminal-title').textContent = title;
     document.querySelector('#terminal-title').setAttribute('aria-label',title);

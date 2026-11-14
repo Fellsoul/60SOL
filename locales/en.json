@@ -31,6 +31,8 @@
   "settings.reduceMotion": "Reduce motion",
   "menu.return": "Main menu",
   "terminal.log": "LOG",
+  "terminal.generation": "Solar generation",
+  "terminal.generationHint": "Power generated this Sol. The amount stored is limited by battery capacity.",
   "terminal.arrivalLog": "Arrival log",
   "terminal.missionComplete": "Mission complete",
   "terminal.workHeading": "Today's work",

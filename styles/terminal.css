@@ -43,6 +43,8 @@ body.console-open #terminal-toggle { visibility: hidden; }
 .terminal-shell { height: 100%; display: flex; flex-direction: column; background: repeating-linear-gradient(0deg, transparent 0 3px, #00000018 3px 4px); }
 .terminal-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 26px; border-bottom: 1px solid var(--line); flex: none; }
 .terminal-header h1 { font: 500 1.2rem "Courier New", monospace; letter-spacing: .18em; margin: 0; }
+.terminal-heading { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; min-width:0; }
+#terminal-generation { margin:0; color:var(--phosphor); font-size:clamp(.6rem,1vw,.85rem); font-variant-numeric:tabular-nums; }
 #terminal-close { background: none; border: 1px solid var(--line); width: 40px; height: 40px; font-size: 1.6rem; border-radius: 4px; }
 #terminal-scroll { overflow-y: auto; overflow-anchor: none; overscroll-behavior: contain; flex: 1; min-height: 0; padding: 26px; scrollbar-color: #667c5c #17251b; }
 #terminal-content { line-height: 1.9; font-size: .96rem; }
