@@ -1,6 +1,6 @@
-#main-menu { position:fixed; inset:0; z-index:100; overflow:hidden; background:#070b14 url("../assets/menu/background.png") center / cover no-repeat; --mx:0px; --my:0px; }
+#main-menu { position:fixed; inset:0; z-index:100; overflow:hidden; background:#070b14; --mx:0px; --my:0px; }
 #main-menu img { position:absolute; pointer-events:none; object-fit:contain; }
-[data-menu-layer=space] { display:none; }
+[data-menu-layer=space] { inset:0; width:100%; height:100%; object-fit:cover!important; z-index:0; }
 [data-menu-layer=mars] { left:14%; top:14%; width:55%; height:72%; z-index:1; }
 [data-menu-layer=meteors] { inset:-3%; width:106%; height:106%; z-index:2; transform:translate(var(--mx),var(--my)); transition:transform .25s ease-out; }
 .menu-buttons { position:absolute; left:66%; top:32%; width:26%; display:grid; gap:20px; z-index:3; }
