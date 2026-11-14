@@ -25,13 +25,15 @@ export class MenuView {
     this.root.querySelectorAll('[data-menu]').forEach(button => { button.textContent = i18n.t(`menu.${button.dataset.menu}`); });
   }
   showSaves(saves,message = '') {
+    const deleting = document.activeElement?.hasAttribute('data-save-delete');
     document.querySelector('#save-picker-title').textContent = i18n.t('menu.load');
     document.querySelector('#save-picker-description').textContent = i18n.t('save.choose');
     document.querySelector('#save-picker-close').textContent = i18n.t('save.back');
-    this.saveMessage.textContent = i18n.t(message || (saves.length ? '' : 'save.empty'));
+    this.saveMessage.textContent = [message ? i18n.t(message) : '',saves.length ? '' : i18n.t('save.empty')].filter(Boolean).join(' ');
     const list = document.querySelector('#save-list');
     list.replaceChildren();
     for (const [index,save] of saves.entries()) {
+      const row = document.createElement('div'); row.className = 'save-row';
       const button = document.createElement('button');
       button.type = 'button'; button.className = 'save-entry'; button.dataset.saveId = save.id; button.disabled = !save.state;
       const title = document.createElement('strong');
@@ -42,9 +44,16 @@ export class MenuView {
       status.textContent = save.state ? i18n.t(`save.phase.${save.state.phase}`) : i18n.t('save.invalid');
       const label = document.createElement('span'); label.className = 'save-entry-action';
       label.textContent = i18n.t(save.state ? 'save.load' : 'save.cannotLoad');
-      button.append(title,date,status,label); list.append(button);
+      button.append(title,date,status,label);
+      const remove = document.createElement('button');
+      remove.type = 'button'; remove.className = 'save-delete'; remove.dataset.saveDelete = save.id;
+      remove.dataset.saveLabel = `${title.textContent}\n${date.textContent}`;
+      remove.textContent = i18n.t('save.delete');
+      remove.setAttribute('aria-label',`${i18n.t('save.delete')} ${title.textContent}`);
+      row.append(button,remove); list.append(row);
     }
     if (!this.saveDialog.open) this.saveDialog.showModal();
+    else if (deleting) (list.querySelector('[data-save-delete]') ?? document.querySelector('#save-picker-close')).focus();
   }
   closeSaves() { if (this.saveDialog.open) this.saveDialog.close(); }
   hide() { this.root.hidden = true; document.querySelector('#scene-viewport').hidden = false; document.querySelector('#terminal-toggle').hidden = false; }

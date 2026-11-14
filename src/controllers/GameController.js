@@ -15,6 +15,15 @@ export class GameController {
     if (!loaded.state) { this.showSaves('save.unavailable'); return; }
     void this.commit(() => { this.model.restore(loaded.state); this.activeSaveId = id; },{morning:true,save:false});
   }
+  deleteSave(id,label) {
+    if (!confirm(`${i18n.t('save.confirmDelete')}\n\n${label}`)) return;
+    const result = this.repository.delete(id);
+    if (result.ok) {
+      if (this.activeSaveId === id) this.activeSaveId = null;
+      this.showMenu();
+    }
+    this.showSaves(result.message);
+  }
   async start() {
     this.showMenu();
     document.querySelector('#main-menu').addEventListener('click',event => {
@@ -32,8 +41,9 @@ export class GameController {
       }
     });
     document.querySelector('#save-list').addEventListener('click',event => {
-      const button = event.target.closest('button[data-save-id]');
+      const button = event.target.closest('button[data-save-id],button[data-save-delete]');
       if (!button || button.disabled || this.busy) return;
+      if (button.hasAttribute('data-save-delete')) { this.deleteSave(button.dataset.saveDelete,button.dataset.saveLabel); return; }
       this.loadSave(button.dataset.saveId);
     });
     document.querySelector('#terminal-toggle').addEventListener('click',() => { if (!this.busy) void this.view.openTerminal(); });

@@ -96,8 +96,8 @@ try:
         page.locator('[data-menu=load]').click()
         page.locator('#save-picker[open]').wait_for()
         assert page.locator('#main-menu').is_visible()
-        assert page.locator('#save-list button:enabled').count() == 1
-        page.locator('#save-list button:enabled').click()
+        assert page.locator('#save-list [data-save-id]:enabled').count() == 1
+        page.locator('#save-list [data-save-id]:enabled').click()
         ready()
         terminal()
         page.locator('#reduce-motion').uncheck()
@@ -141,7 +141,7 @@ try:
         terminal(); page.locator('#restart').click()
         page.locator('#main-menu').wait_for(state='visible')
         page.locator('[data-menu=load]').click()
-        assert page.locator('#save-list button:enabled').count() == 2
+        assert page.locator('#save-list [data-save-id]:enabled').count() == 2
         before_cancel = page.evaluate('JSON.stringify({...localStorage})')
         page.keyboard.press('Escape')
         assert page.locator('#main-menu').is_visible()
@@ -158,6 +158,22 @@ try:
         assert page.locator('#terminal-title').inner_text() == 'SOL 01'
         page.keyboard.press('Escape')
         page.wait_for_function("!document.querySelector('#terminal').open")
+        terminal(); page.locator('#restart').click()
+        page.locator('#main-menu').wait_for(state='visible')
+        page.locator('[data-menu=load]').click()
+        before_delete = page.evaluate('JSON.stringify({...localStorage})')
+        page.once('dialog', lambda dialog: dialog.dismiss())
+        page.locator(f'[data-save-delete="{active_key}"]').click()
+        assert page.evaluate('JSON.stringify({...localStorage})') == before_delete
+        page.once('dialog', lambda dialog: dialog.accept())
+        page.locator(f'[data-save-delete="{active_key}"]').click()
+        assert page.locator('#save-list [data-save-id]').count() == 1
+        assert page.evaluate('(key) => localStorage.getItem(key)', active_key) is None
+        page.once('dialog', lambda dialog: dialog.accept())
+        page.locator('#save-list [data-save-delete]').click()
+        assert page.locator('#save-list [data-save-id]').count() == 0
+        assert page.locator('[data-menu=continue]').is_hidden()
+        assert page.locator('#save-picker-message').inner_text().endswith('Start a new game to create one.')
         assert not errors, errors
 
         # 素材全部缺失时不会自动拼图，终端仍可使用。

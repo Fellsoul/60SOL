@@ -10,7 +10,7 @@ const events = JSON.parse(await readFile(new URL('../data/events.json',import.me
 const tools = JSON.parse(await readFile(new URL('../data/tools.json',import.meta.url),'utf8'));
 const content = { events,tools };
 function model(toolIds = ['toolkit','battery']) { const game = new GameModel(content); game.start(toolIds); return game; }
-function memory() { const data = new Map(); return { get length() { return data.size; }, key:index => [...data.keys()][index] ?? null, getItem:key => data.get(key) ?? null, setItem:(key,value) => data.set(key,value) }; }
+function memory() { const data = new Map(); return { get length() { return data.size; }, key:index => [...data.keys()][index] ?? null, getItem:key => data.get(key) ?? null, setItem:(key,value) => data.set(key,value), removeItem:key => data.delete(key) }; }
 
 test('开局先发电再支付生命维持；状态副本不能修改 Model',() => {
   const game = model();
@@ -163,4 +163,30 @@ test('空存档列表和不可用存储安全返回，不影响有效存档',() 
   const blocked = {getItem() { throw new Error('Storage blocked'); },setItem() { throw new Error('Quota exceeded'); }};
   const repo = new SaveRepository(blocked,content);
   assert.ok(repo.list().message); assert.equal(repo.load().state,null); assert.equal(repo.save(model().snapshot).ok,false);
+});
+
+test('删除只移除指定存档，保留其他任务和语言设置',() => {
+  const storage = memory(); const repo = new SaveRepository(storage,content);
+  const a = repo.save(model().snapshot); const b = repo.save(model(['robot','shield']).snapshot);
+  const retained = storage.getItem(b.id); storage.setItem('outpost.language','zh-CN');
+  assert.equal(repo.delete(a.id).ok,true); assert.equal(repo.load(a.id).state,null);
+  assert.deepEqual(repo.list().saves.map(save => save.id),[b.id]);
+  assert.equal(storage.getItem(b.id),retained); assert.equal(storage.getItem('outpost.language'),'zh-CN');
+  assert.equal(repo.delete(a.id).ok,true);
+});
+
+test('旧版存档和损坏存档均可删除，删完列表为空',() => {
+  const storage = memory(); const repo = new SaveRepository(storage,content);
+  storage.setItem(repo.key,JSON.stringify(model().snapshot)); storage.setItem(`${repo.slotPrefix}broken`,'{broken');
+  assert.equal(repo.delete(repo.key).ok,true); assert.equal(repo.delete(`${repo.slotPrefix}broken`).ok,true);
+  assert.deepEqual(repo.list(),{saves:[],message:''});
+});
+
+test('删除拒绝非存档键，存储不可用时返回失败',() => {
+  const storage = memory(); const repo = new SaveRepository(storage,content); storage.setItem('outpost.language','zh-CN');
+  for (const id of [undefined,null,'outpost.language','',{},'last-light-outpost.save.v10']) assert.equal(repo.delete(id).ok,false);
+  assert.equal(storage.getItem('outpost.language'),'zh-CN');
+  assert.equal(new SaveRepository(null,content).delete(repo.key).ok,false);
+  const blocked = { removeItem() { throw new Error('Storage blocked'); } };
+  assert.equal(new SaveRepository(blocked,content).delete(repo.key).ok,false);
 });

@@ -56,4 +56,11 @@ export class SaveRepository {
       return { ok:true, id, message:'已自动保存到此浏览器。' };
     } catch { return { ok:false, message:'无法自动保存；你仍可继续当局，刷新可能丢失进度。' }; }
   }
+  delete(id) {
+    try {
+      if (!this.storage || typeof id !== 'string' || (id !== this.key && !id.startsWith(this.slotPrefix))) throw new Error('未知存档');
+      this.storage.removeItem(id);
+      return { ok:true, message:'save.deleted' };
+    } catch { return { ok:false, message:'save.deleteFailed' }; }
+  }
 }
