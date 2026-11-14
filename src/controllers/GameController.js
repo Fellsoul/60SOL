@@ -1,4 +1,5 @@
 import { i18n } from '../services/I18n.js';
+import { eventResolved } from '../models/DailyEventRules.js';
 export class GameController {
   constructor(model,view,repository) { this.model = model; this.view = view; this.repository = repository; this.busy = false; this.activeSaveId = null; }
   showMenu() {
@@ -79,7 +80,10 @@ export class GameController {
       const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
-      if (action === 'work') void this.commit(() => this.model.work(id),{keepTasksOpen:true});
+      if (action === 'work') {
+        const state = this.model.snapshot;
+        if (state && eventResolved(state,this.model.events.get(state.currentEventId))) void this.commit(() => this.model.work(id),{keepTasksOpen:true});
+      }
       else if (action === 'choose') {
         const state = this.model.snapshot;
         const choice = this.model.events.get(state.currentEventId).choices.find(choice => choice.id === id);

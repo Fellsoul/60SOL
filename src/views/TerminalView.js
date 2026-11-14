@@ -69,7 +69,7 @@ export class TerminalView {
     text = i18n.t(text);
     return `<p class="terminal-copy"><span class="sr-only">${escapeHtml(text)}</span><span id="${id}" aria-hidden="true" data-copy="${escapeHtml(text)}"></span>${suffix}</p>`;
   }
-  resourceSummary(entries = []) {
+  resourceSummary(entries = [],prefix = 'resource-copy') {
     const localize = values => values?.[i18n.language] ?? values?.en;
     return entries.map((entry,index) => {
       const variants = localize(this.resourceLog.sources?.[entry.source]?.descriptions);
@@ -86,8 +86,17 @@ export class TerminalView {
           ? `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}${amount === 0 ? '0' : ''}</span>${'<img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">'.repeat(amount)}</span>`
           : `<span class="summary-resource-change">${escapeHtml(label)} ${sign}${amount}</span>`;
       }).join(' ');
-      return this.copy(`resource-copy-${index}`,description,` <span class="summary-resource-changes">${changes}</span>`);
+      return this.copy(`${prefix}-${index}`,description,` <span class="summary-resource-changes">${changes}</span>`);
     }).join('');
+  }
+  todayRecords(state) {
+    if (state.outcome) return ''; // The final Sol is already shown as the completed day's log.
+    const entries = state.resourceLog ?? [];
+    const detailed = new Set(entries.filter(entry => entry.fallback).map(entry => i18n.t(entry.fallback)));
+    const lines = state.daySummary.map(line => i18n.t(line)).filter(line => !detailed.has(line));
+    const narrative = lines.length ? this.copy('today-summary-copy',lines.join('\n\n')) : '';
+    const empty = !lines.length && !entries.length ? this.copy('today-empty-copy','terminal.noRecords') : '';
+    return `<section id="today-records"><h2>SOL ${String(state.sol).padStart(2,'0')} / ${escapeHtml(i18n.t('terminal.todayRecords'))}</h2>${narrative}${this.resourceSummary(entries,'today-resource-copy')}${empty}</section>`;
   }
   resetScroll() {
     document.querySelector('#terminal-scroll').scrollTop = 0;
@@ -127,9 +136,8 @@ export class TerminalView {
       const previous = state.previousDaySummary.length ? previousLines.map(line => i18n.t(line)).join('\n\n') : 'summary.arrival';
       let today = event.text;
       if (state.outcome) today = {success:'outcome.success',incomplete:'outcome.incomplete',unsafe:'outcome.unsafe'}[state.outcome];
-      const onClipboard = !state.outcome && event.choices.length > 0;
-      const todayCopy = onClipboard ? '' : `<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}`;
-      this.content.innerHTML = `<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}${todayCopy}<div id="terminal-decisions" class="terminal-choices"></div>`;
+      const todayCopy = `<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}`;
+      this.content.innerHTML = `${this.todayRecords(state)}<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}${todayCopy}<div id="terminal-decisions" class="terminal-choices"></div>`;
       const decisions = this.content.querySelector('#terminal-decisions');
       if (state.phase === 'event') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.eventOnClipboard'))}</p>`;
@@ -138,15 +146,8 @@ export class TerminalView {
       } else if (state.phase === 'end') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('terminal.dayComplete'))}</p>${choice('next','',state.sol === 14 ? 'terminal.finishMission' : 'terminal.endDay',eventResolved(state,event) ? '' : 'error.eventUnresolved',!eventResolved(state,event))}`;
       }
-      if (eventResolved(state,event)) {
-        const result=event.choices.find(choice => choice.id === state.choiceId);
-        decisions.insertAdjacentHTML('afterbegin',`<p class="terminal-note" role="status">${escapeHtml(i18n.t(result.summaryLine))}</p>`);
-      }
       const emergency = this.events.find(item => item.id === 'emergency_clean');
-      if (emergency && state.history.emergency_clean === state.sol) {
-        const response = emergency.choices.find(item => state.daySummary.includes(item.summaryLine));
-        if (response) decisions.insertAdjacentHTML('beforeend',`<section class="emergency-event"><h2>${escapeHtml(i18n.t(emergency.title))}</h2><p role="status">${escapeHtml(i18n.t(response.summaryLine))}</p></section>`);
-      } else if (emergency && emergencyCleanAvailable(state,event)) {
+      if (emergency && state.history.emergency_clean !== state.sol && emergencyCleanAvailable(state,event)) {
         decisions.insertAdjacentHTML('beforeend',`<section class="emergency-event"><h2>${escapeHtml(i18n.t(emergency.title))}</h2><p>${escapeHtml(i18n.t(emergency.text))}</p>${emergency.choices.map(item => {
           const reason = choiceReason(state,item);
           return choice('emergency_clean',item.id,item.label,reason || item.description,Boolean(reason));

@@ -46,6 +46,7 @@ try:
             page.locator('#terminal-toggle').click()
             page.locator('#terminal[open]').wait_for()
             assert page.locator('#terminal [data-action=choose]').count() == 0
+            assert page.locator('#event-copy').count() == 1
             assert page.locator('#terminal-scroll').evaluate('(node) => node.scrollTop') == 0
             assert page.locator('.is-console .terminal-shell').evaluate('(node) => node.scrollTop') == 0
 
@@ -119,7 +120,7 @@ try:
         assert abs((900-collapsed['y'])/collapsed['height'] - .1) < .01
         clipboard()
         assert page.locator('#tasks [data-action=choose][data-id=grow]').is_enabled()
-        assert page.locator('#tasks [data-action=work][data-id=research]').is_enabled()
+        assert page.locator('#tasks [data-action=work]').count() == 0
         page.keyboard.press('Escape')
         assert page.locator('#tasks-toggle').evaluate('(node) => node === document.activeElement')
         terminal()
@@ -464,12 +465,13 @@ try:
         dependency_page.locator('#terminal-toggle:enabled').wait_for();dependency_page.locator('#tasks-toggle').click()
         assert dependency_page.locator('[data-action=choose][data-id=repair]').is_disabled()
         assert dependency_page.locator('[data-action=choose][data-id=close]').is_enabled()
+        assert dependency_page.locator('#tasks [data-action=work]').count() == 0
+        dependency_page.locator('[data-action=choose][data-id=close]').click()
+        dependency_page.locator('#tasks [data-id=close].is-complete').wait_for()
         assert dependency_page.locator('[data-action=work][data-id=grow]').is_enabled()
         assert dependency_page.locator('[data-action=work][data-id=research]').is_disabled()
         dependency_page.locator('[data-action=work][data-id=rest]').click()
         dependency_page.locator('#tasks [data-id=rest].is-complete').wait_for()
-        dependency_page.locator('[data-action=choose][data-id=close]').click()
-        dependency_page.locator('#tasks [data-id=close].is-complete').wait_for()
         assert dependency_page.locator('[data-action=work][data-id=grow]').is_disabled()
         dependency_page.keyboard.press('Escape');dependency_page.locator('#terminal-toggle').click()
         assert dependency_page.locator('[data-action=next]').is_enabled()
