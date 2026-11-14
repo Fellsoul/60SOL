@@ -64,7 +64,22 @@ export class TerminalView {
     text = i18n.t(text);
     return `<p class="terminal-copy"><span class="sr-only">${escapeHtml(text)}</span><span id="${id}" aria-hidden="true" data-copy="${escapeHtml(text)}"></span></p>`;
   }
-  render(state,event) {
+  async fadeContentOut(reducedMotion) {
+    this.writer.cancel();
+    const nodes = [document.querySelector('#terminal-title'),this.content];
+    if (!this.dialog.open || reducedMotion) { nodes.forEach(node => { node.style.opacity = '0'; }); return; }
+    const animations = nodes.map(node => node.animate([{opacity:1},{opacity:0}],{duration:280,easing:'ease-in',fill:'forwards'}));
+    try { await Promise.all(animations.map(animation => animation.finished)); } catch { return; }
+    nodes.forEach(node => { node.style.opacity = '0'; });
+    animations.forEach(animation => animation.cancel());
+  }
+  typeContent(reducedMotion) {
+    const title = document.querySelector('#terminal-title');
+    title.style.opacity = '1'; this.content.style.opacity = '1';
+    const skip = document.querySelector('#skip-typing'); skip.hidden = reducedMotion;
+    this.writer.play(this.jobs,{reducedMotion,onComplete:() => { skip.hidden = true; }});
+  }
+  render(state,event,{autoplay=this.dialog.open}={}) {
     this.writer.cancel();
     this.batterySlot.render(state);
     const title = state ? `SOL ${String(state.sol).padStart(2,'0')}` : 'OUTPOST / LINK';
@@ -96,7 +111,7 @@ export class TerminalView {
     }
     document.querySelector('#terminal-scroll').scrollTop = 0;
     this.jobs = [{node:document.querySelector('#terminal-title'),text:title},...Array.from(this.content.querySelectorAll('[data-copy]'),node => ({node,text:node.dataset.copy}))];
-    if (this.dialog.open) this.writer.play(this.jobs,{reducedMotion:true});
+    if (autoplay) this.writer.play(this.jobs,{reducedMotion:true});
   }
   updateSelection() {
     const form = document.querySelector('#loadout-form'); if (!form) return;

@@ -65,14 +65,15 @@ export class GameController {
       if (event.target.id !== 'loadout-form') return;
       event.preventDefault();
       const ids = new FormData(event.target).getAll('tool');
-      void this.commit(() => this.model.start(ids),{morning:true});
+      this.view.coverScene();
+      void this.commit(() => this.model.start(ids),{morning:true,initial:true});
     });
     document.querySelector('#terminal-content').addEventListener('click',event => {
       const target = event.target.closest('button[data-action]');
       if (!target || target.disabled || this.busy) return;
       const {action,id} = target.dataset;
       const commands = {choose:() => this.model.choose(id),work:() => this.model.work(id),next:() => this.model.nextSol(),battery:() => this.model.useBattery(),lights:() => this.model.setLights(id === 'lights_on')};
-      if (commands[action]) void this.commit(commands[action],{morning:action === 'next'});
+      if (commands[action]) void this.commit(commands[action],{morning:action === 'next',keepTerminal:action !== 'next'});
     });
     document.querySelector('#restart').addEventListener('click',() => {
       if (this.busy) return;
@@ -86,7 +87,7 @@ export class GameController {
     const state = this.model.snapshot;
     return this.view.render(state,state ? this.model.events.get(state.currentEventId) : null,options);
   }
-  async commit(command,{morning=false,initial=false,save=true}={}) {
+  async commit(command,{morning=false,initial=false,save=true,keepTerminal=false}={}) {
     if (this.busy) return;
     this.busy = true; const before = this.model.snapshot;
     try {
@@ -97,6 +98,11 @@ export class GameController {
     if (save && result.ok) this.activeSaveId = result.id;
     if (morning) this.view.startTransitionAudio(before);
     try {
+      if (keepTerminal && this.view.terminal.dialog.open && this.view.terminal.isConsole) {
+        await this.view.refreshTerminal(this.model.snapshot,this.model.events.get(this.model.snapshot.currentEventId));
+        if (!result.ok) this.view.notify(result.message);
+        return;
+      }
       this.view.menu.closeSaves();
       await this.view.closeTerminal();
       this.view.menu.hide();
