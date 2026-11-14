@@ -10,7 +10,7 @@
   "ambient": "assets/audio/transition/ambient.mp3",
   "recaps": {},
   "menu": {
-    "space": "assets/menu/space.png",
+    "space": "assets/menu/background.png",
     "mars": "assets/menu/mars.png",
     "meteors": "assets/menu/meteors.png"
   }
