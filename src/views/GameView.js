@@ -62,7 +62,7 @@ export class GameView {
     await this.scene.render(state,this.reducedMotion);
     this.terminal.render(state,event);
     this.tasks.render(state,event);
-    this.sceneEvent?.render(state,event);
+    this.sceneEvent?.render(state,event,{reset:initial});
     if (morning || initial) {
       // The black layer stays fully opaque while the title animates independently.
       if (state) await this.fade(title,0,1,this.config.titleFadeInMs ?? 700);

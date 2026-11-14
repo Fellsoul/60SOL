@@ -46,6 +46,8 @@ export class SceneEventView {
 
   describe() {
     if (this.node.hidden || !this.eventID) return;
+    this.dismissedIdentity = this.identity;
+    this.node.hidden = true;
     this.clearDescription();
     this.description.textContent = i18n.t(`scene.description.${this.eventID}`);
     this.description.hidden = false;
@@ -75,10 +77,11 @@ export class SceneEventView {
     this.node.dataset.tail = below ? 'top' : 'bottom';
   }
 
-  render(state, event) {
+  render(state, event, {reset = false} = {}) {
     const cue = event?.sceneCue;
-    this.node.hidden = !state || !cue || Boolean(state.outcome) || eventResolved(state, event);
     const identity = state && event ? `${state.sol}:${event.id}` : null;
+    if (reset) this.dismissedIdentity = null;
+    this.node.hidden = !state || !cue || Boolean(state.outcome) || eventResolved(state, event) || identity === this.dismissedIdentity;
     if (this.node.hidden || identity !== this.identity) this.clearDescription();
     this.identity = identity;
     this.eventID = event?.id;
