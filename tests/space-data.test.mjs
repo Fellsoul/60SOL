@@ -9,9 +9,11 @@ import { SaveRepository } from '../src/repositories/SaveRepository.js';
 import { choiceReason } from '../src/models/DailyEventRules.js';
 import { ACTIONS, unavailableReason, workEnergy } from '../src/models/ActionRules.js';
 import { spaceEvidence } from '../src/views/SpaceEvidence.js';
+import { i18n } from '../src/services/I18n.js';
 
 const read=async name=>JSON.parse(await readFile(new URL(`../data/${name}.json`,import.meta.url),'utf8'));
 const config=await read('space_data');const events=await read('events');const tools=await read('tools');
+i18n.setCatalogs({en:JSON.parse(await readFile(new URL('../locales/en.json',import.meta.url),'utf8'))});
 const raw=config.cases[0].raw;
 const first=()=>buildSnapshot(raw,{createdAtUTC:config.cases[0].retainedAtUTC});
 const other=()=>buildSnapshot(config.cases[1].raw,{caseID:config.cases[1].id,createdAtUTC:config.cases[1].retainedAtUTC});
