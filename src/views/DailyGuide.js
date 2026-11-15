@@ -25,8 +25,7 @@ export class DailyGuide {
     const notebook=document.querySelector('#tasks-toggle');
     const target=this.target==='terminal' ? document.querySelector('#terminal-toggle') : notebook;
     const visible=this.target && target && !target.disabled && !target.hidden && document.querySelector('#main-menu').hidden &&
-      !document.querySelector('#tasks[open],#difficulty-picker[open],#save-picker[open]') &&
-      !(this.target==='terminal' && document.querySelector('#terminal[open]'));
+      !document.querySelector('#terminal[open],#tasks[open],#difficulty-picker[open],#save-picker[open]');
     notebook?.classList.toggle('is-guided',Boolean(visible && this.target==='notebook'));
     if (!visible) { if(this.node.matches(':popover-open'))this.node.hidePopover(); return; }
     this.node.dataset.target=this.target;
