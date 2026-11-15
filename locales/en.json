@@ -555,5 +555,9 @@
   "events.fatigue.summary": "The tired astronaut continues their scheduled recovery.",
   "resources.food": "Food",
   "resources.research": "Research points",
-  "resources.inventory": "Current supplies and research"
+  "resources.inventory": "Current supplies and research",
+  "tools.scene.toolkit": "View repair tasks",
+  "tools.scene.robot": "Collect a sample · 4 E · no crew fatigue or daily work used",
+  "tools.scene.battery": "Connect once · up to +6 E",
+  "tools.chargeAdded": "Battery connected:"
 }

@@ -555,5 +555,9 @@
   "events.fatigue.summary": "疲劳的宇航员继续按计划休息恢复。",
   "resources.food": "食物",
   "resources.research": "研究点",
-  "resources.inventory": "当前食物和研究点"
+  "resources.inventory": "当前食物和研究点",
+  "tools.scene.toolkit": "查看维修任务",
+  "tools.scene.robot": "采集样本 · 4 电力 · 不增加疲劳，不占工作机会",
+  "tools.scene.battery": "一次性接入 · 最多补充 6 电力",
+  "tools.chargeAdded": "备用电池已接入："
 }

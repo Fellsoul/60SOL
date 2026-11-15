@@ -6,12 +6,14 @@ import { CREW_IDS, expeditionReason, robotSampleReason, researchUses, ROBOT_SAMP
 import { crewHead, crewStatuses } from './CrewStatus.js';
 import { concurrentEvent, concurrentChoiceReason } from '../models/ConcurrentEvents.js';
 import { resourceText, resourceInventory } from './ResourceIcons.js';
+import { toolkitIcon } from './SceneToolsView.js';
 
 const text = key => resourceText(i18n.t(key));
 // Match the room portraits: astronaut B (glasses) sits left, astronaut A sits right.
 const crewDisplayOrder = ['astronaut-b', 'astronaut-a'];
 const batteryIcon = '<img class="task-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">';
-const energyCost = energy => `<span class="task-energy-cost" role="img" aria-label="${text('tasks.cost')}: ${energy} E"><span aria-hidden="true">−</span>${energy > 0 ? batteryIcon.repeat(energy) : '<span aria-hidden="true">0</span>'}</span>`;
+const energyCost = energy => `<span class="task-energy-cost" role="img" aria-label="${text('tasks.cost')}: ${energy} E"><span aria-hidden="true">−</span>${energy > 4 ? `${batteryIcon}<span aria-hidden="true">× ${energy}</span>` : energy > 0 ? batteryIcon.repeat(energy) : '<span aria-hidden="true">0</span>'}</span>`;
+const toolBadge = task => task.tool === 'toolkit' ? `<span class="tool-badge">${toolkitIcon}${text('tool.toolkit.name')}</span>` : '';
 
 // Derive rows from saved state so completed and unfinished work survive reopening/reload.
 export function clipboardTasks(state,event) {
@@ -91,7 +93,7 @@ export class TaskView {
     const eventCopy = event?.choices.length ? `<section class="clipboard-event${eventResolved(state,event) ? ' is-resolved' : ''}"><h2>${text(event.title)}</h2>${event.sceneCue ? '' : `<p>${text(event.text)}</p>`}</section>` : '';
     this.content.innerHTML = `${resourceInventory(state)}${this.sampling(state,event)}${this.concurrentTasks(state)}${eventCopy}<div class="task-list">${tasks.map(task => {
       const {done,reason} = task;
-      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></span></button>`;
+      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong>${toolBadge(task)}<small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></span></button>`;
     }).join('')}</div><p class="clipboard-note" role="status">${text(note)}</p>`;
     if (this.dialog.open && completed) document.querySelector('#tasks-close').focus({preventScroll:true});
   }
@@ -103,7 +105,7 @@ export class TaskView {
       return `<section class="clipboard-event"><h2>${text(event.title)}${crew}</h2>${event.choices
         .filter(choice => !instance.choiceId || choice.id === instance.choiceId).map(choice => {
           const reason = concurrentChoiceReason(state,choice,this.events?.find(item => item.id === state.currentEventId));
-          return `<button class="task-row ${instance.choiceId ? 'is-complete' : ''}" data-action="concurrent" data-instance="${escapeHtml(instance.id)}" data-id="${escapeHtml(choice.id)}" ${instance.choiceId || reason ? 'disabled' : ''}><span class="task-checkbox">${instance.choiceId ? '✓' : ''}</span><span class="task-details"><strong>${text(choice.label)}</strong><small>${text(instance.choiceId ? 'tasks.checked' : reason || choice.description)}</small><span class="task-cost">${energyCost(choiceEnergy(state,choice))} · ${text(choice.work ? 'tasks.work' : 'tasks.noWork')}</span></span></button>`;
+          return `<button class="task-row ${instance.choiceId ? 'is-complete' : ''}" data-action="concurrent" data-instance="${escapeHtml(instance.id)}" data-id="${escapeHtml(choice.id)}" ${instance.choiceId || reason ? 'disabled' : ''}><span class="task-checkbox">${instance.choiceId ? '✓' : ''}</span><span class="task-details"><strong>${text(choice.label)}</strong>${toolBadge(choice)}<small>${text(instance.choiceId ? 'tasks.checked' : reason || choice.description)}</small><span class="task-cost">${energyCost(choiceEnergy(state,choice))} · ${text(choice.work ? 'tasks.work' : 'tasks.noWork')}</span></span></button>`;
         }).join('')}</section>`;
     }).join('');
   }
