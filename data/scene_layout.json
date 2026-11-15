@@ -14,6 +14,9 @@
       "states": {
         "clear": {
           "src": "assets/scene/exterior/main/clear.png"
+        },
+        "sandstorm": {
+          "src": "assets/scene/exterior/main/sandstorm.png"
         }
       }
     },
@@ -123,6 +126,9 @@
       "states": {
         "clear": {
           "src": "assets/scene/exterior/right/clear.png"
+        },
+        "sandstorm": {
+          "src": "assets/scene/exterior/right/sandstorm.png"
         }
       }
     },
