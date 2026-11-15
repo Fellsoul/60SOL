@@ -115,6 +115,8 @@ body.reduced-motion #terminal-toggle { transition: none; }
 .scene-event-bubble[data-tail=top]::before { top: -23px; bottom: auto; transform: scaleY(-1); }
 .scene-event-bubble[data-kind=thought][data-tail=top]::after { top: -14px; }
 .scene-event-bubble:hover { filter: brightness(.97); }
+.scene-event-bubble[data-tail=none]::after,
+.scene-event-bubble[data-tail=none]::before { display:none; }
 .scene-event-bubble:focus-visible { outline: 3px solid #b7e988; outline-offset: 4px; }
 
 .scene-event-description {

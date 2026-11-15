@@ -70,7 +70,7 @@ export class TerminalView {
   }
   copy(id,text,suffix = '') {
     text = i18n.t(text);
-    return `<p class="terminal-copy"><span class="sr-only">${escapeHtml(text)}</span><span id="${id}" aria-hidden="true" data-copy="${escapeHtml(text)}"></span>${suffix}</p>`;
+    return `<p class="terminal-copy"><span class="sr-only">${escapeHtml(text)}</span><span id="${id}" aria-hidden="true" data-copy="${escapeHtml(text)}"></span>${suffix ? `<span data-copy-after hidden>${suffix}</span>` : ''}</p>`;
   }
   resourceSummary(entries = []) {
     const localize = values => values?.[i18n.language] ?? values?.en;
@@ -155,7 +155,7 @@ export class TerminalView {
       }
       if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy >= LIMITS.energy));
     }
-    this.jobs = [{node:document.querySelector('#terminal-title'),text:title},...Array.from(this.content.querySelectorAll('[data-copy]'),node => ({node,text:node.dataset.copy}))];
+    this.jobs = [{node:document.querySelector('#terminal-title'),text:title},...Array.from(this.content.querySelectorAll('[data-copy]'),node => ({node,text:node.dataset.copy,after:Array.from(node.parentElement.querySelectorAll('[data-copy-after]'))}))];
     if (autoplay) this.writer.play(this.jobs,{reducedMotion:true});
     this.resetScroll();
   }

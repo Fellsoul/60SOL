@@ -14,17 +14,19 @@ export function resourceAmount(resource,amount) {
 const foodUnit='(?:食物|food|F\\b)';
 const researchUnit='(?:本地科研数据|本地数据|科研数据|研究点|研究成果|研究记录|研究(?!次数)|(?:traceable\\s+)?local(?:\\s+research)?\\s+data|research\\s+(?:data|points?|records?)|data|D\\b)';
 const resourcePattern=new RegExp(`([+−-]?\\d+)\\s*(?:点\\s*)?(${foodUnit}|${researchUnit})`,'gi');
-export function resourceText(value) {
-  const text=String(value);let result='',end=0;
+export function resourceTokens(value) {
+  const text=String(value),tokens=[];let end=0;
   for (const match of text.matchAll(resourcePattern)) {
-    result+=escapeHtml(text.slice(end,match.index));
+    tokens.push(...[...text.slice(end,match.index)].map(escapeHtml));
     const food=/食物|food|^F$/i.test(match[2]);
     const sign=/^[+−-]/.test(match[1]) ? match[1][0] : '';
-    result+=sign+resourceAmount(food?'food':'localData',Math.abs(Number(match[1].replace('−','-'))));
+    tokens.push(sign+resourceAmount(food?'food':'localData',Math.abs(Number(match[1].replace('−','-')))));
     end=match.index+match[0].length;
   }
-  return result+escapeHtml(text.slice(end));
+  tokens.push(...[...text.slice(end)].map(escapeHtml));
+  return tokens;
 }
+export const resourceText=value=>resourceTokens(value).join('');
 
 export function resourceInventory(state) {
   return `<section class="resource-inventory" aria-label="${escapeHtml(i18n.t('resources.inventory'))}"><span>${resourceAmount('food',state.food)}</span><span>${resourceAmount('localData',state.localData)}</span></section>`;

@@ -2,8 +2,48 @@ import { resourceText } from './ResourceIcons.js';
 import { eventResolved } from '../models/DailyEventRules.js';
 import { i18n } from '../services/I18n.js';
 import { concurrentEvent } from '../models/ConcurrentEvents.js';
+import { bubbleLayout } from './BubbleLayout.js';
 
 const activeDescriptions = new WeakMap();
+const bubbleGroups = new WeakMap();
+
+function requestLayout(root) {
+  const group=bubbleGroups.get(root);
+  if(!group || group.pending)return;
+  group.pending=true;
+  requestAnimationFrame(()=>{
+    group.pending=false;
+    const views=[...group.views].filter(view=>view.eligible && view.anchor);
+    const width=root.clientWidth,height=root.clientHeight;
+    const items=views.map(view=>{
+      view.node.hidden=false;
+      view.node.style.maxWidth='';view.node.style.maxHeight='';view.node.style.overflowY='';
+      const [x,y]=view.anchor,tipX=width*x/100,tipY=height*y/100;
+      let w=view.node.offsetWidth,h=view.node.offsetHeight;
+      let tail=view.node.dataset.kind==='sound'?0:view.node.dataset.kind==='thought'?46:28;
+      if(h+2*tail>height-16) {
+        view.node.style.maxWidth=`${Math.max(0,width-16)}px`;
+        w=view.node.offsetWidth;h=view.node.offsetHeight;
+      }
+      if(h+2*tail>height-16)tail=0;
+      if(h>height-16) {
+        view.node.style.maxHeight=`${Math.max(24,height-16)}px`;view.node.style.overflowY='auto';
+        h=view.node.offsetHeight;
+      }
+      return {x:tipX-w/2,y:tipY-h-2*tail,width:w,height:h+2*tail,tail,tipX,tipY};
+    });
+    const placements=bubbleLayout(items,width,height);
+    views.forEach((view,index)=>{
+      const rect=placements[index],item=items[index];
+      view.node.hidden=!rect;
+      if(!rect)return;
+      const top=rect.y+item.tail;
+      view.node.style.left=`${rect.x}px`;view.node.style.top=`${top}px`;
+      view.node.style.setProperty('--bubble-tip',`${Math.max(14,Math.min(item.width-25,item.tipX-rect.x))}px`);
+      view.node.dataset.tail=item.tail ? (item.tipY<top?'top':'bottom') : 'none';
+    });
+  });
+}
 
 // Percent coordinates measured against the shared 1672 × 940 artwork canvas.
 const anchors = {
@@ -44,6 +84,8 @@ export class SceneEventView {
     this.node.addEventListener('click', () => this.describe());
     root.append(this.node, this.description);
     this.root = root;
+    if(!bubbleGroups.has(root))bubbleGroups.set(root,{views:new Set(),pending:false});
+    bubbleGroups.get(root).views.add(this);
     this.resize = new ResizeObserver(() => this.position());
     this.resize.observe(root);
   }
@@ -79,6 +121,8 @@ export class SceneEventView {
     if (this.node.hidden || !this.eventID) return;
     this.dismissedIdentity = this.identity;
     this.node.hidden = true;
+    this.eligible = false;
+    requestLayout(this.root);
     activeDescriptions.get(this.root)?.fadeDescription();
     this.clearDescription();
     this.description.innerHTML = resourceText(i18n.t(this.descriptionKey ?? `scene.description.${this.eventID}`));
@@ -93,23 +137,7 @@ export class SceneEventView {
   }
 
   position() {
-    if (this.node.hidden || !this.anchor) return;
-    const [x, y] = this.anchor;
-    const width = this.root.clientWidth;
-    const height = this.root.clientHeight;
-    const tipX = width * x / 100;
-    const tipY = height * y / 100;
-    const bubbleWidth = this.node.offsetWidth;
-    const bubbleHeight = this.node.offsetHeight;
-    const left = Math.max(8, Math.min(width - bubbleWidth - 8, tipX - bubbleWidth / 2));
-    const sound = this.node.dataset.kind === 'sound';
-    const tailLength = this.node.dataset.kind === 'thought' ? 46 : 28;
-    const below = tipY < bubbleHeight + tailLength + 8;
-    this.node.style.left = `${left}px`;
-    const top = sound ? tipY - bubbleHeight / 2 : below ? tipY + tailLength : tipY - bubbleHeight - tailLength;
-    this.node.style.top = `${Math.max(8, Math.min(height - bubbleHeight - 8, top))}px`;
-    this.node.style.setProperty('--bubble-tip', `${Math.max(14, Math.min(bubbleWidth - 20, tipX - left))}px`);
-    this.node.dataset.tail = below ? 'top' : 'bottom';
+    requestLayout(this.root);
   }
 
   render(state, event, {reset = false} = {}) {
@@ -126,6 +154,7 @@ export class SceneEventView {
       for (const [id,view] of this.extraViews) {
         if (active.has(id)) continue;
         view.clearDescription(); view.resize.disconnect(); view.node.remove(); view.description.remove();
+        bubbleGroups.get(this.root)?.views.delete(view);
         this.extraViews.delete(id);
       }
     }
@@ -133,11 +162,12 @@ export class SceneEventView {
     const identity = state && event ? `${state.sol}:${event.id}` : null;
     if (reset) this.dismissedIdentity = null;
     this.node.hidden = !state || !cue || Boolean(state.outcome) || eventResolved(state, event) || identity === this.dismissedIdentity;
+    this.eligible = !this.node.hidden;
     if (this.node.hidden || identity !== this.identity) this.clearDescription();
     this.identity = identity;
     this.eventID = event?.id;
     this.descriptionKey = event?.descriptionKey;
-    if (this.node.hidden) return;
+    if (this.node.hidden) { this.position(); return; }
     this.node.dataset.kind = event.id === 'E14' ? 'thought' : cue.kind;
     const anchor = event.descriptionKey ? cue.anchor : eventAnchors[event.id] ?? cue.anchor;
     this.node.dataset.anchor = anchor;
