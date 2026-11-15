@@ -11,6 +11,7 @@ const NARRATIVES = {
   clean: ['action.clean.narrative','action.clean.summary'],
   repair: ['action.repair.narrative','action.repair.summary'],
   force_repair: ['action.force_repair.narrative','action.force_repair.summary'],
+  repair_robot: ['action.repair_robot.narrative','action.repair_robot.summary'],
   rest: ['action.rest.narrative','action.rest.summary'],
   monitor: ['action.monitor.narrative','action.monitor.summary'],
   shield: ['action.shield.narrative','action.shield.summary'],
@@ -25,6 +26,7 @@ export const ACTIONS = Object.freeze([
   { id:'clean', label:'action.clean.label', energy:2, description:'清除积尘，次日起恢复当前难度的正常发电量。', facility:'solar' },
   { id:'repair', label:'action.repair.label', energy:2, description:'本骨架支持维修积尘面板；需要工具箱。', facility:'solar', tool:'toolkit' },
   { id:'force_repair', label:'action.force_repair.label', energy:0, costH:20, facility:'solar' },
+  { id:'repair_robot', label:'action.repair_robot.label', energy:0, costQ:1, facility:'cabin' },
   { id:'rest', label:'action.rest.label', energy:1, description:'人员状态 +8，上限 100。', facility:'cabin' },
   { id:'shield', label:'action.shield.label', energy:0, description:'消耗加固包和今日工作；永久保留屏蔽状态。', tool:'shield' },
   { id:'standby', label:'action.standby.label', energy:0, description:'保留电力；日终仍消耗食物。' },
@@ -49,6 +51,8 @@ export function unavailableReason(state, action, event = null) {
     if (response) return choiceReason(state,response);
   }
   const systems = dailyState(state);
+  if (action.id === 'repair_robot' && state.tools.robot !== 'damaged') return 'error.robotNotDamaged';
+  if (systems.spares < (action.costQ ?? 0)) return 'error.sparesInsufficient';
   if (!['rest','standby'].includes(action.id) && !CREW_IDS.some(id => !crewAway(state,id) && !crewFatigued(state,id) && !crewUnconscious(state,id))) return 'error.crewResting';
   if (action.id === 'grow' && systems.greenhouseDisabled) return 'error.facilityUnavailable';
   if (action.id === 'research' && state.sol < systems.labUntil) return 'error.facilityUnavailable';
@@ -77,6 +81,7 @@ const effects = {
   clean(s) { s.dusty = false; dailyState(s).generationCap=6; },
   repair(s) { s.dusty = false; dailyState(s).generationCap=6; dailyState(s).trackingCap=6; },
   force_repair(s) { effects.repair(s); },
+  repair_robot(s) { s.tools.robot = 'ready'; },
   dust(s) { s.dusty = true; },
   rest(s) { s.health = Math.min(LIMITS.health,s.health+8); },
   shield(s) { s.shielded = true; s.tools.shield = 'consumed'; },

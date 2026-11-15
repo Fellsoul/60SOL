@@ -45,6 +45,7 @@ export class GameModel {
     const before=resourceSnapshot(s);
     s.energy -= ROBOT_SAMPLE_ENERGY;
     collectSample(s); s.robotSampleSol=s.sol;
+    s.tools.robot = 'damaged';
     recordResourceChange(s,before,'sampling.robot',this.resourceLog,'action.robot.summary');
     s.daySummary.push('action.robot.summary');
   }
@@ -134,13 +135,14 @@ export class GameModel {
     const paidEnergy=workEnergy(s,action);
     s.energy -= paidEnergy;
     s.health -= action.costH ?? 0;
+    dailyState(s).spares -= action.costQ ?? 0;
     applyEffect(s,actionId);
     recordResourceChange(s,before,`work.${actionId}`,this.resourceLog,action.summaryLine);
     s.daySummary.push(action.summaryLine);
     s.workId = actionId;
     recordSpaceDecision(s,actionId,paidEnergy);
     s.phase = eventResolved(s,event) ? 'end' : 'event';
-    recordVisualAction(s,{action:actionId,label:action.label,summary:action.summaryLine,energy:paidEnergy,condition:action.costH??0});
+    recordVisualAction(s,{action:actionId,label:action.label,summary:action.summaryLine,energy:paidEnergy,condition:action.costH??0,spares:action.costQ??0});
     logEntry(s,`基地工作：${action.label}；消耗 ${paidEnergy} E。${action.description ?? action.narrative}`);
   }
   setLights(on) {

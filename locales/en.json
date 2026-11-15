@@ -66,7 +66,7 @@
   "tool.monitor.name": "Radiation monitor",
   "tool.shield.name": "Shielding kit",
   "tool.toolkit.description": "Makes repairs reliable. They still take power and time.",
-  "tool.robot.description": "Collects some samples for the crew, using extra power.",
+  "tool.robot.description": "Collects some samples for the crew, using extra power. Each trip damages the robot; repair costs 1 spare part and one work assignment before reuse.",
   "tool.battery.description": "Connect it to the power system once. It cannot be reused.",
   "tool.monitor.description": "Forecasts tomorrow's weather in the terminal and warns of sandstorms. Produces no research data.",
   "monitor.forecast": "Tomorrow's weather",
@@ -148,8 +148,8 @@
   "action.repair.summary": "We serviced the solar panels with the toolkit.",
   "action.rest.narrative": "Give the crew time to recover. This takes today's work.",
   "action.rest.summary": "The crew rested in the cabin for a day and recovered some strength.",
-  "action.robot.narrative": "Collect one sample today for 4 E, once per Sol, without using the crew’s daily work.",
-  "action.robot.summary": "The robot returned with one sample for one laboratory study.",
+  "action.robot.narrative": "Collect one sample today for 4 E, once per Sol, without using the crew’s daily work. Each trip damages the robot; repair costs 1 spare part and one work assignment before reuse.",
+  "action.robot.summary": "The robot returned with 1 sample, but was damaged on the trip. It needs repair before another departure.",
   "action.monitor.narrative": "Use power to record environmental readings. The monitor provides no shielding.",
   "action.monitor.summary": "We recorded environmental readings with the monitor.",
   "action.shield.narrative": "Spend today installing shielding. The kit will leave its storage space.",
@@ -637,5 +637,10 @@
   "action.force_repair.summary": "We manually repaired the solar panels, clearing dust and restoring tracking. We lost 20 health and used today’s work without toolkit or power.",
   "space.offline": "Current space data is unavailable. This mission uses ordinary rules without historical solar restrictions.",
   "space.partialCurrent": "Current Earth–Mars light time is available. Current solar-advisory and temperature inputs are unavailable; no extra EVA restrictions or heating costs are applied.",
-  "space.advisory.unknown": "unavailable; no extra EVA restriction"
+  "space.advisory.unknown": "unavailable; no extra EVA restriction",
+  "action.repair_robot.label": "Repair the robot",
+  "action.repair_robot.narrative": "Spend 1 spare part and today’s work to repair the damaged robot. No power or toolkit required; collection remains limited to once per Sol.",
+  "action.repair_robot.summary": "We repaired the robot with 1 spare part and today’s work, without using power.",
+  "error.robotDamaged": "The robot is damaged. Repair it with 1 spare part and one work assignment.",
+  "error.robotNotDamaged": "There is no damaged robot to repair."
 }

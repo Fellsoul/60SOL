@@ -24,7 +24,7 @@ export function clipboardTasks(state,event) {
     done:state.choiceId === choice.id,
     reason:state.phase !== 'event' ? 'error.workUsed' : choiceReason(state,choice)}));
   if (pending) return rows;
-  return rows.concat(ACTIONS.filter(action => !action.tool || state.tools[action.tool]).map(action => ({...action,
+  return rows.concat(ACTIONS.filter(action => (!action.tool || state.tools[action.tool]) && (action.id !== 'repair_robot' || state.tools.robot)).map(action => ({...action,
     energy:workEnergy(state,action),
     description:action.narrative,command:'work',done:state.workId === action.id,
     reason:unavailableReason(state,action,event)})));

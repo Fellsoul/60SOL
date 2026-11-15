@@ -32,8 +32,9 @@ export function expeditionReason(state,id) {
 }
 export function robotSampleReason(state,event = null) {
   if (!state || state.phase === 'finished') return 'error.missionFinished';
-  if (state.tools.robot !== 'ready') return 'error.toolUnavailable';
   if (state.robotSampleSol === state.sol) return 'error.robotAlreadyCollected';
+  if (state.tools.robot === 'damaged') return 'error.robotDamaged';
+  if (state.tools.robot !== 'ready') return 'error.toolUnavailable';
   if (state.samples.length >= SAMPLE_CAPACITY) return 'error.samplesFull';
   if (state.phase === 'event' && event?.blockedWork?.includes('robot')) return event.blockReason;
   if (state.weather === 'sandstorm') return 'error.stormOutside';

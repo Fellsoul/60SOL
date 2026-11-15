@@ -66,7 +66,7 @@
   "tool.monitor.name": "辐射监测仪",
   "tool.shield.name": "屏蔽加固包",
   "tool.toolkit.description": "让维修变得可靠，仍然需要电力和时间。",
-  "tool.robot.description": "代替队员完成部分采样工作，需要较多电力。",
+  "tool.robot.description": "代替队员完成部分采样工作，需要较多电力。 每次出行后损坏，需消耗 1 个备用零件和当天工作修理后才能再次使用。",
   "tool.battery.description": "接入供电系统后就不能再次使用。",
   "tool.monitor.description": "在终端预知明天天气，沙尘暴前发出警报；不生产研究点。",
   "monitor.forecast": "明日天气预报",
@@ -148,8 +148,8 @@
   "action.repair.summary": "我们用工具箱维护了太阳能板。",
   "action.rest.narrative": "让队员恢复精神，今天不再安排其他工作。",
   "action.rest.summary": "队员在生活舱里休息了一天，精神有所恢复。",
-  "action.robot.narrative": "消耗 4 E，当天采集 1 个样本，每天限一次，不占用人物每日工作。",
-  "action.robot.summary": "机器人带回了 1 个样本，可进行一次研究。",
+  "action.robot.narrative": "消耗 4 E，当天采集 1 个样本，每天限一次，不占用人物每日工作。 每次出行后损坏，需消耗 1 个备用零件和当天工作修理后才能再次使用。",
+  "action.robot.summary": "机器人带回了 1 个样本，但采集后损坏了。再次出发前需要修理。",
   "action.monitor.narrative": "投入电力记录环境读数；监测仪本身不提供防护。",
   "action.monitor.summary": "我们用监测仪记录了环境读数。",
   "action.shield.narrative": "用今天的工作安装加固材料，工具包会从原位消失。",
@@ -637,5 +637,10 @@
   "action.force_repair.summary": "我们强行手动维修了太阳能板，清除积尘并恢复追踪。扣除 20 生命值并占用当天工作，未使用工具箱或电力。",
   "space.offline": "当前太空数据不可用。本局使用普通规则，不自动套用历史太阳预警。",
   "space.partialCurrent": "已获取当前地火通信时间。暂无当前太阳预警及温度输入，不额外增加外出禁令或供暖耗电。",
-  "space.advisory.unknown": "数据不可用，不增加外出限制"
+  "space.advisory.unknown": "数据不可用，不增加外出限制",
+  "action.repair_robot.label": "修理机器人",
+  "action.repair_robot.narrative": "消耗 1 个备用零件并占用当天工作，修复损坏的机器人。不耗电、不需要工具箱；每天仍最多采集一次。",
+  "action.repair_robot.summary": "我们用 1 个备用零件和当天工作修好了机器人，未消耗电力。",
+  "error.robotDamaged": "机器人已损坏，需要用 1 个备用零件和一次工作修理。",
+  "error.robotNotDamaged": "没有需要修理的损坏机器人。"
 }

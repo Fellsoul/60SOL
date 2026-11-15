@@ -40,13 +40,13 @@ test('robot collection supplies a real sample once per Sol, independently of eve
   assert.deepEqual(model.snapshot.samples,[1]);assert.equal(researchUses(model.snapshot),1);
   const collected=model.snapshot;assert.throws(()=>model.collectWithRobot(),{message:'error.robotAlreadyCollected'});assert.deepEqual(model.snapshot,collected);
   respond(model);model.work('research');assert.equal(model.snapshot.localData,20);assert.deepEqual(model.snapshot.samples,[]);assert.equal(sceneState(model.snapshot).samples,'0');
-  model.nextSol();model.useBattery();model.collectWithRobot();respond(model);model.work('research');assert.equal(model.snapshot.localData,40);assert.deepEqual(model.snapshot.samples,[]);assert.equal(sceneState(model.snapshot).samples,'0');
+  model.nextSol();model.useBattery();respond(model);model.work('repair_robot');model.nextSol();model.collectWithRobot();respond(model);model.work('research');assert.equal(model.snapshot.localData,40);assert.deepEqual(model.snapshot.samples,[]);assert.equal(sceneState(model.snapshot).samples,'0');
   model.nextSol();respond(model);assert.throws(()=>model.work('research'),{message:'error.noSamples'});
 });
 
 test('collection caps at three samples, rejects unaffordable or missing robots, and never charges on rejection',()=>{
   const model=game(),state=model.snapshot;state.samples=[1,2];model.restore(state);model.collectWithRobot();assert.deepEqual(model.snapshot.samples,[1,2,1]);assert.equal(researchUses(model.snapshot),3);
-  day(model);const full=model.snapshot;assert.throws(()=>model.collectWithRobot(),{message:'error.samplesFull'});assert.throws(()=>model.planExpedition('astronaut-a'),{message:'error.samplesFull'});assert.deepEqual(model.snapshot,full);
+  day(model,'repair_robot');const full=model.snapshot;assert.throws(()=>model.collectWithRobot(),{message:'error.samplesFull'});assert.throws(()=>model.planExpedition('astronaut-a'),{message:'error.samplesFull'});assert.deepEqual(model.snapshot,full);
   const missing=game(['toolkit','battery']);assert.throws(()=>missing.collectWithRobot(),{message:'error.toolUnavailable'});
   const low=game(),s=low.snapshot;s.energy=3;low.restore(s);assert.throws(()=>low.collectWithRobot(),{message:'error.powerInsufficient'});assert.deepEqual(low.snapshot,s);
 });
@@ -91,4 +91,33 @@ test('v3 migration keeps resources without inventing samples; malformed new crew
   const saved=repo.save(legacy),loaded=repo.load(saved.id).state;assert.equal(loaded.version,5);assert.equal(loaded.localData,24);assert.deepEqual(loaded.samples,[]);
   for(const update of [{samples:[2,2,2,2]},{samples:[0]},{robotSampleSol:2},{crew:{}},{expeditionPlan:{crewId:'stranger',departSol:2}}]) {const invalid=repo.save({...model.snapshot,...update});assert.equal(repo.load(invalid.id).state,null);}
   const late=model.snapshot;late.sol=13;model.restore(late);assert.throws(()=>model.planExpedition('astronaut-a'),{message:'error.expeditionTooLate'});
+});
+
+
+test('each robot trip damages it; repair spends one spare and one work, survives reload, and permits the next day trip',()=>{
+  const model=game();model.collectWithRobot();
+  assert.equal(model.snapshot.tools.robot,'damaged');assert.equal(sceneState(model.snapshot).tools.robot,'damaged');
+  respond(model);const before=model.snapshot;model.work('repair_robot');
+  assert.equal(model.snapshot.tools.robot,'ready');assert.equal(model.snapshot.dailySystems.spares,before.dailySystems.spares-1);
+  assert.equal(model.snapshot.energy,before.energy);assert.equal(model.snapshot.workId,'repair_robot');
+  assert.equal(model.snapshot.visualAction.cost.spares,1);
+  assert.equal(model.snapshot.resourceLog.at(-1).changes['systems.spares'],-1);
+  assert.throws(()=>model.work('repair_robot'));assert.throws(()=>model.collectWithRobot(),{message:'error.robotAlreadyCollected'});
+  const repo=repository();const saved=repo.save(model.snapshot);model.restore(repo.load(saved.id).state);
+  assert.equal(model.snapshot.tools.robot,'ready');assert.equal(model.snapshot.workId,'repair_robot');
+  model.nextSol();model.collectWithRobot();assert.equal(model.snapshot.tools.robot,'damaged');
+  const damaged=repo.save(model.snapshot);model.restore(repo.load(damaged.id).state);
+  assert.equal(model.snapshot.tools.robot,'damaged');
+  day(model);assert.throws(()=>model.collectWithRobot(),{message:'error.robotDamaged'});
+});
+
+test('robot repair rejects missing spares, absent or healthy robots and used work without charging resources',()=>{
+  for(const kind of ['no-spares','no-robot','healthy','work-used']){
+    const model=game(kind==='no-robot'?['toolkit','battery']:['robot','battery']);
+    if(kind!=='no-robot'&&kind!=='healthy')model.collectWithRobot();
+    respond(model);const state=model.snapshot;
+    if(kind==='no-spares')state.dailySystems.spares=0;
+    if(kind==='work-used'){state.workId='standby';state.phase='end';}
+    model.restore(state);assert.throws(()=>model.work('repair_robot'));assert.deepEqual(model.snapshot,state);
+  }
 });

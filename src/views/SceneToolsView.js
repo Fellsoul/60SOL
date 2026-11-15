@@ -20,6 +20,13 @@ export class SceneToolsView {
       button.dataset.tool = id;
       button.setAttribute('role','img');
       button.innerHTML = art;
+      if (id === 'robot') {
+        const fallback = button.querySelector('svg');
+        const image = document.createElement('img'); image.alt = ''; image.hidden = true;
+        image.onload = () => { image.hidden = false; fallback.setAttribute('hidden',''); };
+        image.onerror = () => { image.hidden = true; fallback.removeAttribute('hidden'); };
+        button.append(image);
+      }
       this.node.append(button); this.buttons.set(id,button);
     }
     this.repair = document.createElement('div');
@@ -32,12 +39,19 @@ export class SceneToolsView {
     if (!state) { this.lastState = null; return; }
     for (const [id,button] of this.buttons) {
       button.hidden = !Object.hasOwn(state.tools,id);
+      const status = state.tools[id];
+      if (id === 'robot' && button.dataset.state !== status) {
+        const image = button.querySelector('img');
+        image.hidden = true; button.querySelector('svg').removeAttribute('hidden');
+        if (['ready','damaged'].includes(status)) image.src = `assets/ui/robot/${status}.png`;
+      }
+      button.dataset.state = status ?? 'absent';
       const reason = id === 'robot' ? robotSampleReason(state,event)
         : id === 'battery' ? state.tools.battery !== 'ready' ? 'error.noBattery'
           : state.energy >= LIMITS.energy ? 'error.batteryFull' : ''
         : state.tools.toolkit !== 'ready' ? 'error.toolUnavailable' : '';
       button.dataset.available = String(!reason);
-      const label = `${i18n.t(`tool.${id}.name`)}: ${i18n.t(reason || `tool.${id}.description`)}`;
+      const label = `${i18n.t(`tool.${id}.name`)}: ${i18n.t(id === 'robot' && status === 'damaged' ? 'error.robotDamaged' : reason || `tool.${id}.description`)}`;
       button.title = label; button.setAttribute('aria-label',label);
     }
     // Show feedback only for a new committed repair, never on save restoration.

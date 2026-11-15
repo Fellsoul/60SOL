@@ -3714,7 +3714,8 @@
       "monitor",
       "shield",
       "standby",
-      "force_repair"
+      "force_repair",
+      "repair_robot"
     ],
     "blockReason": "dependency.shelter",
     "sceneCue": {
