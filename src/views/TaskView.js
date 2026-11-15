@@ -1,4 +1,5 @@
-import { choiceReason, choiceEnergy, eventResolved } from '../models/DailyEventRules.js';
+import { choiceReason, choiceEnergy, eventResolved, emergencyCleanAvailable } from '../models/DailyEventRules.js';
+import { dailyActivitiesComplete } from '../models/DailyWorkRules.js';
 import { ACTIONS, unavailableReason, workEnergy } from '../models/ActionRules.js';
 import { i18n } from '../services/I18n.js';
 import { escapeHtml } from './dom.js';
@@ -89,13 +90,23 @@ export class TaskView {
     this.toggle.dataset.phase = state.phase;
     const tasks = clipboardTasks(state,event);
     const completed = tasks.some(task => task.done);
-    const note = !eventResolved(state,event) ? 'tasks.eventFirst' : state.phase === 'finished' ? 'tasks.finished' : state.workId ? (state.workId.startsWith('event:') ? 'tasks.eventWork' : 'tasks.checked') : 'tasks.choose';
+    const note = !eventResolved(state,event) ? 'tasks.eventFirst' : state.phase === 'finished' ? 'tasks.finished' : state.workId ? (state.workId.startsWith('event:') ? 'tasks.eventWork' : 'tasks.checked') : dailyActivitiesComplete(state,event) ? 'tasks.noActivities' : 'tasks.choose';
     const eventCopy = event?.choices.length ? `<section class="clipboard-event${eventResolved(state,event) ? ' is-resolved' : ''}"><h2>${text(event.title)}</h2>${event.sceneCue ? '' : `<p>${text(event.text)}</p>`}</section>` : '';
-    this.content.innerHTML = `${resourceInventory(state)}${this.sampling(state,event)}${this.concurrentTasks(state)}${eventCopy}<div class="task-list">${tasks.map(task => {
+    this.content.innerHTML = `${resourceInventory(state)}${this.concurrentTasks(state)}${eventCopy}${this.emergencyTasks(state,event)}<div class="task-list">${tasks.map(task => {
       const {done,reason} = task;
       return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong>${toolBadge(task)}<small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></span></button>`;
-    }).join('')}</div><p class="clipboard-note" role="status">${text(note)}</p>`;
+    }).join('')}</div><p class="clipboard-note" role="status">${text(note)}</p>${dailyActivitiesComplete(state,event) ? this.sampling(state,event) : ''}`;
     if (this.dialog.open && completed) document.querySelector('#tasks-close').focus({preventScroll:true});
+  }
+  emergencyTasks(state,event) {
+    const emergency = this.events?.find(item => item.id === 'emergency_clean');
+    if (!emergency) return '';
+    const done = state.history.emergency_clean === state.sol;
+    if (!done && !emergencyCleanAvailable(state,event)) return '';
+    return `<section class="clipboard-event"><h2>${text(emergency.title)}</h2><p>${text(emergency.text)}</p>${emergency.choices.filter(choice => !done || state.daySummary.includes(choice.summaryLine)).map(choice => {
+      const reason = choiceReason(state,choice);
+      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="emergency_clean" data-id="${escapeHtml(choice.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(choice.label)}</strong>${toolBadge(choice)}<small>${text(done ? choice.summaryLine : reason || choice.description)}</small><span class="task-cost">${energyCost(choiceEnergy(state,choice))} · ${text(choice.work ? 'tasks.work' : 'tasks.noWork')}</span></span></button>`;
+    }).join('')}</section>`;
   }
   concurrentTasks(state) {
     return (state.concurrentEvents ?? []).map(instance => {

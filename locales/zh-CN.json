@@ -264,6 +264,7 @@
   "tasks.onTable": "工作记录板放在桌上。",
   "tasks.checked": "已完成",
   "tasks.choose": "选择一项工作。",
+  "tasks.noActivities": "剩余资源不足以执行每日活动。可在下方选择是否安排采样出行，或直接结束今天。",
   "tasks.empty": "目前没有可执行的工作。",
   "tasks.eventOptions": "可以在这里选择应对方案，无关工作不需要先处理事件。",
   "tasks.eventOnClipboard": "请到桌上的工作记录板选择事件处理方式。",

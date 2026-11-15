@@ -8,6 +8,7 @@ import { beginSol, finishSol } from './TurnEngine.js';
 import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
 import { freshCrew, expeditionReason, robotSampleReason, collectSample, ROBOT_SAMPLE_ENERGY } from './ExpeditionRules.js';
 import { concurrentEvent, concurrentChoiceReason, syncFatigueEvents } from './ConcurrentEvents.js';
+import { dailyActivitiesComplete } from './DailyWorkRules.js';
 
 export class GameModel {
   #state = null;
@@ -159,6 +160,7 @@ export class GameModel {
   nextSol() {
     if (this.#state?.concurrentEvents?.some(instance => !instance.choiceId)) throw new Error('error.eventUnresolved');
     if (this.#state && !eventResolved(this.#state,this.events.get(this.#state.currentEventId))) throw new Error('error.eventUnresolved');
+    if (this.#state?.phase === 'work' && dailyActivitiesComplete(this.#state,this.events.get(this.#state.currentEventId))) this.work('standby');
     if (this.#state?.phase !== 'end') throw new Error('error.finishDayFirst');
     finishSol(this.#state,this.resourceLog);
     if (!this.#state.outcome) { this.#state.sol += 1; beginSol(this.#state,this.events,this.environment,this.resourceLog); }

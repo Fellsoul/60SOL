@@ -264,6 +264,7 @@
   "tasks.onTable": "Your task clipboard is on the table.",
   "tasks.checked": "Completed",
   "tasks.choose": "Select a task to complete.",
+  "tasks.noActivities": "No daily activity can run with the remaining resources. You may optionally plan a sample expedition below, or end the day.",
   "tasks.empty": "No tasks are available right now.",
   "tasks.eventOptions": "Choose a response here. Unrelated work does not require finishing the event first.",
   "tasks.eventOnClipboard": "Choose a response on the clipboard on the table.",
