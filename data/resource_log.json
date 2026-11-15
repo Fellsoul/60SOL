@@ -16,7 +16,7 @@
     "work.clean": {"descriptions": {"en": ["We cleared dust from the solar panels.", "The crew cleaned the solar array."], "zh-CN": ["我们清除了太阳能板上的积尘。", "成员们完成了太阳能阵列的清洁。"]}},
     "work.repair": {"descriptions": {"en": ["We repaired the power equipment.", "The crew restored the solar equipment."], "zh-CN": ["我们维修了供电设备。", "成员们修复了太阳能设备。"]}},
     "work.rest": {"descriptions": {"en": ["The crew took time to rest and recover.", "A quiet rest helped the crew recover."], "zh-CN": ["成员们休息了一段时间，恢复了状态。", "安静的休整帮助成员们恢复了体力。"]}},
-    "sampling.robot": {"descriptions": {"en": ["The robot returned with one sample, available for two laboratory studies."], "zh-CN": ["机器人带回了 1 个样本，可供小组研究两次。"]}},
+    "sampling.robot": {"descriptions": {"en": ["The robot returned with one sample, consumed by one day of research for 20 data."], "zh-CN": ["机器人带回了 1 个样本，可消耗一天工作研究，获得 20 点数据。"]}},
     "expedition.return": {"descriptions": {"en": ["The returning expedition supplied a new sample for research."], "zh-CN": ["返回的成员带回了可供研究的新样本。"]}},
     "work.robot": {"descriptions": {"en": ["The robot completed its research task.", "The robot returned with new research data."], "zh-CN": ["机器人完成了科研任务。", "机器人带回了新的研究数据。"]}},
     "work.monitor": {"descriptions": {"en": ["The monitor collected new scientific readings.", "We saved a new set of monitoring data."], "zh-CN": ["监测仪采集了新的科研读数。", "我们保存了新一组监测数据。"]}}

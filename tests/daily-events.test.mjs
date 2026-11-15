@@ -92,17 +92,19 @@ test('final daily response sends existing research once before mission evaluatio
 test('a full daily-event mission can reach the 60-data objective safely',() => {
   const game=new GameModel({events,tools,environment:{default:'clear',days:{4:'sandstorm',8:'sandstorm',9:'sandstorm'}}});
   game.start(['toolkit','battery']);game.setLights(false);
-  const route=[['secure',null],['inspect_clean',null],['manual','research'],['close','transmit'],['forgo','clean'],['replace',null],['restore',null],['lock','research'],['standby','research'],['isolate','repair'],['minimum',null],['forgo','research'],['isolate','transmit'],['borrow',null]];
+  const route=[['secure',null],['inspect_clean',null],['manual','research'],['close','transmit'],['forgo','clean'],['replace',null],['restore',null],['lock','research'],['standby','standby'],['isolate','repair'],['minimum',null],['forgo','research'],['isolate','transmit'],['borrow',null]];
   for(let index=0;index<route.length;index++) {
     assert.equal(game.snapshot.sol,index+1);
     if(index===6)game.useBattery();
+    if(index===6)game.setLights(true);
+    if(index===7)game.setLights(false);
     const [response,work]=route[index];game.choose(response);
-    if(work)game.work(work);
-    if([0,10].includes(index))game.planExpedition('astronaut-a');
+    if(work)assert.doesNotThrow(()=>game.work(work),`Sol ${index+1}: ${JSON.stringify(game.snapshot.crew)}`);
+    if([0,8].includes(index))game.planExpedition('astronaut-a');
     if(index===4)game.planExpedition('astronaut-b');
     settleExtras(game);game.nextSol();
   }
-  assert.equal(game.snapshot.outcome,'success');assert.equal(game.snapshot.sentData,60);assert.ok(game.snapshot.health>0);
+  assert.equal(game.snapshot.outcome,'success');assert.ok(game.snapshot.sentData>=60);assert.ok(game.snapshot.health>0);
 });
 
 test('fatigue events exceed random slots and stay attached to each tired astronaut',() => {

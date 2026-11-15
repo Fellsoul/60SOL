@@ -1,4 +1,4 @@
-import { CREW_IDS, crewAway } from '../models/ExpeditionRules.js';
+import { CREW_IDS, crewAway, crewUnconscious } from '../models/ExpeditionRules.js';
 import { i18n } from '../services/I18n.js';
 import { escapeHtml } from './dom.js';
 
@@ -10,6 +10,7 @@ export function crewHead(id) {
   return `<svg class="crew-head" viewBox="0 0 82 90" aria-hidden="true"><path d="${hair}"/><path d="M23 34L25 51Q29 65 41 67Q54 65 59 51L61 34M32 64L31 73L18 79L9 87M51 64L52 73L65 79L74 87M31 73Q41 83 52 73"/>${id === 'astronaut-b' ? '<path d="M25 38Q31 33 38 38L37 45Q30 49 26 43ZM44 38Q51 33 58 38L56 44Q49 49 45 44ZM38 39H44"/>' : '<path d="M29 39H35M47 39H53"/>'}<path d="M36 55Q41 58 46 55"/></svg>`;
 }
 export function crewStatuses(state,id) {
+  if (crewUnconscious(state,id)) return [i18n.t('crew.comaRemaining').replace('{days}',state.crew[id].comaDays)];
   return [`${i18n.t('crew.fatigue')} ${state.crew[id].fatigue*25}%`];
 }
 export class CrewStatus {

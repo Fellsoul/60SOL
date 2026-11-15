@@ -1,12 +1,12 @@
 // 将唯一 Model 状态投影为素材状态名；纯函数，不改变游戏或保存第二套库存。
-import { crewAway, crewFatigued } from '../models/ExpeditionRules.js';
+import { crewAway, crewFatigued, crewUnconscious } from '../models/ExpeditionRules.js';
 export function sceneState(state) {
   if (!state) return { always:'visible', crewIdle:'seated', weather:'clear', lighting:'on', plants:'seed', crew:'seated', panels:'clean', transmission:'idle', tools:{} };
   return {
     always: 'visible',
     samples: String(state.samples?.length ?? 0),
-    crewA: crewAway(state,'astronaut-a') ? 'away' : state.health < 100 ? 'injured' : crewFatigued(state,'astronaut-a') ? 'exhausted' : 'seated',
-    crewB: crewAway(state,'astronaut-b') ? 'away' : state.health < 100 ? 'injured' : crewFatigued(state,'astronaut-b') ? 'exhausted' : 'seated',
+    crewA: crewAway(state,'astronaut-a') ? 'away' : crewUnconscious(state,'astronaut-a') ? 'sleep' : crewFatigued(state,'astronaut-a') ? 'tired' : state.health < 100 ? 'injured' : 'seated',
+    crewB: crewAway(state,'astronaut-b') ? 'away' : crewUnconscious(state,'astronaut-b') ? 'sleep' : crewFatigued(state,'astronaut-b') ? 'tired' : state.health < 100 ? 'injured' : 'seated',
     crewIdle: 'seated',
     weather: state.weather,
     lighting: state.lightsOn && state.lifeSupportPaid && state.energy > 0 ? 'on' : 'off',

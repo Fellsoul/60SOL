@@ -284,14 +284,17 @@
         "resting": {
           "src": "assets/scene/crew/astronaut_a/resting.png"
         },
-        "exhausted": {
-          "src": "assets/scene/crew/astronaut_a/exhausted.png"
+        "tired": {
+          "src": "assets/scene/crew/astronaut_a/tired.png"
         },
         "away": {
           "hidden": true
         },
         "injured": {
           "src": "assets/scene/crew/astronaut_a/injured.png"
+        },
+        "sleep": {
+          "src": "assets/scene/crew/astronaut_a/sleep.png"
         }
       }
     },
@@ -307,14 +310,17 @@
         "resting": {
           "src": "assets/scene/crew/astronaut_b/resting.png"
         },
-        "exhausted": {
-          "src": "assets/scene/crew/astronaut_b/exhausted.png"
+        "tired": {
+          "src": "assets/scene/crew/astronaut_b/tired.png"
         },
         "away": {
           "hidden": true
         },
         "injured": {
           "src": "assets/scene/crew/astronaut_b/injured.png"
+        },
+        "sleep": {
+          "src": "assets/scene/crew/astronaut_b/sleep.png"
         }
       }
     },
@@ -336,7 +342,7 @@
     {
       "id": "tool-toolkit",
       "bind": "tools.toolkit",
-      "zIndex": 60,
+      "zIndex": 61,
       "defaultState": "absent",
       "states": {
         "ready": {
@@ -376,7 +382,7 @@
     {
       "id": "tool-battery",
       "bind": "tools.battery",
-      "zIndex": 60,
+      "zIndex": 58,
       "defaultState": "absent",
       "states": {
         "ready": {
@@ -396,7 +402,7 @@
     {
       "id": "tool-monitor",
       "bind": "tools.monitor",
-      "zIndex": 60,
+      "zIndex": 62,
       "defaultState": "absent",
       "states": {
         "ready": {
@@ -416,7 +422,7 @@
     {
       "id": "tool-shield",
       "bind": "tools.shield",
-      "zIndex": 60,
+      "zIndex": 57,
       "defaultState": "absent",
       "states": {
         "ready": {

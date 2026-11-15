@@ -13,6 +13,7 @@ export class GameView {
     this.config = content.presentation; this.menu = new MenuView(this.config.menu); this.audio = new TransitionAudio(this.config);
     this.scene = new SceneView(document.querySelector('#scene'),content.scene_layout);
     this.terminal = new TerminalView(content.tools,content.events,content.resource_log);
+    this.terminal.environment = content.environment;
     this.tasks = new TaskView();
     this.tasks.events = content.events;
     this.events = content.events;

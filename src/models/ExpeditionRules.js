@@ -9,22 +9,23 @@ export const crewAway = (state,id) => {
   return Boolean(crew?.returnSol && state.sol >= crew.departSol && state.sol < crew.returnSol);
 };
 export const crewFatigued = (state,id) => (state.crew?.[id]?.fatigue ?? 0) > 0;
-export const researchUses = state => (state.samples ?? []).reduce((total,uses) => total+uses,0);
+export const crewUnconscious = (state,id) => (state.crew?.[id]?.comaDays ?? 0) > 0;
+export const researchUses = state => (state.samples ?? []).length;
 export function collectSample(state) {
   if (state.samples.length >= SAMPLE_CAPACITY) return false;
-  state.samples.push(2);
+  state.samples.push(1);
   return true;
 }
 export function consumeSample(state) {
   if (!state.samples.length) throw new Error('error.noSamples');
-  state.samples[0] -= 1;
-  if (state.samples[0] === 0) state.samples.shift();
+  state.samples.shift();
 }
 export function expeditionReason(state,id) {
   if (!state || state.phase === 'finished') return 'error.missionFinished';
   if (!CREW_IDS.includes(id)) return 'error.crewUnavailable';
   if (state.sol > 12) return 'error.expeditionTooLate'; // Return before the 14-Sol mission ends.
   if (crewAway(state,id)) return 'error.crewAway';
+  if (crewUnconscious(state,id)) return 'error.crewUnconscious';
   if (crewFatigued(state,id)) return 'error.crewFatigued';
   if (state.samples.length >= SAMPLE_CAPACITY) return 'error.samplesFull';
   return '';
@@ -46,7 +47,9 @@ export function advanceExpeditions(state,event = null) {
     const crew = state.crew[id];
     if (crew.returnSol !== null && crew.returnSol <= state.sol) {
       const collected = collectSample(state);
-      crew.departSol = null; crew.returnSol = null; crew.fatigue = 4;
+      const stormTrip = crew.returnSol - crew.departSol === 2;
+      crew.departSol = null; crew.returnSol = null; crew.fatigue = stormTrip ? 0 : 4;
+      crew.comaDays = stormTrip ? 2 : 0;
       state.daySummary.push(`expedition.return.${id.replaceAll('-','_')}`);
       if (!collected) state.daySummary.push('expedition.storageFull');
     }
@@ -54,20 +57,24 @@ export function advanceExpeditions(state,event = null) {
   const plan = state.expeditionPlan;
   if (!plan || plan.departSol > state.sol) return;
   state.expeditionPlan = null;
-  if (state.weather === 'sandstorm' || outsideBlocked(state) || event?.blockedWork?.includes('clean')) {
+  if (state.weather !== 'sandstorm' && (outsideBlocked(state) || event?.blockedWork?.includes('clean'))) {
     state.daySummary.push('expedition.cancelledWeather'); return;
   }
   if (state.samples.length >= SAMPLE_CAPACITY) {
     state.daySummary.push('expedition.cancelledFull'); return;
   }
   const crew = state.crew[plan.crewId];
-  crew.departSol = state.sol; crew.returnSol = state.sol+1;
+  crew.departSol = state.sol; crew.returnSol = state.sol+(state.weather === 'sandstorm' ? 2 : 1);
   state.daySummary.push(`expedition.depart.${plan.crewId.replaceAll('-','_')}`);
 }
 
-export function recoverCrew(state,lit) {
+export function recoverCrew(state,lit,fed=true) {
   for (const id of CREW_IDS) {
     const crew=state.crew[id];
+    if (crewUnconscious(state,id)) {
+      if (!crewAway(state,id) && fed) crew.comaDays -= 1;
+      continue;
+    }
     if (!crewAway(state,id) && crew.fatigue > 0) {
       crew.fatigue = Math.max(0,crew.fatigue-(lit ? 2 : 1));
       if (!crew.fatigue) state.daySummary.push(`expedition.recovered.${id.replaceAll('-','_')}`);
