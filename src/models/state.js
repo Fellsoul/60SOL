@@ -56,6 +56,7 @@ export function validateState(s, eventIds, toolIds) {
     if (entries === undefined) continue; // Older v3 saves have narrative summaries only.
     if (!Array.isArray(entries) || entries.length > 50 || !entries.every(entry => entry &&
       typeof entry.source === 'string' && entry.source.length <= 200 &&
+      (entry.generated === undefined || (entry.source === 'generation' && Number.isInteger(entry.generated) && entry.generated >= 0 && entry.generated <= 6)) &&
       Number.isInteger(entry.variant) && entry.variant >= 0 && entry.variant < 100 &&
       typeof entry.fallback === 'string' && entry.fallback.length <= 2000 &&
       entry.changes && typeof entry.changes === 'object' && !Array.isArray(entry.changes) &&
