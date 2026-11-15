@@ -21,6 +21,7 @@
   },
   {
     "id": "shield",
+    "selectable": false,
     "name": "tool.shield.name",
     "description": "tool.shield.description"
   }
