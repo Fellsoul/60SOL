@@ -9,6 +9,7 @@ export function recordVisualAction(state,{action,label,summary,energy,condition=
   if (!available.length) { state.visualAction = null; return; }
   let station = WORK_STATIONS[action] ?? EVENT_STATIONS[eventId] ?? 'desk';
   if (eventId === 'E15' && choiceId === 'replace') station = 'exterior';
+  if (action === 'force_repair') station = 'exterior';
   if (action === 'rest' || choiceId === 'rest') station = 'desk';
   state.visualAction = {
     id:`sol:${state.sol}:${state.currentEventId}:${state.workId}`,

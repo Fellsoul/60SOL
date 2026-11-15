@@ -1,3 +1,15 @@
+# Current acquisition update (2026-11-15)
+
+Start with `python3 tools/serve_space_data.py`. The same-origin `/api/space-data` endpoint now automatically requests the current UTC day's Mars (499) / Earth geocentre (500@399) observer ephemeris from JPL Horizons, quantity 21, CSV output. It caches successful packs for one hour and backs off failures for 30 seconds. Requests use TLS verification, a fixed upstream URL, a six-second network limit and a 128 KiB size limit; the browser allows eight seconds. `--current-file` remains an optional override.
+
+Automatic packs use schema 2 and contain the current light-time calculation. The browser validates the target, units, dates, numeric range and checksums, and applies the existing guidance-delay mapping. Current solar-advisory and temperature inputs are explicitly unavailable: neither historic Mars restrictions nor old temperature measurements are substituted. Schema 1 complete packs and existing saved missions remain compatible. Missing current data uses a fresh cache, then ordinary gameplay with an explicit status message. Historical cases require explicit selection on the new-game loadout. Ordinary static servers support this offline gameplay but cannot provide automatic NASA input.
+
+The current source status is available in terminal evidence details. A real JPL payload for 2026-11-15 was fetched and passed the client validation/freshness checks. No automatic current DONKI or REMS collection is claimed. Existing saves keep their frozen original snapshot, including any historical restrictions; start a new mission to use the new acquisition policy.
+
+The original integration report below describes the previous implementation and historical source provenance; its all-sources-required and automatic-history-fallback behavior is superseded by this update.
+
+---
+
 # Space-data integration — CDS revision 1.0
 
 ## Included behavior

@@ -133,13 +133,14 @@ export class GameModel {
     const before = resourceSnapshot(s);
     const paidEnergy=workEnergy(s,action);
     s.energy -= paidEnergy;
+    s.health -= action.costH ?? 0;
     applyEffect(s,actionId);
     recordResourceChange(s,before,`work.${actionId}`,this.resourceLog,action.summaryLine);
     s.daySummary.push(action.summaryLine);
     s.workId = actionId;
     recordSpaceDecision(s,actionId,paidEnergy);
     s.phase = eventResolved(s,event) ? 'end' : 'event';
-    recordVisualAction(s,{action:actionId,label:action.label,summary:action.summaryLine,energy:paidEnergy});
+    recordVisualAction(s,{action:actionId,label:action.label,summary:action.summaryLine,energy:paidEnergy,condition:action.costH??0});
     logEntry(s,`基地工作：${action.label}；消耗 ${paidEnergy} E。${action.description ?? action.narrative}`);
   }
   setLights(on) {

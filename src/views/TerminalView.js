@@ -8,6 +8,7 @@ import { i18n } from '../services/I18n.js';
 import { LIMITS } from '../models/state.js';
 import { BatterySlotView } from './BatterySlotView.js';
 import { ENDING_ART } from '../models/EndingRules.js';
+import { spaceEvidence, snapshotSelector } from './SpaceEvidence.js';
 
 function choice(action,id,label,description='',disabled=false) {
   label = i18n.t(label); description = i18n.t(description);
@@ -182,6 +183,8 @@ export class TerminalView {
       }
       if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy >= LIMITS.energy));
     }
+    if (state) this.content.insertAdjacentHTML('beforeend',spaceEvidence(state));
+    else this.content.querySelector('#loadout-form')?.insertAdjacentHTML('afterbegin',snapshotSelector());
     this.jobs = [{node:document.querySelector('#terminal-title'),text:title},...Array.from(this.content.querySelectorAll('[data-copy]'),node => ({node,text:node.dataset.copy,after:Array.from(node.parentElement.querySelectorAll('[data-copy-after]'))}))];
     if (autoplay) this.writer.play(this.jobs,{reducedMotion:true});
     this.resetScroll();

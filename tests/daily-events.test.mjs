@@ -76,6 +76,26 @@ test('manual-care, panel and laboratory restrictions affect actual normal work a
   game.choose('lock');game.work('standby');game.nextSol();assert.equal(game.snapshot.generation,5);
 });
 
+test('closing the lab blocks research for today and tomorrow, survives reload, and reopens automatically',() => {
+  const game=dailyGame(); const state=game.snapshot;
+  Object.assign(state,{sol:4,currentEventId:'E07',samples:[1],energy:12,food:128,concurrentEvents:[]});
+  game.restore(state); game.choose('close');
+  assert.equal(game.snapshot.dailySystems.labUntil,6);
+  assert.equal(game.snapshot.energy,12); assert.equal(game.snapshot.workId,null);
+  assert.throws(()=>game.work('research'),{message:'error.facilityUnavailable'});
+  game.work('standby'); game.nextSol();
+  const repo=new SaveRepository(storage(),{events,tools}); const saved=repo.save(game.snapshot);
+  game.restore(repo.load(saved.id).state);
+  assert.equal(game.snapshot.sol,5);
+  const research=ACTIONS.find(action=>action.id==='research');
+  assert.equal(unavailableReason(game.snapshot,research,game.events.get(game.snapshot.currentEventId)),'error.facilityUnavailable');
+  game.choose('forgo'); game.work('standby'); settleExtras(game); game.nextSol();
+  assert.equal(game.snapshot.sol,6);
+  game.choose('forgo');
+  const ready=game.snapshot; ready.energy=12; game.restore(ready);
+  game.work('research'); assert.equal(game.snapshot.localData,20); assert.deepEqual(game.snapshot.samples,[]);
+});
+
 test('scheduled crop and final-day cases are replaced when prerequisites are missing',() => {
   const game=dailyGame();const state=game.snapshot;
   Object.assign(state,{sol:11,phase:'end',choiceId:'minimum',currentEventId:'E19',eventDone:true,growth:0,food:30});game.restore(state);

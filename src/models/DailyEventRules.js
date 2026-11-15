@@ -20,7 +20,7 @@ export function emergencyCleanAvailable(state,event = null) {
     (state.weather === 'sandstorm' || state.energy < 2));
 }
 const outdoorChoice=choice=>choice.outside || ['clean','repair'].includes(choice.action) || choice.id==='force_clean';
-export function choiceEnergy(state,choice) { return spaceEnergyCost(state,eventEnergyCost(state,choice.energy),Boolean(outdoorChoice(choice))); }
+export function choiceEnergy(state,choice) { return choice.id === 'force_repair' ? 0 : spaceEnergyCost(state,eventEnergyCost(state,choice.energy),Boolean(outdoorChoice(choice))); }
 export function choiceReason(state,choice) {
   if (choice.work && state.workId) return 'error.workUsed';
   if (outdoorChoice(choice) && outsideBlocked(state)) return 'dependency.spaceAdvisory';
@@ -28,7 +28,7 @@ export function choiceReason(state,choice) {
   if (choice.tool && state.tools[choice.tool] !== 'ready') return 'error.toolUnavailable';
   if (state.health <= (choice.costH ?? 0)) return 'error.conditionInsufficient';
   if (dailyState(state).spares < (choice.costQ ?? 0)) return 'error.sparesInsufficient';
-  if ((choice.outside || ['clean','repair'].includes(choice.action)) && state.weather === 'sandstorm') return 'error.stormOutside';
+  if ((choice.outside || ['clean','repair'].includes(choice.action)) && !choice.allowStorm && state.weather === 'sandstorm') return 'error.stormOutside';
   return '';
 }
 export function applyDailyChoice(state,choice) {

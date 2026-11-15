@@ -13,6 +13,8 @@ export class GameController {
     this.view.coverScene();
     const difficulty = this.pendingDifficulty ?? this.model.snapshot?.difficulty ?? 'medium';
     await this.commit(()=>this.model.start(ids,snapshot,difficulty),{morning:true,initial:true});
+    if (this.snapshots && !snapshot) this.view.notify('space.offline');
+    else if (snapshot?.schemaVersion === 2) this.view.notify('space.partialCurrent');
   }
   showMenu() {
     void this.view.music?.setMode('menu');

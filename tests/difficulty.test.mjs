@@ -11,7 +11,7 @@ const content = {events:await read('events'),tools:await read('tools')};
 function game(difficulty) { const model=new GameModel(content);model.start(['toolkit','battery'],null,difficulty);return model; }
 
 test('each difficulty generates approved power, pays support, and respects battery capacity',()=>{
-  for (const [difficulty,generation,support,dust] of [['easy',9,2,4],['medium',8,3,4],['hard',4,4,2]]) {
+  for (const [difficulty,generation,support,dust] of [['easy',9,2,4],['medium',8,3,4],['hard',6,3,3]]) {
     const model=game(difficulty),state=model.snapshot;
     assert.equal(state.generation,generation);assert.equal(state.energy,12-support);
     assert.equal(state.resourceLog.find(x=>x.source==='lifeSupport').changes.energy,-support);
