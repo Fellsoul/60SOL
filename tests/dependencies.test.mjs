@@ -34,8 +34,8 @@ test('independent work before event response survives reload; responding does no
   const items=new Map();const repo=new SaveRepository({getItem:key=>items.get(key)??null,setItem:(key,value)=>items.set(key,value)},{events,tools});
   const saved=repo.save(model.snapshot);const restored=new GameModel({events,tools});restored.restore(repo.load(saved.id).state);
   assert.deepEqual(restored.snapshot,model.snapshot);
-  const before=restored.snapshot;assert.throws(()=>restored.work('rest'));assert.deepEqual(restored.snapshot,before);
-  restored.choose('close');assert.equal(restored.snapshot.phase,'end');assert.equal(restored.snapshot.workId,'rest');assert.equal(restored.snapshot.energy,2);
+  const before=restored.snapshot;restored.work('rest');assert.equal(restored.snapshot.energy,before.energy-1);
+  restored.choose('close');assert.equal(restored.snapshot.phase,'end');assert.equal(restored.snapshot.workId,'rest');assert.equal(restored.snapshot.energy,1);
   assert.throws(()=>restored.work('standby'));restored.nextSol();assert.equal(restored.snapshot.sol,5);
 });
 

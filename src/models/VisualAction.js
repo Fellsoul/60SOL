@@ -1,5 +1,6 @@
 // Semantic presentation records are committed with gameplay, never by animation callbacks.
 import { CREW_IDS, crewAway, crewFatigued, crewUnconscious } from './ExpeditionRules.js';
+import { workHistory } from './WorkBudget.js';
 const WORK_STATIONS = Object.freeze({grow:'greenhouse',research:'lab',transmit:'communications',clean:'exterior',repair:'exterior',rest:'desk',robot:'communications',monitor:'communications',shield:'desk',standby:'desk'});
 const EVENT_STATIONS = Object.freeze({emergency_clean:'exterior',E01:'exterior',E02:'exterior',E04:'greenhouse',E07:'lab',E08:'desk',E09:'greenhouse',E11:'greenhouse',E12:'lab',E14:'lab',E15:'lab',E16:'communications',E17:'lab',E19:'shelter'});
 const STATIONS = ['desk','greenhouse','lab','communications','exterior','shelter'];
@@ -7,13 +8,16 @@ const STATIONS = ['desk','greenhouse','lab','communications','exterior','shelter
 export function recordVisualAction(state,{action,label,summary,energy,condition=0,spares=0,eventId=null,choiceId=null}) {
   const available = CREW_IDS.filter(id => !crewAway(state,id) && !crewUnconscious(state,id));
   if (!available.length) { state.visualAction = null; return; }
+  const rested=available.filter(id=>!crewFatigued(state,id));
+  const actors=rested.length ? rested : available;
+  const assignment=workHistory(state).length;
   let station = WORK_STATIONS[action] ?? EVENT_STATIONS[eventId] ?? 'desk';
   if (eventId === 'E15' && choiceId === 'replace') station = 'exterior';
   if (action === 'force_repair') station = 'exterior';
   if (action === 'rest' || choiceId === 'rest') station = 'desk';
   state.visualAction = {
-    id:`sol:${state.sol}:${state.currentEventId}:${state.workId}`,
-    actorId:available.find(id => !crewFatigued(state,id)) ?? available[0],sol:state.sol,label,summary,station,
+    id:`sol:${state.sol}:${state.currentEventId}:${state.workId}:${assignment}`,
+    actorId:actors[Math.max(0,assignment-1)%actors.length],sol:state.sol,label,summary,station,
     mode:station === 'exterior' ? 'eva' : 'interior',
     cost:{energy,condition,spares,work:1},
     terminal:{location:'desk',outfit:'indoor',outsideVisible:false},

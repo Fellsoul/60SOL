@@ -26,6 +26,7 @@ export function beginSol(state, events, environment = {}, resourceLog = {}) {
   recordResourceChange(state,before,state.lifeSupportPaid ? 'lifeSupport' : 'lifeSupportPartial',resourceLog);
   state.choiceId = null;
   state.workId = null;
+  state.workIds = [];
   state.currentEventId = events.select(state);
   const expeditionBefore = resourceSnapshot(state);
   advanceExpeditions(state,events.get(state.currentEventId));

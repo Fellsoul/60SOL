@@ -28,7 +28,7 @@ test('forced cleaning costs 20 health and one work slot, no energy, without skip
   assert.equal(after.energy,0);assert.equal(after.health,70);assert.equal(after.dusty,false);
   assert.equal(after.dailySystems.generationCap,6);assert.equal(after.generation,before.generation);
   assert.equal(after.workId,'event:force_clean');assert.equal(after.currentEventId,'E07');assert.equal(after.eventDone,false);
-  assert.throws(()=>model.nextSol(),{message:'error.eventUnresolved'});assert.throws(()=>model.work('standby'));
+  assert.throws(()=>model.nextSol(),{message:'error.eventUnresolved'});model.work('standby');assert.throws(()=>model.work('standby'));
   model.choose('close');assert.equal(model.snapshot.phase,'end');
   assert.throws(()=>model.chooseEmergencyClean('force_clean'));assert.equal(model.snapshot.health,70);
 });
@@ -37,7 +37,7 @@ test('declining and insufficient health/work have no unexpected resource or miss
   const model=game();const before=model.snapshot;model.chooseEmergencyClean('stay_inside');
   for(const key of ['energy','health','dusty','workId','choiceId','phase']) assert.equal(model.snapshot[key],before[key]);
   assert.throws(()=>model.chooseEmergencyClean('force_clean'));
-  for(const override of [{health:20},{health:1},{workId:'standby'},{phase:'finished',outcome:'unsafe'},{currentEventId:'E19'}]) {
+  for(const override of [{health:20},{health:1},{workId:'standby',workIds:['standby','standby']},{phase:'finished',outcome:'unsafe'},{currentEventId:'E19'}]) {
     const locked=game(override);const snapshot=locked.snapshot;
     assert.throws(()=>locked.chooseEmergencyClean('force_clean'));assert.deepEqual(locked.snapshot,snapshot);
   }

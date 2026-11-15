@@ -11,6 +11,7 @@ import { concurrentEvent, concurrentChoiceReason, syncFatigueEvents } from './Co
 import { dailyActivitiesComplete } from './DailyWorkRules.js';
 import { ensureMissionJournal } from './MissionJournal.js';
 import { endForCrewFailure } from './EndingRules.js';
+import { spendWork } from './WorkBudget.js';
 
 export class GameModel {
   #state = null;
@@ -81,7 +82,7 @@ export class GameModel {
     s.eventDone = true;
     s.choiceId = choiceId;
     s.daySummary.push(choice.summaryLine ?? this.events.get(s.currentEventId).summaryLine);
-    if (choice.work) s.workId = `event:${choice.id}`;
+    if (choice.work) spendWork(s,`event:${choice.id}`);
     s.phase = s.workId ? 'end' : 'work';
     if (choice.work) recordVisualAction(s,{action:choice.action,label:choice.label,summary:choice.summaryLine,energy:paidEnergy,condition:choice.costH??0,spares:choice.costQ??0,eventId:s.currentEventId,choiceId:choice.id});
     logEntry(s,`事件决策：${choice.label}；消耗 ${paidEnergy} E${choice.work ? '，占用今日工作' : ''}。`);
@@ -100,7 +101,7 @@ export class GameModel {
     s.history.emergency_clean = s.sol;
     s.daySummary.push(choice.summaryLine);
     if (choice.work) {
-      s.workId = `event:${choice.id}`;
+      spendWork(s,`event:${choice.id}`);
       s.phase = eventResolved(s,this.events.get(s.currentEventId)) ? 'end' : 'event';
       recordVisualAction(s,{action:'clean',label:choice.label,summary:choice.summaryLine,energy:paidEnergy,condition:choice.costH??0,eventId:event.id,choiceId:choice.id});
     }
@@ -124,7 +125,7 @@ export class GameModel {
     recordResourceChange(s, before, `event.${event.id}.${choice.id}`, this.resourceLog, choice.summaryLine);
     recordSpaceDecision(s, `${instance.id}:${choice.id}`, energy);
     if (choice.work) {
-      s.workId = `event:${instance.id}:${choice.id}`;
+      spendWork(s,`event:${instance.id}:${choice.id}`);
       if (eventResolved(s, this.events.get(s.currentEventId))) s.phase = 'end';
       recordVisualAction(s, { action: choice.action, label: choice.label, summary: choice.summaryLine,
         energy, condition: choice.costH ?? 0, spares: choice.costQ ?? 0, eventId: event.id, choiceId: choice.id });
@@ -147,7 +148,7 @@ export class GameModel {
     applyEffect(s,actionId);
     recordResourceChange(s,before,`work.${actionId}`,this.resourceLog,action.summaryLine);
     s.daySummary.push(action.summaryLine);
-    s.workId = actionId;
+    spendWork(s,actionId);
     recordSpaceDecision(s,actionId,paidEnergy);
     s.phase = eventResolved(s,event) ? 'end' : 'event';
     recordVisualAction(s,{action:actionId,label:action.label,summary:action.summaryLine,energy:paidEnergy,condition:action.costH??0,spares:action.costQ??0});

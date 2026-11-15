@@ -8,6 +8,7 @@ import { crewHead, crewStatuses } from './CrewStatus.js';
 import { concurrentEvent, concurrentChoiceReason } from '../models/ConcurrentEvents.js';
 import { resourceText, resourceInventory } from './ResourceIcons.js';
 import { toolkitIcon } from './SceneToolsView.js';
+import { workHistory, workLimit, workRemaining } from '../models/WorkBudget.js';
 
 const text = key => resourceText(i18n.t(key));
 // Match the room portraits: astronaut B (glasses) sits left, astronaut A sits right.
@@ -26,7 +27,7 @@ export function clipboardTasks(state,event) {
   if (pending) return rows;
   return rows.concat(ACTIONS.filter(action => (!action.tool || state.tools[action.tool]) && (action.id !== 'repair_robot' || state.tools.robot)).map(action => ({...action,
     energy:workEnergy(state,action),
-    description:action.narrative,command:'work',done:state.workId === action.id,
+    description:action.narrative,command:'work',done:workHistory(state).includes(action.id),
     reason:unavailableReason(state,action,event)})));
 }
 
@@ -92,9 +93,9 @@ export class TaskView {
     const completed = tasks.some(task => task.done);
     const note = !eventResolved(state,event) ? 'tasks.eventFirst' : state.phase === 'finished' ? 'tasks.finished' : state.workId ? (state.workId.startsWith('event:') ? 'tasks.eventWork' : 'tasks.checked') : dailyActivitiesComplete(state,event) ? 'tasks.noActivities' : 'tasks.choose';
     const eventCopy = event?.choices.length ? `<section class="clipboard-event${eventResolved(state,event) ? ' is-resolved' : ''}"><h2>${text(event.title)}</h2>${event.sceneCue ? '' : `<p>${text(event.text)}</p>`}</section>` : '';
-    this.content.innerHTML = `${resourceInventory(state)}${this.concurrentTasks(state)}${eventCopy}${this.emergencyTasks(state,event)}<div class="task-list">${tasks.map(task => {
+    this.content.innerHTML = `${resourceInventory(state)}<p class="work-budget">${text('tasks.workRemaining')}: ${workRemaining(state)} / ${workLimit(state)}</p>${this.concurrentTasks(state)}${eventCopy}${this.emergencyTasks(state,event)}<div class="task-list">${tasks.map(task => {
       const {done,reason} = task;
-      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong>${toolBadge(task)}<small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></span></button>`;
+      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${reason || (done && task.command !== 'work') ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong>${toolBadge(task)}<small>${text(reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></span></button>`;
     }).join('')}</div><p class="clipboard-note" role="status">${text(note)}</p>${dailyActivitiesComplete(state,event) ? this.sampling(state,event) : ''}`;
     if (this.dialog.open && completed) document.querySelector('#tasks-close').focus({preventScroll:true});
   }

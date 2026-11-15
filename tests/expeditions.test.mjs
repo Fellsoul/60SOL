@@ -117,7 +117,7 @@ test('robot repair rejects missing spares, absent or healthy robots and used wor
     if(kind!=='no-robot'&&kind!=='healthy')model.collectWithRobot();
     respond(model);const state=model.snapshot;
     if(kind==='no-spares')state.dailySystems.spares=0;
-    if(kind==='work-used'){state.workId='standby';state.phase='end';}
+    if(kind==='work-used'){state.workId='standby';state.workIds=['standby','standby'];state.phase='end';}
     model.restore(state);assert.throws(()=>model.work('repair_robot'));assert.deepEqual(model.snapshot,state);
   }
 });

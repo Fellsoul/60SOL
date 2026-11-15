@@ -1,6 +1,7 @@
 import { outsideBlocked, spaceEnergyCost } from './SpaceData.js';
 import { LIMITS } from './state.js';
 import { eventEnergyCost, eventEnergyChange } from './DifficultyRules.js';
+import { workRemaining } from './WorkBudget.js';
 
 export const DAILY_DEFAULTS = Object.freeze({spares:2,generationCap:6,trackingCap:6,supportExtra:0,careCost:3,harvestFood:32,labUntil:0,greenhouseDisabled:false,antennaLimit:30});
 export function dailyState(state) { return state.dailySystems ??= {...DAILY_DEFAULTS}; }
@@ -22,7 +23,7 @@ export function emergencyCleanAvailable(state,event = null) {
 const outdoorChoice=choice=>choice.outside || ['clean','repair'].includes(choice.action) || choice.id==='force_clean';
 export function choiceEnergy(state,choice) { return choice.id === 'force_repair' ? 0 : spaceEnergyCost(state,eventEnergyCost(state,choice.energy),Boolean(outdoorChoice(choice))); }
 export function choiceReason(state,choice) {
-  if (choice.work && state.workId) return 'error.workUsed';
+  if (choice.work && !workRemaining(state)) return 'error.workUsed';
   if (outdoorChoice(choice) && outsideBlocked(state)) return 'dependency.spaceAdvisory';
   if (state.energy < choiceEnergy(state,choice)) return 'error.powerInsufficient';
   if (choice.tool && state.tools[choice.tool] !== 'ready') return 'error.toolUnavailable';

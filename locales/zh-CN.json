@@ -162,7 +162,7 @@
   "action.lights_on.summary": "我们重新打开了生活舱的灯，熟悉的暖光回到房间。",
   "error.eventFirst": "先处理今日事件",
   "error.missionFinished": "任务已结束",
-  "error.workUsed": "今日工作机会已使用",
+  "error.workUsed": "今日工作机会已用完",
   "error.toolUnavailable": "缺少可用工具",
   "error.powerInsufficient": "可用电力不足",
   "error.noLocalData": "没有待传输的本地数据",
@@ -258,7 +258,7 @@
   "tasks.title": "工作记录板",
   "tasks.close": "关闭工作记录板",
   "tasks.department": "基地 / 工作安排",
-  "tasks.intro": "在这里完成工作。打勾表示已完成，未打勾表示尚未完成。每个火星日只能安排一项工作。",
+  "tasks.intro": "在这里安排工作。两名成员都在基地且无疲劳、无昏迷时，每天最多工作两次；其他情况上限为一次。事件工作也占用次数，可以提前结束当天。",
   "tasks.footer": "最后的曙光基地 · 队员工作单",
   "tasks.open": "打开工作记录板",
   "tasks.ready": "请在工作记录板上选择今天的工作。",
@@ -644,5 +644,7 @@
   "error.robotDamaged": "机器人已损坏，需要用 1 个备用零件和一次工作修理。",
   "error.robotNotDamaged": "没有需要修理的损坏机器人。",
   "guide.terminal": "打开终端查看今日简报",
-  "guide.notebook": "打开工作记录本安排今日工作"
+  "guide.notebook": "打开工作记录本安排今日工作",
+  "tasks.workRemaining": "剩余工作机会",
+  "error.transmissionFull": "今天的传输额度已用完。"
 }

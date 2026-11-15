@@ -2,6 +2,7 @@ import { outsideBlocked, spaceEnergyCost } from './SpaceData.js';
 import { dailyState, choiceReason } from './DailyEventRules.js';
 import { LIMITS, logEntry } from './state.js';
 import { consumeSample, CREW_IDS, crewAway, crewFatigued, crewUnconscious } from './ExpeditionRules.js';
+import { workRemaining } from './WorkBudget.js';
 
 // 规则保留数值，终端只使用 narrative 和 summaryLine。
 const NARRATIVES = {
@@ -42,7 +43,7 @@ export function workEnergy(state,action) { return spaceEnergyCost(state,action.i
 export function unavailableReason(state, action, event = null) {
   if (outsideBlocked(state) && ['clean','repair','force_repair'].includes(action.id)) return 'dependency.spaceAdvisory';
   if (state.phase === 'finished') return 'error.missionFinished';
-  if (state.workId || !['event','work'].includes(state.phase)) return 'error.workUsed';
+  if (!workRemaining(state) || !['event','work','end'].includes(state.phase)) return 'error.workUsed';
   if (action.tool && state.tools[action.tool] !== 'ready') return 'error.toolUnavailable';
   if (state.health <= (action.costH ?? 0)) return 'error.conditionInsufficient';
   if (state.phase === 'event') {
@@ -60,6 +61,7 @@ export function unavailableReason(state, action, event = null) {
   if (action.id === 'research' && !state.samples?.length) return 'error.noSamples';
   if (action.id === 'transmit' && systems.antennaLimit === 0) return 'error.facilityUnavailable';
   if (action.id === 'transmit' && state.localData === 0) return 'error.noLocalData';
+  if (action.id === 'transmit' && state.pendingData >= systems.antennaLimit) return 'error.transmissionFull';
   if (['clean','repair','force_repair'].includes(action.id) && !state.dusty && systems.generationCap === 6 && (action.id === 'clean' || systems.trackingCap === 6)) return 'error.panelsClean';
   if (state.weather === 'sandstorm' && ['clean','repair','robot'].includes(action.id)) return 'error.stormOutside';
   return '';
@@ -77,7 +79,7 @@ const effects = {
     }
   },
   research(s) { consumeSample(s); s.localData += 20; },
-  transmit(s) { const amount = Math.min(dailyState(s).antennaLimit,s.localData); s.localData -= amount; s.pendingData += amount; },
+  transmit(s) { const amount = Math.min(Math.max(0,dailyState(s).antennaLimit-s.pendingData),s.localData); s.localData -= amount; s.pendingData += amount; },
   clean(s) { s.dusty = false; dailyState(s).generationCap=6; },
   repair(s) { s.dusty = false; dailyState(s).generationCap=6; dailyState(s).trackingCap=6; },
   force_repair(s) { effects.repair(s); },

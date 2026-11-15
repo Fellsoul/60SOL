@@ -29,3 +29,5 @@ Optional browser checks require Python Playwright and Microsoft Edge:
 - `python tests/battery_browser.py`: checks actual green/grayscale battery artwork pixels; additionally requires Pillow.
 
 Keep new tests focused on observable behavior or a distinct regression. Avoid checks that only assert an internal method-call sequence, and reuse the full-mission tests instead of adding another equivalent playthrough.
+
+`work-budget.test.mjs` covers two-rested-crew quota, one-work floor, shared event/repair costs, repeated actions, persistence, and transmission bounds.
