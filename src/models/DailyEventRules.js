@@ -1,5 +1,6 @@
 import { outsideBlocked, spaceEnergyCost } from './SpaceData.js';
 import { LIMITS } from './state.js';
+import { eventEnergyCost, eventEnergyChange } from './DifficultyRules.js';
 
 export const DAILY_DEFAULTS = Object.freeze({spares:2,generationCap:6,trackingCap:6,supportExtra:0,careCost:3,harvestFood:32,labUntil:0,greenhouseDisabled:false,antennaLimit:30});
 export function dailyState(state) { return state.dailySystems ??= {...DAILY_DEFAULTS}; }
@@ -19,7 +20,7 @@ export function emergencyCleanAvailable(state,event = null) {
     (state.weather === 'sandstorm' || state.energy < 2));
 }
 const outdoorChoice=choice=>choice.outside || ['clean','repair'].includes(choice.action) || choice.id==='force_clean';
-export function choiceEnergy(state,choice) { return spaceEnergyCost(state,choice.energy,Boolean(outdoorChoice(choice))); }
+export function choiceEnergy(state,choice) { return spaceEnergyCost(state,eventEnergyCost(state,choice.energy),Boolean(outdoorChoice(choice))); }
 export function choiceReason(state,choice) {
   if (choice.work && state.workId) return 'error.workUsed';
   if (outdoorChoice(choice) && outsideBlocked(state)) return 'dependency.spaceAdvisory';
@@ -36,9 +37,10 @@ export function applyDailyChoice(state,choice) {
   for (const effect of choice.dailyEffects ?? []) {
     switch (effect.op) {
       case 'add': {
-        const cap = {food:LIMITS.food,health:LIMITS.health,localData:10000}[effect.resource];
+        const cap = {energy:LIMITS.energy,food:LIMITS.food,health:LIMITS.health,localData:10000}[effect.resource];
         if (cap === undefined) throw new Error('Invalid daily resource');
-        state[effect.resource] = Math.max(0,Math.min(cap,state[effect.resource]+effect.amount)); break;
+        const amount = effect.resource === 'energy' ? eventEnergyChange(state,effect.amount) : effect.amount;
+        state[effect.resource] = Math.max(0,Math.min(cap,state[effect.resource]+amount)); break;
       }
       case 'set':
         if (!Object.hasOwn(DAILY_DEFAULTS,effect.key)) throw new Error('Invalid daily system');

@@ -100,6 +100,7 @@ try:
         assert page.locator('[data-layer=shelf]').get_attribute('data-state') == 'visible'
         assert page.locator('[data-layer=shelf-override]').get_attribute('data-state') == 'visible'
         page.locator('[data-menu=new]').click()
+        page.locator('[data-difficulty=medium]').click()
         assert page.locator('progress, #resources, #journal').count() == 0
         page.locator('[value=toolkit]').check()
         page.locator('[value=battery]').check()
@@ -301,6 +302,7 @@ try:
         assert page.locator('.scene-dust:visible').count() == 0
         older = page.evaluate('(key) => localStorage.getItem(key)', active_key)
         page.locator('[data-menu=new]').click()
+        page.locator('[data-difficulty=medium]').click()
         page.locator('[value=robot]').check(); page.locator('[value=shield]').check()
         decide('#loadout-form button',closes=True)
         assert page.locator('.scene-dust:visible').count() == 0
@@ -414,6 +416,7 @@ try:
           scene.dispose(); root.remove(); return hidden;
         }""")
         missing_page.locator('[data-menu=new]').click()
+        missing_page.locator('[data-difficulty=medium]').click()
         missing_page.locator('#loadout-form').wait_for()
         # Real transition timing and volume envelope, using silent WAV test data in memory.
         sample = io.BytesIO()
@@ -427,6 +430,7 @@ try:
         movie = cinema.new_page(); movie.goto(url)
         movie.locator('[data-menu=new]').wait_for()
         movie.locator('[data-menu=new]').click(force=True)  # Floating button intentionally moves.
+        movie.locator('[data-difficulty=medium]').click()
         movie.locator('[value=toolkit]').check(); movie.locator('[value=battery]').check()
         movie.evaluate("""() => {
           window.transitionSamples = [];
@@ -453,6 +457,7 @@ try:
         dependency_context=browser.new_context(reduced_motion='reduce')
         dependency_page=dependency_context.new_page();dependency_page.goto(url)
         dependency_page.locator('[data-menu=new]').click()
+        dependency_page.locator('[data-difficulty=medium]').click()
         dependency_page.locator('[value=robot]').check();dependency_page.locator('[value=battery]').check()
         dependency_page.locator('#loadout-form button').click()
         dependency_page.locator('#terminal-toggle:enabled').wait_for()
@@ -479,6 +484,7 @@ try:
         daily_context=browser.new_context(reduced_motion='reduce')
         daily_page=daily_context.new_page();daily_page.goto(url)
         daily_page.locator('[data-menu=new]').click()
+        daily_page.locator('[data-difficulty=medium]').click()
         daily_page.locator('[value=toolkit]').check();daily_page.locator('[value=battery]').check()
         daily_page.locator('#loadout-form button').click()
         for sol in range(1,15):
@@ -512,6 +518,7 @@ try:
         motion_context=browser.new_context(reduced_motion='no-preference')
         motion_page=motion_context.new_page();motion_page.goto(url)
         motion_page.locator('[data-menu=new]').click(force=True)
+        motion_page.locator('[data-difficulty=medium]').click()
         motion_page.locator('[value=toolkit]').check();motion_page.locator('[value=battery]').check()
         motion_page.locator('#loadout-form button').click()
         motion_page.locator('#terminal-toggle:enabled').wait_for()

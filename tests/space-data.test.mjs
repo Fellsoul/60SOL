@@ -73,7 +73,7 @@ test('space data changes only bounded EVA constraints and preserves independent 
 test('heating and guidance mappings affect actual morning demand and due-day availability',() => {
   const game=new GameModel({events,tools});game.start(['toolkit','battery'],first());let state=game.snapshot;
   Object.assign(state,{sol:3,currentEventId:'E04',phase:'end',choiceId:'manual',eventDone:true,energy:0,lightsOn:false,food:30});game.restore(state);
-  game.nextSol();assert.equal(game.snapshot.energy,2);assert.equal(game.snapshot.health,100);
+  game.nextSol();assert.equal(game.snapshot.energy,4);assert.equal(game.snapshot.health,100);
   state=game.snapshot;Object.assign(state,{sol:7,currentEventId:'E12',phase:'event',choiceId:null,eventDone:false,workId:null});game.restore(state);
   game.choose('ask');assert.equal(game.snapshot.dailySystems.labUntil,9);assert.equal(game.snapshot.spaceTrace.at(-1).snapshotID,first().snapshotID);
 });

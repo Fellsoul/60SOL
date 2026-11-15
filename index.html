@@ -41,6 +41,23 @@
     <p id="save-picker-message" role="status"></p>
     <div id="save-list"></div>
   </dialog>
+  <dialog id="difficulty-picker" aria-labelledby="difficulty-title">
+    <header class="difficulty-header"><h1 id="difficulty-title" data-i18n="difficulty.title">Choose difficulty</h1><button id="difficulty-close" type="button" data-i18n-aria-label="difficulty.cancel" aria-label="Back">×</button></header>
+    <div class="difficulty-options">
+      <div class="difficulty-option">
+        <button type="button" data-difficulty="easy" aria-describedby="difficulty-easy-description"><img src="assets/menu/easy.png" alt="" draggable="false"><strong data-i18n="difficulty.easy">Easy</strong></button>
+        <p id="difficulty-easy-description" class="difficulty-tooltip" role="tooltip" data-i18n="difficulty.easy.description">A gentler start, with plentiful solar power and more room to recover.</p>
+      </div>
+      <div class="difficulty-option">
+        <button type="button" data-difficulty="medium" aria-describedby="difficulty-medium-description"><img src="assets/menu/normal.png" alt="" draggable="false"><strong data-i18n="difficulty.medium">Normal</strong></button>
+        <p id="difficulty-medium-description" class="difficulty-tooltip" role="tooltip" data-i18n="difficulty.medium.description">A balanced expedition. Plan your supplies and make each day count.</p>
+      </div>
+      <div class="difficulty-option">
+        <button type="button" data-difficulty="hard" aria-describedby="difficulty-hard-description"><img src="assets/menu/hardpng.png" alt="" draggable="false"><strong data-i18n="difficulty.hard">Hard</strong></button>
+        <p id="difficulty-hard-description" class="difficulty-tooltip" role="tooltip" data-i18n="difficulty.hard.description">Scarce power and demanding upkeep leave little room for mistakes.</p>
+      </div>
+    </div>
+  </dialog>
   <dialog id="tasks" aria-labelledby="tasks-title" aria-describedby="tasks-intro">
     <div class="clipboard-clip" aria-hidden="true"></div>
     <div class="clipboard-paper">

@@ -20,6 +20,7 @@ try:
         page = browser.new_page(viewport={'width':1440,'height':900},reduced_motion='reduce')
         page.goto(f'http://127.0.0.1:{server.server_port}')
         page.locator('[data-menu=new]').click()
+        page.locator('[data-difficulty=medium]').click()
         page.locator('[value=toolkit]').check(); page.locator('[value=battery]').check()
         page.locator('#loadout-form button').click()
         page.locator('#terminal-toggle:enabled').click()

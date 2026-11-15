@@ -73,7 +73,7 @@ test('manual-care, panel and laboratory restrictions affect actual normal work a
   assert.throws(()=>game.work('research'),{message:'error.facilityUnavailable'});
   game.work('standby');game.nextSol();
   const panel=game.snapshot;Object.assign(panel,{sol:8,currentEventId:'E02',phase:'event',choiceId:null,workId:null,eventDone:false});game.restore(panel);
-  game.choose('lock');game.work('standby');game.nextSol();assert.equal(game.snapshot.generation,4);
+  game.choose('lock');game.work('standby');game.nextSol();assert.equal(game.snapshot.generation,5);
 });
 
 test('scheduled crop and final-day cases are replaced when prerequisites are missing',() => {

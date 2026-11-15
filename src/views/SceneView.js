@@ -82,6 +82,9 @@ export class SceneView {
         if (asset) {
           const image = document.createElement('img'); image.alt = ''; image.draggable = false;
           image.src = asset.src;
+          // State-specific alignment in original canvas pixels, scaling with the scene.
+          const offset = (layer.config.states[renderedKey] ?? config).offset;
+          if (offset && !config.motion) image.style.transform = `translate(${100*(offset.x ?? 0)/this.canvas.width}%,${100*(offset.y ?? 0)/this.canvas.height}%)`;
           if (config.motion) {
             // Two identical tiles make the end of each translation match its start.
             layer.track = document.createElement('div'); layer.track.className = 'scene-dust-track';

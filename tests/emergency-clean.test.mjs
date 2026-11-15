@@ -52,7 +52,7 @@ test('saving and reloading preserves the health cost and prevents duplicate emer
 });
 
 test('cleaning helps next clear morning but a subsequent storm can coat the panels again',()=>{
-  for(const [weather,generation] of [['clear',6],['sandstorm',3]]) {
+  for(const [weather,generation] of [['clear',8],['sandstorm',4]]) {
     const model=new GameModel({events,tools,environment:{default:weather}});
     model.restore(game().snapshot);model.chooseEmergencyClean('force_clean');model.choose('close');model.nextSol();
     assert.equal(model.snapshot.generation,generation);assert.equal(model.snapshot.dusty,weather==='sandstorm');
