@@ -14,7 +14,7 @@ export class CrewMotion {
         actor={node,image,idle:null,reaction:null};this.actors.set(id,actor);
       }
       if(!actor)continue;
-      if(reduced) { actor.idle?.cancel();actor.reaction?.cancel();actor.idle=null;actor.reaction=null;continue; }
+      if(reduced || node.dataset?.state === 'sleep') { actor.idle?.cancel();actor.reaction?.cancel();actor.idle=null;actor.reaction=null;continue; }
       if(!actor.idle) actor.idle=image.animate([
         {transform:'scaleY(1) rotate(0deg)'},
         {transform:'scaleY(1.012) rotate(.2deg)'},
@@ -30,6 +30,7 @@ export class CrewMotion {
     if(this.reduced || frame.skipped || frame.key==='complete') { this.stopReaction();return; }
     if(!['accepted','foregroundCut','working'].includes(frame.key))return;
     const actor=this.actors.get(frame.plan.actorId);if(!actor)return;
+    if(actor.node.dataset?.state === 'sleep')return;
     actor.reaction?.cancel();
     actor.reaction=actor.node.animate([
       {transform:'rotate(0deg)'},{transform:'rotate(-1deg)',offset:.35},

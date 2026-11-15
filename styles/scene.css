@@ -32,7 +32,6 @@ body.reduced-motion #terminal-toggle { transition: none; }
 .crew-inspector.astronaut-a .crew-status-panel { left:calc(100% + 12px); }
 .crew-inspector.astronaut-b .crew-status-panel { right:calc(100% + 12px); }
 .crew-inspector:is(:hover,:focus-within) .crew-status-panel { opacity:1; visibility:visible; }
-.scene-layer[data-state="exhausted"] img { filter:saturate(.6) brightness(.88); }
 
 .scene-event-bubble {
   position: absolute;

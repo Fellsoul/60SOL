@@ -1,7 +1,7 @@
 import { outsideBlocked, spaceEnergyCost } from './SpaceData.js';
 import { dailyState, choiceReason } from './DailyEventRules.js';
 import { LIMITS, logEntry } from './state.js';
-import { consumeSample, CREW_IDS, crewAway, crewFatigued } from './ExpeditionRules.js';
+import { consumeSample, CREW_IDS, crewAway, crewFatigued, crewUnconscious } from './ExpeditionRules.js';
 
 // 规则保留数值，终端只使用 narrative 和 summaryLine。
 const NARRATIVES = {
@@ -19,12 +19,11 @@ const NARRATIVES = {
 };
 export const ACTIONS = Object.freeze([
   { id:'grow', label:'action.grow.label', energy:3, description:'照料 +1；累计 3 次获得 32 F。', facility:'greenhouse' },
-  { id:'research', label:'action.research.label', energy:3, description:'消耗一次样本研究次数；本地科研数据 +12。', facility:'cabin' },
+  { id:'research', label:'action.research.label', energy:3, description:'消耗 1 个样本及当天工作；本地科研数据 +20。', facility:'cabin' },
   { id:'transmit', label:'action.transmit.label', energy:2, description:'最多发送 30 点；日终确认计入目标。', facility:'antenna' },
   { id:'clean', label:'action.clean.label', energy:2, description:'清除积尘，次日起恢复 6 E 发电。', facility:'solar' },
   { id:'repair', label:'action.repair.label', energy:2, description:'本骨架支持维修积尘面板；需要工具箱。', facility:'solar', tool:'toolkit' },
   { id:'rest', label:'action.rest.label', energy:1, description:'人员状态 +8，上限 100。', facility:'cabin' },
-  { id:'monitor', label:'action.monitor.label', energy:2, description:'本地数据 +6；不会降低辐射。', tool:'monitor' },
   { id:'shield', label:'action.shield.label', energy:0, description:'消耗加固包和今日工作；永久保留屏蔽状态。', tool:'shield' },
   { id:'standby', label:'action.standby.label', energy:0, description:'保留电力；日终仍消耗食物。' },
 ].map(action => ({...action,narrative:NARRATIVES[action.id][0],summaryLine:NARRATIVES[action.id][1]})));
@@ -47,7 +46,7 @@ export function unavailableReason(state, action, event = null) {
     if (response) return choiceReason(state,response);
   }
   const systems = dailyState(state);
-  if (!['rest','standby'].includes(action.id) && !CREW_IDS.some(id => !crewAway(state,id) && !crewFatigued(state,id))) return 'error.crewResting';
+  if (!['rest','standby'].includes(action.id) && !CREW_IDS.some(id => !crewAway(state,id) && !crewFatigued(state,id) && !crewUnconscious(state,id))) return 'error.crewResting';
   if (action.id === 'grow' && systems.greenhouseDisabled) return 'error.facilityUnavailable';
   if (action.id === 'research' && state.sol < systems.labUntil) return 'error.facilityUnavailable';
   if (state.energy < workEnergy(state,action)) return 'error.powerInsufficient';
@@ -70,8 +69,7 @@ const effects = {
       logEntry(s,`温室完成收获，实际入库 ${gain} F。`);
     }
   },
-  research(s) { consumeSample(s); s.localData += 12; },
-  monitor(s) { s.localData += 6; },
+  research(s) { consumeSample(s); s.localData += 20; },
   transmit(s) { const amount = Math.min(dailyState(s).antennaLimit,s.localData); s.localData -= amount; s.pendingData += amount; },
   clean(s) { s.dusty = false; dailyState(s).generationCap=6; },
   repair(s) { s.dusty = false; dailyState(s).generationCap=6; dailyState(s).trackingCap=6; },

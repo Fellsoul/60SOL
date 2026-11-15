@@ -137,6 +137,11 @@ export class TerminalView {
       if (state.outcome) today = {success:'outcome.success',incomplete:'outcome.incomplete',unsafe:'outcome.unsafe'}[state.outcome];
       this.content.innerHTML = `${resourceInventory(state)}<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}<div id="terminal-decisions" class="terminal-choices"></div>`;
       const decisions = this.content.querySelector('#terminal-decisions');
+      if (state.tools.monitor === 'ready' && state.sol < LIMITS.sols) {
+        const weather = this.environment?.days?.[String(state.sol+1)] ?? this.environment?.default ?? 'clear';
+        const forecast = weather === 'sandstorm' ? 'monitor.storm' : 'monitor.clear';
+        decisions.insertAdjacentHTML('beforebegin',`<section class="weather-forecast"><h2>${escapeHtml(i18n.t('monitor.forecast'))} · SOL ${state.sol+1}</h2>${this.copy('forecast-copy',forecast)}</section>`);
+      }
       if (state.phase === 'event') {
         decisions.innerHTML = `<p class="terminal-note">${escapeHtml(i18n.t('tasks.eventOnClipboard'))}</p>`;
       } else if (state.phase === 'work' && !dailyActivitiesComplete(state,event)) {

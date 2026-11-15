@@ -39,15 +39,16 @@ export function validateState(s, eventIds, toolIds) {
   if (!Array.isArray(s.samples) || s.samples.length > 3 || !s.samples.every(uses => uses === 1 || uses === 2)) return false;
   if (!s.crew || Object.keys(s.crew).length !== 2 || !CREW_IDS.every(id => {
     const c=s.crew[id];
-    if (!c || Object.keys(c).length !== 3) return false;
-    if (![c.departSol,c.returnSol].every(sol => sol === null || (Number.isInteger(sol) && sol >= 1 && sol <= 14))) return false;
+    if (!c || Object.keys(c).some(key => !['departSol','returnSol','fatigue','comaDays'].includes(key))) return false;
+    if (c.comaDays !== undefined && (!Number.isInteger(c.comaDays) || c.comaDays < 0 || c.comaDays > 2)) return false;
+    if (![c.departSol,c.returnSol].every(sol => sol === null || (Number.isInteger(sol) && sol >= 1 && sol <= 15))) return false;
     if (!Number.isInteger(c.fatigue) || c.fatigue < 0 || c.fatigue > 4) return false;
     return (c.departSol === null) === (c.returnSol === null) &&
-      (c.departSol === null || (c.departSol === s.sol && c.returnSol === c.departSol+1 && c.fatigue === 0));
+      (c.departSol === null || (c.departSol <= s.sol && s.sol < c.returnSol && [1,2].includes(c.returnSol-c.departSol) && c.fatigue === 0 && !c.comaDays));
   })) return false;
   if (s.robotSampleSol !== null && (!Number.isInteger(s.robotSampleSol) || s.robotSampleSol < 1 || s.robotSampleSol > s.sol)) return false;
   if (s.expeditionPlan !== null && (!s.expeditionPlan || !CREW_IDS.includes(s.expeditionPlan.crewId) ||
-    s.expeditionPlan.departSol !== s.sol+1 || s.sol > 12 || s.crew[s.expeditionPlan.crewId].returnSol !== null || s.crew[s.expeditionPlan.crewId].fatigue > 0)) return false;
+    s.expeditionPlan.departSol !== s.sol+1 || s.sol > 12 || s.crew[s.expeditionPlan.crewId].returnSol !== null || s.crew[s.expeditionPlan.crewId].fatigue > 0 || s.crew[s.expeditionPlan.crewId].comaDays > 0)) return false;
   if (!['clear','sandstorm'].includes(s.weather) || typeof s.lightsOn !== 'boolean' || !['seed','sprout','growing','mature'].includes(s.plantStage)) return false;
   if (!Number.isInteger(s.summarySol) || s.summarySol < 0 || s.summarySol > s.sol) return false;
   if (![s.daySummary,s.previousDaySummary].every(lines => Array.isArray(lines) && lines.length <= 30 && lines.every(line => typeof line === 'string' && line.length <= 2000))) return false;

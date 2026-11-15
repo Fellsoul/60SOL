@@ -1,9 +1,11 @@
 assets/scene/interior/outpost_base_shelf.png
 assets/scene/interior/outpost_base_shelfOverride.png
-assets/scene/crew/astronaut_a/exhausted.png
+assets/scene/crew/astronaut_a/tired.png
+assets/scene/crew/astronaut_a/sleep.png
 assets/scene/crew/astronaut_a/resting.png
 assets/scene/crew/astronaut_a/seated.png
-assets/scene/crew/astronaut_b/exhausted.png
+assets/scene/crew/astronaut_b/tired.png
+assets/scene/crew/astronaut_b/sleep.png
 assets/scene/crew/astronaut_b/resting.png
 assets/scene/crew/astronaut_b/seated.png
 assets/scene/equipment/terminal/idle.png
