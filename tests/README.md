@@ -19,7 +19,7 @@ Run the automated suite with `npm test` (Node's built-in test runner; no extra p
 | `clipboard.test.mjs` | Available and completed tasks across turns and reloads |
 | `daily-guide.test.mjs` | Three-day terminal/notebook guidance, persisted progress, legacy saves, and no gameplay cost |
 | `controller.test.mjs` | Light switching saves progress and keeps the terminal open |
-| `launch-intro.test.mjs` | Setup gating, natural typing and pauses, three-second holds, background completion, skip, cancellation, replay, and reduced motion |
+| `launch-intro.test.mjs` | Setup gating, natural typing, persistent slogan, zoom/black transition, skip, cancellation, replay, and reduced motion |
 | `i18n.test.mjs` | Catalog consistency, content references, fallbacks, and old narrative text |
 
 Run the local data-server cache/outage tests with `python3 -m unittest discover -s tests -p '*_test.py'`.

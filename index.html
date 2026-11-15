@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="styles/movement.css">
   <link rel="stylesheet" href="styles/space-data.css">
   <link rel="stylesheet" href="styles/intro.css">
+  <link rel="stylesheet" href="styles/i18n.css">
   <script type="module" src="src/app.js"></script>
 </head>
 <body>
@@ -37,12 +38,15 @@
       <img class="intro-camera" alt="Launch camera" draggable="false">
       <p class="intro-text" aria-hidden="true"></p>
       <p class="intro-announcement sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+      <div class="intro-whiteout" aria-hidden="true"></div>
+      <div class="intro-blackout" aria-hidden="true"></div>
       <button class="intro-skip" type="button" hidden>SKIP INTRO</button>
     </section>
     <div id="scene-viewport"><div id="scene" data-i18n-aria-label="scene.interior" aria-label="Mars outpost interior"></div></div>
     <button id="terminal-toggle" data-i18n-aria-label="terminal.open" aria-label="Open terminal" aria-haspopup="dialog" aria-controls="terminal" aria-expanded="false" disabled>
       <img src="assets/scene/interior/outpost_console.png" alt="" draggable="false">
     </button>
+    <p id="scene-control-reason" hidden></p>
     <div id="morning-veil" aria-hidden="true"><div id="morning-black"></div><span id="sol-title"></span><button id="ending-continue" type="button" data-i18n-aria-label="ending.openJournal" aria-label="View mission journal" hidden></button></div>
     <p id="notice" role="status" aria-live="polite" hidden></p>
   </main>

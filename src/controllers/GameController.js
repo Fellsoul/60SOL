@@ -187,15 +187,14 @@ export class GameController {
         this.view.intro.stop();
       }
       this.view.menu.hide();
-      await this.render({morning,initial});
+      await this.render({morning,initial,intro});
       if (!result.ok) this.view.notify(result.message);
     } catch (error) {
       this.view.intro?.stop();
       this.view.notify(`画面更新失败，任务决定已保留：${error.message}`);
       document.querySelector('#morning-veil').style.pointerEvents = 'none';
       document.querySelector('#morning-veil').style.opacity = '0';
-      document.querySelector('#terminal-toggle').disabled = false;
-      document.querySelector('#tasks-toggle').disabled = !this.model.snapshot;
+      this.view.updateSceneControls();
     } finally { this.busy = false; }
   }
 }

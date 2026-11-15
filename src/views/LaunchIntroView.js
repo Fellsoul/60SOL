@@ -1,4 +1,5 @@
 import { i18n } from '../services/I18n.js';
+import { textCharacters } from './TextSegments.js';
 
 const asset = name => new URL(`../../assets/scene/init_game/${name}`,import.meta.url).href;
 
@@ -13,15 +14,34 @@ export class LaunchIntroView {
     this.text = this.root.querySelector('.intro-text');
     this.announcement = this.root.querySelector('.intro-announcement');
     this.skipButton = this.root.querySelector('.intro-skip');
+    this.whiteout = this.root.querySelector('.intro-whiteout');
+    this.blackout = this.root.querySelector('.intro-blackout');
     this.pending = new Set();
     this.animations = new Set();
     this.session = 0;
     this.skipButton.addEventListener('click',() => this.skip());
-    window.addEventListener('resize',() => this.sizeCamera());
+    window.addEventListener('resize',() => { this.sizeCamera(); this.fitSlogan(); });
   }
   sizeCamera() {
     // A square covering roughly one tenth of the scene, at every aspect ratio.
     this.camera.style.width = `${Math.sqrt(innerWidth*innerHeight*.1)}px`;
+  }
+  fitSlogan() {
+    if (this.transitioning) return;
+    if (typeof getComputedStyle !== 'function' || !this.sloganText || !this.text.classList.contains('intro-slogan')) return;
+    this.text.style.setProperty('--intro-slogan-fit','999px');
+    if (!this.text.clientWidth) return;
+    const style = getComputedStyle(this.text);
+    const measure = document.createElement('span');
+    measure.textContent = this.sloganText;
+    measure.setAttribute('aria-hidden','true');
+    Object.assign(measure.style,{position:'absolute',visibility:'hidden',whiteSpace:'pre',font:style.font,letterSpacing:style.letterSpacing});
+    this.root.appendChild(measure);
+    const width = measure.getBoundingClientRect().width;
+    measure.remove();
+    if (width > this.text.clientWidth) {
+      this.text.style.setProperty('--intro-slogan-fit',`${parseFloat(style.fontSize)*(this.text.clientWidth-2)/width}px`);
+    }
   }
   start(reducedMotion = false) {
     this.stop();
@@ -30,6 +50,7 @@ export class LaunchIntroView {
     this.skipped = false;
     this.textStarted = false;
     this.reducedMotion = reducedMotion;
+    this.transitioning = false;
     this.root.hidden = false;
     this.sizeCamera();
     this.root.classList.remove('intro-cruising');
@@ -41,6 +62,9 @@ export class LaunchIntroView {
     this.text.classList.remove('intro-slogan');
     this.announcement.textContent = '';
     this.text.style.opacity = '0';
+    this.text.style.transform = '';
+    this.whiteout.style.opacity = '0';
+    this.blackout.style.opacity = '0';
     this.background.style.transform = reducedMotion ? 'translateY(0)' : 'translateY(calc(100dvh - 100%))';
     this.load(this.rocket,asset('rocket_launch.gif'));
     this.load(this.camera,asset('camera_pip.gif'));
@@ -103,7 +127,8 @@ export class LaunchIntroView {
     this.textStarted = true;
     this.skipButton.hidden = false;
     this.skipButton.focus({preventScroll:true});
-    const lines = this.config.lines.map(line => Array.from(line));
+    const copy = this.config.translations?.[i18n.language]?.lines ?? this.config.lines;
+    const lines = copy.map(textCharacters);
     const playLines = async () => {
       for (const [lineIndex,characters] of lines.entries()) {
         if (!running()) return;
@@ -112,6 +137,8 @@ export class LaunchIntroView {
         if (lineIndex === 2) this.text.classList.add('intro-slogan');
         // Size against the complete slogan so its font stays steady while typing.
         this.text.style.setProperty('--intro-slogan-characters',String(Math.max(1,characters.length)));
+        this.sloganText = characters.join('');
+        this.fitSlogan();
         this.announcement.textContent = characters.join('');
         this.text.style.opacity = '1';
         for (let index=0; index<characters.length && !this.reducedMotion; index++) {
@@ -121,6 +148,13 @@ export class LaunchIntroView {
         }
         if (!running()) return;
         this.text.textContent = characters.join('');
+        if (lineIndex === 2) {
+          // Hold the complete slogan before enlarging it into the ending transition.
+          await Promise.all([this.wait(this.config.lineHoldMs),this.scrollFinished]);
+          if (!running()) return;
+          await this.expandSlogan(running);
+          return;
+        }
         await this.wait(this.config.lineHoldMs);
         if (!running()) return;
         if (!this.reducedMotion) await this.animate(this.text,[{opacity:1},{opacity:0}],this.config.lineFadeMs);
@@ -130,6 +164,24 @@ export class LaunchIntroView {
       }
     };
     await Promise.all([this.scrollFinished,playLines()]);
+  }
+  async expandSlogan(running) {
+    this.transitioning = true;
+    if (!this.reducedMotion) {
+      const lineHeight = typeof getComputedStyle === 'function' ? parseFloat(getComputedStyle(this.text).lineHeight) : 40;
+      const scale = Math.max(24,innerHeight/Math.max(1,lineHeight)*3);
+      const transform = `translate(-50%,-50%) scale(${scale})`;
+      await Promise.all([
+        this.animate(this.text,[{transform:'translate(-50%,-50%) scale(1)'},{transform}],this.config.sloganZoomMs ?? 1800),
+        this.animate(this.whiteout,[{opacity:0},{opacity:0,offset:.65},{opacity:1}],this.config.sloganZoomMs ?? 1800)
+      ]);
+      if (!running()) return;
+      this.text.style.transform = transform;
+      this.whiteout.style.opacity = '1';
+      await this.animate(this.blackout,[{opacity:0},{opacity:1}],this.config.whiteToBlackMs ?? 650);
+      if (!running()) return;
+    }
+    this.blackout.style.opacity = '1';
   }
   clearPending() {
     for (const finish of [...this.pending]) finish();

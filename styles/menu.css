@@ -14,7 +14,7 @@
 body.reduced-motion .menu-buttons button { animation:none; }
 body.reduced-motion [data-menu-layer=meteors] { transform:none; transition:none; }
 .settings-field { display:grid; gap:12px; margin:24px 0; }
-.settings-field select { padding:12px; background:#18261c; color:#d5dfcf; border:1px solid #607358; font:inherit; }
+.settings-field select { min-width:0; max-width:100%; padding:12px; background:#18261c; color:#d5dfcf; border:1px solid #607358; font:inherit; }
 #save-picker { width:min(620px,calc(100vw - 32px)); max-height:calc(100dvh - 40px); padding:24px; border:1px solid #8da7a477; border-radius:10px; background:#0d1b22; color:#e3e9df; overflow:auto; }
 #save-picker::backdrop { background:#030810cc; }
 .save-picker-header { display:flex; align-items:center; justify-content:space-between; gap:16px; }

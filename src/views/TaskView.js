@@ -23,7 +23,7 @@ export function clipboardTasks(state,event) {
   const eventChoices = (event?.choices ?? []).filter(choice => pending || state.choiceId === choice.id);
   const rows = eventChoices.map(choice => ({...choice,energy:choiceEnergy(state,choice),command:'choose',
     done:state.choiceId === choice.id,
-    reason:state.phase !== 'event' ? 'error.workUsed' : choiceReason(state,choice)}));
+    reason:state.choiceId === choice.id ? 'tasks.checked' : state.phase === 'finished' ? 'error.missionFinished' : state.phase !== 'event' ? 'error.eventFirst' : choiceReason(state,choice)}));
   if (pending) return rows;
   return rows.concat(ACTIONS.filter(action => (!action.tool || state.tools[action.tool]) && (action.id !== 'repair_robot' || state.tools.robot)).map(action => ({...action,
     energy:workEnergy(state,action),
@@ -68,10 +68,11 @@ export class TaskView {
     if (this.selectingSol !== state.sol) { this.selecting=false; this.selectingSol=state.sol; }
     const checked=Boolean(plan || this.selecting);
     const disabled=CREW_IDS.every(id => expeditionReason(state,id)) && !plan;
+    const planReason = state.phase === 'finished' ? 'error.missionFinished' : disabled ? CREW_IDS.map(id => expeditionReason(state,id)).find(Boolean) : '';
     const robotReason=robotSampleReason(state,event);
     return `<section class="sampling-board"><h2>${text('sampling.title')}</h2><p class="sample-stock">${text('sampling.stock')}: <strong>${state.samples.length} / 3</strong> · ${text('sampling.uses')}: <strong>${researchUses(state)}</strong></p><p class="sampling-hint">${text('sampling.rules')}</p>
-      <label class="expedition-toggle"><input id="expedition-check" type="checkbox" ${checked ? 'checked' : ''} ${state.phase === 'finished' || disabled ? 'disabled' : ''}><span>${text('sampling.planTomorrow')} <small>SOL ${state.sol+1}</small></span></label>
-      ${disabled ? `<p class="sampling-hint">${text(CREW_IDS.map(id => expeditionReason(state,id)).find(Boolean))}</p>` : ''}
+      <label class="expedition-toggle"><input id="expedition-check" type="checkbox" ${checked ? 'checked' : ''} ${planReason ? 'disabled aria-describedby="expedition-reason"' : ''}><span>${text('sampling.planTomorrow')} <small>SOL ${state.sol+1}</small></span></label>
+      ${planReason ? `<p id="expedition-reason" class="sampling-hint">${text(planReason)}</p>` : ''}
       <div class="crew-picker" data-crew-picker ${checked ? '' : 'hidden'}>${crewDisplayOrder.map(id => {
         const reason=expeditionReason(state,id),selected=plan?.crewId===id;
         return `<button type="button" class="crew-choice${selected ? ' is-selected' : ''}" data-action="expedition" data-id="${id}" aria-pressed="${selected}" ${reason ? 'disabled' : ''} title="${escapeHtml(crewStatuses(state,id).join('\n'))}">${crewHead(id)}<strong>${text(`crew.${id.replaceAll('-','_')}.name`)}</strong><small>${text(reason || (selected ? 'sampling.selected' : 'sampling.selectCrew'))}</small></button>`;
@@ -105,8 +106,8 @@ export class TaskView {
     const done = state.history.emergency_clean === state.sol;
     if (!done && !emergencyCleanAvailable(state,event)) return '';
     return `<section class="clipboard-event"><h2>${text(emergency.title)}</h2><p>${text(emergency.text)}</p>${emergency.choices.filter(choice => !done || state.daySummary.includes(choice.summaryLine)).map(choice => {
-      const reason = choiceReason(state,choice);
-      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="emergency_clean" data-id="${escapeHtml(choice.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(choice.label)}</strong>${toolBadge(choice)}<small>${text(done ? choice.summaryLine : reason || choice.description)}</small><span class="task-cost">${energyCost(choiceEnergy(state,choice))} · ${text(choice.work ? 'tasks.work' : 'tasks.noWork')}</span></span></button>`;
+      const reason = done ? 'tasks.checked' : state.phase === 'finished' ? 'error.missionFinished' : choiceReason(state,choice);
+      return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="emergency_clean" data-id="${escapeHtml(choice.id)}" ${reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(choice.label)}</strong>${toolBadge(choice)}<small>${text(reason || choice.description)}</small><span class="task-cost">${energyCost(choiceEnergy(state,choice))} · ${text(choice.work ? 'tasks.work' : 'tasks.noWork')}</span></span></button>`;
     }).join('')}</section>`;
   }
   concurrentTasks(state) {
@@ -116,7 +117,7 @@ export class TaskView {
       const crew = instance.crewId ? ` · ${text(`crew.${instance.crewId.replaceAll('-','_')}.name`)}` : '';
       return `<section class="clipboard-event"><h2>${text(event.title)}${crew}</h2>${event.choices
         .filter(choice => !instance.choiceId || choice.id === instance.choiceId).map(choice => {
-          const reason = concurrentChoiceReason(state,choice,this.events?.find(item => item.id === state.currentEventId));
+          const reason = instance.choiceId ? 'tasks.checked' : state.phase === 'finished' ? 'error.missionFinished' : concurrentChoiceReason(state,choice,this.events?.find(item => item.id === state.currentEventId));
           return `<button class="task-row ${instance.choiceId ? 'is-complete' : ''}" data-action="concurrent" data-instance="${escapeHtml(instance.id)}" data-id="${escapeHtml(choice.id)}" ${instance.choiceId || reason ? 'disabled' : ''}><span class="task-checkbox">${instance.choiceId ? '✓' : ''}</span><span class="task-details"><strong>${text(choice.label)}</strong>${toolBadge(choice)}<small>${text(instance.choiceId ? 'tasks.checked' : reason || choice.description)}</small><span class="task-cost">${energyCost(choiceEnergy(state,choice))} · ${text(choice.work ? 'tasks.work' : 'tasks.noWork')}</span></span></button>`;
         }).join('')}</section>`;
     }).join('');

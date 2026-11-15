@@ -8,9 +8,15 @@
 .intro-rocket { position: absolute; left: 50%; top: 50%; height: 88%; width: auto; max-width: 90%; object-fit: contain; transform: translate(-50%,-50%) rotate(5deg); pointer-events: none; animation: intro-rocket-flight 2.4s ease-in-out infinite; }
 .intro-camera { position: absolute; top: max(16px,env(safe-area-inset-top)); left: max(16px,env(safe-area-inset-left)); width: min(31.623vw,31.623vh); aspect-ratio: 1; object-fit: cover; border: 1px solid #c9d8dd80; box-shadow: 0 4px 22px #0008; }
 .intro-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: min(82%,960px); margin: 0; color: #fff; text-align: center; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 clamp(20px,3vw,38px)/1.5 'Courier New',monospace; text-shadow: 0 2px 4px #000,0 0 18px #000,0 0 36px #000; }
-.intro-text.intro-slogan { width: min(92%,1440px); white-space: nowrap; overflow-wrap: normal; font-size: min(clamp(20px,3vw,38px),calc(min(92vw,1440px) / var(--intro-slogan-characters) / .62)); }
+.intro-text.intro-slogan { width: min(92%,1440px); white-space: nowrap; overflow-wrap: normal; font-size: min(clamp(20px,3vw,38px),calc(min(92vw,1440px) / var(--intro-slogan-characters) / .62),var(--intro-slogan-fit,999px)); }
 .intro-skip { position: absolute; right: max(20px,env(safe-area-inset-right)); bottom: max(20px,env(safe-area-inset-bottom)); min-height: 40px; padding: 8px 14px; border: 1px solid #c9d8dd80; border-radius: 4px; background: #050d19b3; color: #edf3f5; font: 12px 'Courier New',monospace; letter-spacing: .12em; }
 .intro-skip:hover { background: #203746; border-color: #edf3f5; }
 @keyframes intro-star-drift { to { transform: translateY(50%); } }
 @keyframes intro-rocket-flight { 50% { transform: translate(-50%,calc(-50% - 4px)) rotate(5deg); } }
 body.reduced-motion .intro-rocket, body.reduced-motion .intro-stars { animation: none; }
+.intro-camera { z-index: 2; }
+.intro-text { z-index: 3; transform-origin: center; }
+.intro-whiteout, .intro-blackout { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
+.intro-whiteout { z-index: 4; background: #fff; }
+.intro-blackout { z-index: 5; background: #000; }
+.intro-skip { z-index: 6; }

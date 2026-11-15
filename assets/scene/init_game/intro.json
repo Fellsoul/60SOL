@@ -1,7 +1,7 @@
 {
   "lines": [
     "As Earth becomes hotter due to global warming, humanity seeks solutions on Mars.",
-    "As the commander, your task is to send samples from Mars back to Earth within 14 Sols.",
+    "As the commander, your task is to transmit 60 research data points from Mars to Earth within 14 Sols, or days on Mars.",
     "2 ASTRONAUTS. LIMITED RESOURCES. HAPHAZARD EVENTS."
   ],
   "scrollMs": 11000,
@@ -10,5 +10,72 @@
   "typingPauseChance": 0.06,
   "typingPauseMs": 120,
   "lineHoldMs": 2000,
-  "lineFadeMs": 1000
+  "lineFadeMs": 1000,
+  "sloganZoomMs": 1800,
+  "whiteToBlackMs": 650,
+  "translations": {
+    "es": {
+      "lines": [
+        "La Tierra se calienta por el cambio climático. La humanidad busca soluciones en Marte.",
+        "Como comandante, debes transmitir 60 puntos de datos de investigación de Marte a la Tierra en 14 Sols.",
+        "2 ASTRONAUTAS. RECURSOS LIMITADOS. IMPREVISTOS."
+      ]
+    },
+    "de": {
+      "lines": [
+        "Die Erde wird durch die globale Erwärmung heißer. Die Menschheit sucht Lösungen auf Mars.",
+        "Als Kommandant musst du innerhalb von 14 Sols 60 Forschungsdatenpunkte vom Mars zur Erde übertragen.",
+        "2 ASTRONAUTEN. BEGRENZTE VORRÄTE. UNVORHERGESEHENES."
+      ]
+    },
+    "fr": {
+      "lines": [
+        "La Terre se réchauffe. L'humanité cherche des solutions sur Mars.",
+        "En tant que commandant, transmettez 60 points de données de recherche de Mars à la Terre en 14 Sols.",
+        "2 ASTRONAUTES. RESSOURCES LIMITÉES. IMPRÉVUS."
+      ]
+    },
+    "hi": {
+      "lines": [
+        "वैश्विक ताप से पृथ्वी गर्म हो रही है। मानवता मंगल पर समाधान खोजती है।",
+        "कमांडर के रूप में 14 सोल में मंगल से 60 शोध डेटा अंक पृथ्वी पर भेजना आपका काम है।",
+        "2 अंतरिक्ष यात्री। सीमित संसाधन। अनपेक्षित घटनाएं।"
+      ]
+    },
+    "ja": {
+      "lines": [
+        "地球温暖化が進む中、人類は火星に解決策を求める。",
+        "指揮官として、14ソル以内に火星から研究データ60ポイントを地球へ送信するのが任務だ。",
+        "宇宙飛行士2人。限られた物資。予期せぬ出来事。"
+      ]
+    },
+    "uk": {
+      "lines": [
+        "Земля нагрівається через глобальне потепління. Людство шукає рішення на Марсі.",
+        "Ви командир. Ваше завдання — за 14 солів передати 60 одиниць дослідницьких даних з Марса на Землю.",
+        "2 АСТРОНАВТИ. ОБМЕЖЕНІ РЕСУРСИ. НЕПЕРЕДБАЧЕНІ ПОДІЇ."
+      ]
+    },
+    "zh-CN": {
+      "lines": [
+        "随着全球变暖加剧，地球不断升温，人类在火星寻找解决之道。",
+        "作为指挥官，你需要在14个火星日内，从火星向地球传回60点科研数据。",
+        "2名宇航员。有限的资源。突发的事件。"
+      ]
+    },
+    "zh-HK": {
+      "lines": [
+        "隨著全球變暖加劇，地球不斷升溫，人類在火星尋找解決之道。",
+        "作為指揮官，你需要在14個火星日內，從火星向地球傳回60點科研資料。",
+        "2名宇航員。有限的資源。突發的事件。"
+      ]
+    },
+    "ar": {
+      "lines": [
+        "تزداد حرارة الأرض بسبب الاحترار العالمي، فتبحث البشرية عن حلول على المريخ.",
+        "بصفتك القائد، عليك إرسال 60 نقطة من بيانات البحث من المريخ إلى الأرض خلال 14 يوما مريخيا.",
+        "2 من رواد الفضاء. موارد محدودة. أحداث غير متوقعة."
+      ]
+    }
+  }
 }

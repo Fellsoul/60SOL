@@ -8,7 +8,9 @@ import { SaveRepository } from '../src/repositories/SaveRepository.js';
 import { finishSol } from '../src/models/TurnEngine.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(path,import.meta.url),'utf8'));
-const catalogs = {en:await readJson('../locales/en.json'),'zh-CN':await readJson('../locales/zh-CN.json')};
+const languages = await readJson('../locales/languages.json');
+const catalogs = Object.fromEntries(await Promise.all(languages.map(async ({code}) =>
+  [code,await readJson(`../locales/${code}.json`)])));
 const events = await readJson('../data/events.json');
 const tools = await readJson('../data/tools.json');
 const semanticKey = /^[a-z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+$/;
@@ -16,9 +18,72 @@ const semanticKey = /^[a-z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+$/;
 test('所有语言使用相同的英文语义 key，译文保持为字符串',() => {
   assert.deepEqual(Object.keys(catalogs.en).sort(),Object.keys(catalogs['zh-CN']).sort());
   for (const catalog of Object.values(catalogs)) {
+    assert.deepEqual(Object.keys(catalog).sort(),Object.keys(catalogs.en).sort());
     for (const [key,value] of Object.entries(catalog)) {
       assert.match(key,semanticKey); assert.equal(typeof value,'string'); assert.ok(value.length);
+      assert.deepEqual(value.match(/\{[a-zA-Z]+\}/g) ?? [],catalogs.en[key].match(/\{[a-zA-Z]+\}/g) ?? [],`Placeholder changed: ${key}`);
     }
+  }
+});
+
+test('registered languages load, persist and switch without changing mission saves',async t => {
+  const entries = new Map([['outpost.language','hi'],['mission-save','preserve this save']]);
+  t.mock.method(globalThis,'fetch',async path => ({ok:true,json:() => readJson(`../${path}`)}));
+  for (const [key,value] of Object.entries({document:{documentElement:{lang:''}},localStorage:{getItem:key => entries.get(key),setItem:(key,value) => entries.set(key,value)}})) {
+    const previous = Object.getOwnPropertyDescriptor(globalThis,key);
+    Object.defineProperty(globalThis,key,{value,configurable:true});
+    t.after(() => previous ? Object.defineProperty(globalThis,key,previous) : delete globalThis[key]);
+  }
+  const translator = new I18n();await translator.init();
+  assert.equal(translator.language,'hi');
+  assert.equal(new Set(languages.map(({code}) => code)).size,languages.length);
+  for (const {code} of languages) {
+    translator.setLanguage(code);
+    assert.equal(document.documentElement.lang,code);
+    assert.equal(document.documentElement.dir,code === 'ar' ? 'rtl' : 'ltr');
+    assert.equal(entries.get('outpost.language'),code);
+    assert.equal(translator.t('menu.new'),catalogs[code]['menu.new']);
+    assert.equal(translator.t('我们照料了作物，种植槽中的叶片舒展开来。'),catalogs[code]['action.grow.summary']);
+  }
+  translator.setLanguage('ar');assert.equal(document.documentElement.dir,'rtl');
+  const reloaded = new I18n();await reloaded.init();
+  assert.equal(reloaded.language,'ar');assert.equal(document.documentElement.dir,'rtl');
+  translator.setLanguage('unsupported');assert.equal(translator.language,'en');assert.equal(document.documentElement.dir,'ltr');
+  assert.equal(entries.get('mission-save'),'preserve this save');assert.equal(entries.size,2);
+});
+
+test('translated instructions preserve numeric costs, yields and limits',() => {
+  for (const [key,english] of Object.entries(catalogs.en)) {
+    if (!/(?:\.description|\.narrative)$|^sampling\./.test(key)) continue;
+    for (const {code} of languages.filter(({code}) => !['en','zh-CN','zh-HK'].includes(code))) {
+      const numbers = catalogs[code][key].match(/\d+/g) ?? [];
+      for (const number of english.match(/\d+/g) ?? []) {
+        assert.ok(numbers.includes(number),`${code}: ${key} lost ${number}`);
+      }
+    }
+  }
+});
+
+test('intro, credits and resource logs have complete localized copy',async () => {
+  const intro = await readJson('../assets/scene/init_game/intro.json');
+  const credits = await readJson('../assets/menu/credits.json');
+  const logs = await readJson('../data/resource_log.json');
+  for (const {code} of languages) {
+    if (code !== 'en') {
+      assert.equal(intro.translations[code].lines.length,intro.lines.length);
+      assert.ok(intro.translations[code].lines.every(line => typeof line === 'string' && line.length));
+      intro.lines.forEach((line,index) => {
+        const translated = intro.translations[code].lines[index].match(/\d+/g) ?? [];
+        for (const number of line.match(/\d+/g) ?? []) assert.ok(translated.includes(number),`${code}: intro lost ${number}`);
+      });
+      assert.equal(credits.translations[code].title,catalogs[code]['menu.credits']);
+      assert.equal(credits.translations[code].sections.length,credits.sections.length);
+    }
+    for (const source of Object.values(logs.sources)) {
+      assert.equal(source.descriptions[code].length,source.descriptions.en.length);
+      assert.ok(source.descriptions[code].every(line => typeof line === 'string' && line.length));
+    }
+    for (const resource of Object.values(logs.resources)) assert.ok(resource[code]?.length);
   }
 });
 

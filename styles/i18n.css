@@ -1,0 +1,11 @@
+/* Arabic follows reading order; physical scene and animation coordinates stay fixed. */
+html[dir="rtl"] #scene { direction:ltr; }
+html[dir="rtl"] :is(.scene-event-bubble,.scene-event-description,.crew-status-panel) { direction:rtl; }
+html[dir="rtl"] :is(.menu-buttons button,.save-entry,.terminal-choice,.task-row,.clipboard-primary,.robot-sample) { text-align:start; }
+html[dir="rtl"] :is(.terminal-header h1,#terminal-content h2,.clipboard-eyebrow,#tasks-title,.clipboard-footer,#sol-title,.intro-skip,.difficulty-options strong) { letter-spacing:normal; }
+html[dir="rtl"] :is(.terminal-header h1,.intro-text,.intro-skip,.clipboard-eyebrow,.clipboard-meta,.clipboard-footer,.task-cost,.sample-stock,#sol-title,.motion-cost) { font-family:"Segoe UI","Geeza Pro","Noto Sans Arabic",sans-serif; letter-spacing:normal; }
+html[dir="rtl"] .terminal-footer label { margin-left:0; margin-right:auto; }
+html[dir="rtl"] :is(.mission-events,.mission-actions) { padding-left:0; padding-right:1.4em; }
+html[dir="rtl"] .task-completed span { margin-right:0; margin-left:8px; }
+html[dir="rtl"] :is(.resource-amount,.summary-resource-change,.task-energy-cost,#tasks-sol,#tasks-power,#sol-title) { direction:ltr; unicode-bidi:isolate; }
+html[dir="rtl"] .terminal-copy { unicode-bidi:plaintext; }

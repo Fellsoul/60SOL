@@ -10,7 +10,8 @@ import { escapeHtml } from '../src/views/dom.js';
 
 const read = async path => JSON.parse(await readFile(new URL(path,import.meta.url),'utf8'));
 const content = {events:(await read('../data/events.json')).filter(event => !event.dailySol),tools:await read('../data/tools.json')};
-i18n.setCatalogs({en:await read('../locales/en.json'),'zh-CN':await read('../locales/zh-CN.json')});
+const languages = await read('../locales/languages.json');
+i18n.setCatalogs(Object.fromEntries(await Promise.all(languages.map(async ({code}) => [code,await read(`../locales/${code}.json`)]))));
 const valid = state => validateState(state,content.events.map(e => e.id),content.tools.map(t => t.id));
 function model() { const game = new GameModel(content); game.start(['toolkit','battery']); return game; }
 function repository() {
@@ -99,12 +100,12 @@ test('ending report lists days in order, selected choices once, and marks unknow
   const state=game.snapshot;Object.assign(state,{sol:3,summarySol:3,outcome:'success'});
   state.missionJournal.push({sol:3,summary:[],resources:[],events:[]});
   const view={resourceLog:{},copy:TerminalView.prototype.copy,resourceSummary:TerminalView.prototype.resourceSummary};
-  for (const language of ['en','zh-CN']) {
+  for (const {code:language} of languages) {
     i18n.language=language;
     const html=TerminalView.prototype.missionSummary.call(view,state);
     assert.deepEqual([...html.matchAll(/data-sol="(\d+)"/g)].map(match => match[1]),['1','2','3']);
-    assert.ok(html.includes(i18n.t('ending.missingLog')));
-    assert.ok(html.includes(i18n.t('event.arrival.endingSummary')));
+    assert.ok(html.includes(escapeHtml(i18n.t('ending.missingLog'))),language);
+    assert.ok(html.includes(escapeHtml(i18n.t('event.arrival.endingSummary'))),language);
     assert.equal(html.split(escapeHtml(i18n.t('event.arrival.choice.plan.summaryLine'))).length-1,1);
     assert.ok(!html.includes('data-action="next"'));
   }

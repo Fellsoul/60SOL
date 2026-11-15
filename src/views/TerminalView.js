@@ -184,9 +184,13 @@ export class TerminalView {
       }
       if (!state.outcome) {
         const light = LIGHT_ACTIONS.find(action => action.id === (state.lightsOn ? 'lights_off' : 'lights_on'));
-        decisions.insertAdjacentHTML('beforeend',`<h2>${escapeHtml(i18n.t('terminal.lighting'))}</h2>` + choice('lights',light.id,light.label,light.narrative,!state.lightsOn && state.energy === 0));
+        const reason = !state.lightsOn && state.energy === 0 ? 'error.powerInsufficient' : '';
+        decisions.insertAdjacentHTML('beforeend',`<h2>${escapeHtml(i18n.t('terminal.lighting'))}</h2>` + choice('lights',light.id,light.label,reason || light.narrative,Boolean(reason)));
       }
-      if (state.tools.battery === 'ready' && !state.outcome) decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect','battery.description',state.energy >= LIMITS.energy));
+      if (state.tools.battery === 'ready' && !state.outcome) {
+        const reason = state.energy >= LIMITS.energy ? 'error.batteryFull' : '';
+        decisions.insertAdjacentHTML('beforeend',choice('battery','','battery.connect',reason || 'battery.description',Boolean(reason)));
+      }
     }
     if (state) this.content.insertAdjacentHTML('beforeend',spaceEvidence(state));
     else this.content.querySelector('#loadout-form')?.insertAdjacentHTML('afterbegin',snapshotSelector());
@@ -199,12 +203,22 @@ export class TerminalView {
     const count = form.querySelectorAll('input:checked').length;
     const submit = form.querySelector('button[type=submit]'); submit.disabled = count !== 2;
     submit.textContent = i18n.t(count === 2 ? 'loadout.enter' : 'loadout.chooseTwo');
-    form.querySelectorAll('input:not(:checked)').forEach(input => { input.disabled = count === 2; });
+    let hint = form.querySelector('#loadout-limit');
+    if (!hint) {
+      hint = document.createElement('p'); hint.id = 'loadout-limit'; hint.className = 'terminal-note';
+      form.querySelector('.loadout').after(hint);
+    }
+    hint.textContent = i18n.t('loadout.limit'); hint.hidden = count !== 2;
+    form.querySelectorAll('input[name=tool]').forEach(input => {
+      input.disabled = !input.checked && count === 2;
+      if (input.disabled) input.setAttribute('aria-describedby',hint.id);
+      else input.removeAttribute('aria-describedby');
+    });
   }
   setReducedMotion(value) { this.reducedMotion = value; if (value) this.writer.skip(); }
   renderCredits() {
     this.writer.cancel();
-    const {title,sections} = this.credits;
+    const {title,sections} = this.credits.translations?.[i18n.language] ?? this.credits;
     const heading = document.querySelector('#terminal-title');
     heading.textContent = title;
     heading.setAttribute('aria-label',title);

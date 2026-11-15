@@ -1,45 +1,1084 @@
 {
   "sources": {
-    "generation": {"descriptions": {"en": ["The solar panels supplied the base with power.", "The batteries received today's solar charge."], "zh-CN": ["太阳能板为基地补充了电力。", "电池已接收今日的太阳能充电。"]}},
-    "lifeSupport": {"descriptions": {"en": ["Life support is running normally.", "Life support completed its checks without a problem."], "zh-CN": ["维生系统正在正常运行。", "维生系统没有出现问题，已完成今日检查。"]}},
-    "lifeSupportPartial": {"descriptions": {"en": ["Life support used the remaining power, but its supply was insufficient.", "The batteries could not fully power life support."], "zh-CN": ["维生系统耗尽了剩余电量，但供电仍然不足。", "电池余量无法满足维生系统的需求。"]}},
-    "lighting": {"descriptions": {"en": ["The cabin lights stayed on through the day.", "Cabin lighting drew power from the batteries."], "zh-CN": ["舱内照明维持了一天的运行。", "舱内灯光消耗了电池中的电量。"]}},
-    "meals": {"descriptions": {"en": ["The crew used food from storage for their daily meals.", "Today's rations were taken from the food supply."], "zh-CN": ["成员们从库存中取用了今日的食物。", "今日口粮已从食物储备中扣除。"]}},
-    "hunger": {"descriptions": {"en": ["Insufficient food affected the crew's condition.", "The crew went without enough food today."], "zh-CN": ["食物供应不足，影响了成员的身体状态。", "今日口粮不足，成员们没能吃饱。"]}},
-    "supportDamage": {"descriptions": {"en": ["A life-support power shortage harmed the crew.", "Insufficient life support affected crew health."], "zh-CN": ["维生系统供电不足，成员健康受到影响。", "维生保障不足，成员的身体状态下降。"]}},
-    "powerFailures": {"descriptions": {"en": ["The consecutive life-support failure count was updated."], "zh-CN": ["连续维生供电故障记录已更新。"]}},
-    "transmissionConfirmed": {"descriptions": {"en": ["Earth confirmed receipt of the transmitted research.", "Our research transmission reached Earth successfully."], "zh-CN": ["地球已确认收到传送的科研数据。", "科研数据已成功抵达地球。"]}},
-    "battery": {"descriptions": {"en": ["The spare battery supplied additional power.", "We connected the backup battery to the base."], "zh-CN": ["备用电池为基地补充了电力。", "我们将备用电池接入了基地。"]}},
-    "work.grow": {"descriptions": {"en": ["We tended the greenhouse crops.", "The crew checked and cared for the planting trays."], "zh-CN": ["我们照料了温室里的作物。", "成员们检查并照料了种植槽。"]}},
-    "work.research": {"descriptions": {"en": ["We completed today's laboratory research.", "New research results were stored locally."], "zh-CN": ["我们完成了今日的实验研究。", "新的实验结果已保存在本地。"]}},
-    "work.transmit": {"descriptions": {"en": ["We sent local research and are awaiting confirmation.", "Research records were queued for Earth to confirm."], "zh-CN": ["我们发出了本地科研数据，等待地球确认。", "科研记录已发送，正在等待接收确认。"]}},
-    "work.clean": {"descriptions": {"en": ["We cleared dust from the solar panels.", "The crew cleaned the solar array."], "zh-CN": ["我们清除了太阳能板上的积尘。", "成员们完成了太阳能阵列的清洁。"]}},
-    "work.repair": {"descriptions": {"en": ["We repaired the power equipment.", "The crew restored the solar equipment."], "zh-CN": ["我们维修了供电设备。", "成员们修复了太阳能设备。"]}},
-    "work.rest": {"descriptions": {"en": ["The crew took time to rest and recover.", "A quiet rest helped the crew recover."], "zh-CN": ["成员们休息了一段时间，恢复了状态。", "安静的休整帮助成员们恢复了体力。"]}},
-    "sampling.robot": {"descriptions": {"en": ["The robot returned with one sample, consumed by one day of research for 20 data."], "zh-CN": ["机器人带回了 1 个样本，可消耗一天工作研究，获得 20 点数据。"]}},
-    "expedition.return": {"descriptions": {"en": ["The returning expedition supplied a new sample for research."], "zh-CN": ["返回的成员带回了可供研究的新样本。"]}},
-    "work.robot": {"descriptions": {"en": ["The robot completed its research task.", "The robot returned with new research data."], "zh-CN": ["机器人完成了科研任务。", "机器人带回了新的研究数据。"]}},
-    "work.monitor": {"descriptions": {"en": ["The monitor collected new scientific readings.", "We saved a new set of monitoring data."], "zh-CN": ["监测仪采集了新的科研读数。", "我们保存了新一组监测数据。"]}}
+    "generation": {
+      "descriptions": {
+        "en": [
+          "The solar panels supplied the base with power.",
+          "The batteries received today's solar charge."
+        ],
+        "zh-CN": [
+          "太阳能板为基地补充了电力。",
+          "电池已接收今日的太阳能充电。"
+        ],
+        "es": [
+          "Los paneles suministraron energía.",
+          "Las baterías recibieron la carga solar de hoy."
+        ],
+        "de": [
+          "Die Module lieferten Strom.",
+          "Die Batterien erhielten die heutige Solarladung."
+        ],
+        "fr": [
+          "Les panneaux ont fourni de l'énergie.",
+          "Les batteries ont reçu la charge solaire du jour."
+        ],
+        "hi": [
+          "पैनलों ने बेस को ऊर्जा दी।",
+          "बैटरियों को आज का सौर चार्ज मिला।"
+        ],
+        "ja": [
+          "パネルが基地に電力を供給した。",
+          "今日の太陽光発電で充電した。"
+        ],
+        "uk": [
+          "Панелі забезпечили базу енергією.",
+          "Батареї отримали сьогоднішній сонячний заряд."
+        ],
+        "zh-HK": [
+          "太陽能板為基地補充了電力。",
+          "電池已接收今日的太陽能充電。"
+        ],
+        "ar": [
+          "زودت الألواح الشمسية القاعدة بالطاقة.",
+          "تلقت البطاريات الشحنة الشمسية لليوم."
+        ]
+      }
+    },
+    "lifeSupport": {
+      "descriptions": {
+        "en": [
+          "Life support is running normally.",
+          "Life support completed its checks without a problem."
+        ],
+        "zh-CN": [
+          "维生系统正在正常运行。",
+          "维生系统没有出现问题，已完成今日检查。"
+        ],
+        "es": [
+          "El soporte vital funciona con normalidad.",
+          "El soporte vital superó sus revisiones."
+        ],
+        "de": [
+          "Die Lebenserhaltung läuft normal.",
+          "Die Lebenserhaltung bestand alle Prüfungen."
+        ],
+        "fr": [
+          "Le système de survie fonctionne normalement.",
+          "Le système de survie a passé tous les contrôles sans problème."
+        ],
+        "hi": [
+          "जीवन रक्षक प्रणाली सामान्य है।",
+          "जीवन रक्षक प्रणाली की जांच बिना समस्या पूरी हुई।"
+        ],
+        "ja": [
+          "生命維持は正常に稼働中。",
+          "生命維持の点検を問題なく完了した。"
+        ],
+        "uk": [
+          "Життєзабезпечення працює нормально.",
+          "Перевірки життєзабезпечення пройшли без проблем."
+        ],
+        "zh-HK": [
+          "維生系統正在正常運行。",
+          "維生系統沒有出現問題，已完成今日檢查。"
+        ],
+        "ar": [
+          "يعمل نظام دعم الحياة بصورة طبيعية.",
+          "أكمل نظام دعم الحياة فحوصه دون مشكلة."
+        ]
+      }
+    },
+    "lifeSupportPartial": {
+      "descriptions": {
+        "en": [
+          "Life support used the remaining power, but its supply was insufficient.",
+          "The batteries could not fully power life support."
+        ],
+        "zh-CN": [
+          "维生系统耗尽了剩余电量，但供电仍然不足。",
+          "电池余量无法满足维生系统的需求。"
+        ],
+        "es": [
+          "El soporte vital agotó la energía restante, pero no fue suficiente.",
+          "Las baterías no cubrieron todo el soporte vital."
+        ],
+        "de": [
+          "Die Lebenserhaltung verbrauchte den Reststrom, doch er reichte nicht.",
+          "Die Batterien konnten die Lebenserhaltung nicht voll versorgen."
+        ],
+        "fr": [
+          "Le système de survie a épuisé l’énergie restante, sans en avoir assez.",
+          "Les batteries n’ont pas suffi à alimenter le système de survie."
+        ],
+        "hi": [
+          "जीवन रक्षक प्रणाली ने बची ऊर्जा ली, पर कम पड़ी।",
+          "बैटरियां जीवन रक्षक प्रणाली को पूरी ऊर्जा नहीं दे सकीं।"
+        ],
+        "ja": [
+          "生命維持が残りの電力を使ったが不足した。",
+          "バッテリーでは生命維持を十分に賄えなかった。"
+        ],
+        "uk": [
+          "Життєзабезпечення витратило решту енергії, але її не вистачило.",
+          "Батареї не змогли повністю живити життєзабезпечення."
+        ],
+        "zh-HK": [
+          "維生系統耗盡了剩餘電量，但供電仍然不足。",
+          "電池餘量無法滿足維生系統的需求。"
+        ],
+        "ar": [
+          "استهلك نظام دعم الحياة الطاقة المتبقية، لكنها لم تكف.",
+          "لم تستطع البطاريات تغذية نظام دعم الحياة بالكامل."
+        ]
+      }
+    },
+    "lighting": {
+      "descriptions": {
+        "en": [
+          "The cabin lights stayed on through the day.",
+          "Cabin lighting drew power from the batteries."
+        ],
+        "zh-CN": [
+          "舱内照明维持了一天的运行。",
+          "舱内灯光消耗了电池中的电量。"
+        ],
+        "es": [
+          "Las luces estuvieron encendidas todo el día.",
+          "La iluminación consumió energía de las baterías."
+        ],
+        "de": [
+          "Das Licht blieb den ganzen Tag an.",
+          "Die Beleuchtung verbrauchte Batteriestrom."
+        ],
+        "fr": [
+          "Les lumières sont restées allumées toute la journée.",
+          "L'éclairage a consommé l'énergie des batteries."
+        ],
+        "hi": [
+          "केबिन की बत्तियां दिनभर चालू रहीं।",
+          "प्रकाश में बैटरी की ऊर्जा लगी।"
+        ],
+        "ja": [
+          "船室は一日中点灯していた。",
+          "照明がバッテリーの電力を消費した。"
+        ],
+        "uk": [
+          "Світло горіло весь день.",
+          "Освітлення витратило енергію батарей."
+        ],
+        "zh-HK": [
+          "艙內照明維持了一天的運行。",
+          "艙內燈光消耗了電池中的電量。"
+        ],
+        "ar": [
+          "ظلت إضاءة المقصورة مشغلة طوال اليوم.",
+          "استهلكت الإضاءة طاقة من البطاريات."
+        ]
+      }
+    },
+    "meals": {
+      "descriptions": {
+        "en": [
+          "The crew used food from storage for their daily meals.",
+          "Today's rations were taken from the food supply."
+        ],
+        "zh-CN": [
+          "成员们从库存中取用了今日的食物。",
+          "今日口粮已从食物储备中扣除。"
+        ],
+        "es": [
+          "La tripulación comió de las reservas.",
+          "Las raciones de hoy se retiraron del almacén."
+        ],
+        "de": [
+          "Die Besatzung aß aus den Vorräten.",
+          "Die heutigen Rationen wurden entnommen."
+        ],
+        "fr": [
+          "L'équipage a mangé les vivres stockés.",
+          "Les rations du jour ont été prises dans les réserves."
+        ],
+        "hi": [
+          "दल ने भंडार से दैनिक भोजन लिया।",
+          "आज का राशन भंडार से निकाला गया।"
+        ],
+        "ja": [
+          "乗員は備蓄の食料で食事を取った。",
+          "今日の配給を食料庫から取り出した。"
+        ],
+        "uk": [
+          "Екіпаж поїв із запасів.",
+          "Сьогоднішні пайки взято зі сховища."
+        ],
+        "zh-HK": [
+          "成員們從庫存中取用了今日的食物。",
+          "今日口糧已從食物儲備中扣除。"
+        ],
+        "ar": [
+          "تناول الطاقم وجباته من مخزون الطعام.",
+          "سحبنا حصص اليوم من مخزون المؤن."
+        ]
+      }
+    },
+    "hunger": {
+      "descriptions": {
+        "en": [
+          "Insufficient food affected the crew's condition.",
+          "The crew went without enough food today."
+        ],
+        "zh-CN": [
+          "食物供应不足，影响了成员的身体状态。",
+          "今日口粮不足，成员们没能吃饱。"
+        ],
+        "es": [
+          "La falta de comida afectó a la salud.",
+          "Hoy la tripulación no comió suficiente."
+        ],
+        "de": [
+          "Nahrungsmangel beeinträchtigte den Zustand.",
+          "Die Besatzung bekam heute nicht genug Essen."
+        ],
+        "fr": [
+          "Le manque de vivres a affecté la santé.",
+          "L'équipage n'a pas assez mangé aujourd'hui."
+        ],
+        "hi": [
+          "भोजन की कमी से दल की हालत बिगड़ी।",
+          "आज दल को पर्याप्त खाना नहीं मिला।"
+        ],
+        "ja": [
+          "食料不足が乗員の状態に響いた。",
+          "今日の食事は十分ではなかった。"
+        ],
+        "uk": [
+          "Брак їжі вплинув на стан екіпажу.",
+          "Сьогодні екіпаж не наївся."
+        ],
+        "zh-HK": [
+          "食物供應不足，影響了成員的身體狀態。",
+          "今日口糧不足，成員們沒能吃飽。"
+        ],
+        "ar": [
+          "أثر نقص الطعام في حالة الطاقم.",
+          "لم يحصل الطاقم على طعام كاف اليوم."
+        ]
+      }
+    },
+    "supportDamage": {
+      "descriptions": {
+        "en": [
+          "A life-support power shortage harmed the crew.",
+          "Insufficient life support affected crew health."
+        ],
+        "zh-CN": [
+          "维生系统供电不足，成员健康受到影响。",
+          "维生保障不足，成员的身体状态下降。"
+        ],
+        "es": [
+          "La falta de energía para soporte vital dañó a la tripulación.",
+          "El soporte vital insuficiente redujo la salud."
+        ],
+        "de": [
+          "Strommangel bei der Lebenserhaltung schadete der Crew.",
+          "Unzureichende Lebenserhaltung senkte die Gesundheit."
+        ],
+        "fr": [
+          "Le manque d’énergie du système de survie a nui à l’équipage.",
+          "Un système de survie insuffisant a réduit la santé."
+        ],
+        "hi": [
+          "जीवन रक्षक ऊर्जा की कमी ने दल को नुकसान दिया।",
+          "अपर्याप्त जीवन रक्षक प्रणाली से स्वास्थ्य घटा।"
+        ],
+        "ja": [
+          "生命維持の電力不足で乗員が被害を受けた。",
+          "不十分な生命維持が健康を損ねた。"
+        ],
+        "uk": [
+          "Брак енергії життєзабезпечення зашкодив екіпажу.",
+          "Недостатнє життєзабезпечення погіршило здоров'я."
+        ],
+        "zh-HK": [
+          "維生系統供電不足，成員健康受到影響。",
+          "維生保障不足，成員的身體狀態下降。"
+        ],
+        "ar": [
+          "أضر نقص طاقة دعم الحياة بالطاقم.",
+          "أثر قصور نظام دعم الحياة في صحة الطاقم."
+        ]
+      }
+    },
+    "powerFailures": {
+      "descriptions": {
+        "en": [
+          "The consecutive life-support failure count was updated."
+        ],
+        "zh-CN": [
+          "连续维生供电故障记录已更新。"
+        ],
+        "es": [
+          "Se actualizó el recuento de fallos consecutivos del soporte vital."
+        ],
+        "de": [
+          "Zähler aufeinanderfolgender Lebenserhaltungsausfälle aktualisiert."
+        ],
+        "fr": [
+          "Le nombre de pannes consécutives de survie a été actualisé."
+        ],
+        "hi": [
+          "लगातार जीवन रक्षक विफलताओं की गिनती बदली गई।"
+        ],
+        "ja": [
+          "生命維持の連続障害回数を更新した。"
+        ],
+        "uk": [
+          "Оновлено кількість послідовних відмов життєзабезпечення."
+        ],
+        "zh-HK": [
+          "連續維生供電故障記錄已更新。"
+        ],
+        "ar": [
+          "تم تحديث عدد أعطال دعم الحياة المتتالية."
+        ]
+      }
+    },
+    "transmissionConfirmed": {
+      "descriptions": {
+        "en": [
+          "Earth confirmed receipt of the transmitted research.",
+          "Our research transmission reached Earth successfully."
+        ],
+        "zh-CN": [
+          "地球已确认收到传送的科研数据。",
+          "科研数据已成功抵达地球。"
+        ],
+        "es": [
+          "La Tierra confirmó la recepción de la investigación.",
+          "Nuestra investigación llegó a la Tierra."
+        ],
+        "de": [
+          "Die Erde bestätigte den Forschungsempfang.",
+          "Unsere Forschung erreichte die Erde."
+        ],
+        "fr": [
+          "La Terre a confirmé la réception des recherches.",
+          "Nos recherches ont atteint la Terre."
+        ],
+        "hi": [
+          "पृथ्वी ने शोध मिलने की पुष्टि की।",
+          "हमारा शोध सफलतापूर्वक पृथ्वी पहुंचा।"
+        ],
+        "ja": [
+          "地球が研究の受信を確認した。",
+          "研究の送信が地球に届いた。"
+        ],
+        "uk": [
+          "Земля підтвердила отримання досліджень.",
+          "Наші дослідження дісталися Землі."
+        ],
+        "zh-HK": [
+          "地球已確認收到傳送的科研資料。",
+          "科研資料已成功抵達地球。"
+        ],
+        "ar": [
+          "أكدت الأرض استلام البحث المرسل.",
+          "وصل إرسالنا البحثي إلى الأرض بنجاح."
+        ]
+      }
+    },
+    "battery": {
+      "descriptions": {
+        "en": [
+          "The spare battery supplied additional power.",
+          "We connected the backup battery to the base."
+        ],
+        "zh-CN": [
+          "备用电池为基地补充了电力。",
+          "我们将备用电池接入了基地。"
+        ],
+        "es": [
+          "La batería de repuesto aportó energía.",
+          "Conectamos la batería de reserva a la base."
+        ],
+        "de": [
+          "Die Reservebatterie lieferte zusätzlichen Strom.",
+          "Wir schlossen die Reservebatterie an die Basis an."
+        ],
+        "fr": [
+          "La batterie de secours a fourni de l'énergie.",
+          "Nous avons branché la batterie de secours à la base."
+        ],
+        "hi": [
+          "अतिरिक्त बैटरी ने ऊर्जा दी।",
+          "बैकअप बैटरी बेस से जोड़ी।"
+        ],
+        "ja": [
+          "予備バッテリーが電力を補充した。",
+          "基地に予備バッテリーを接続した。"
+        ],
+        "uk": [
+          "Запасна батарея додала енергії.",
+          "Ми під'єднали резервну батарею до бази."
+        ],
+        "zh-HK": [
+          "備用電池為基地補充了電力。",
+          "我們將備用電池接入了基地。"
+        ],
+        "ar": [
+          "وفرت البطارية الاحتياطية طاقة إضافية.",
+          "وصلنا البطارية الاحتياطية بالقاعدة."
+        ]
+      }
+    },
+    "work.grow": {
+      "descriptions": {
+        "en": [
+          "We tended the greenhouse crops.",
+          "The crew checked and cared for the planting trays."
+        ],
+        "zh-CN": [
+          "我们照料了温室里的作物。",
+          "成员们检查并照料了种植槽。"
+        ],
+        "es": [
+          "Cuidamos los cultivos del invernadero.",
+          "La tripulación revisó y cuidó las bandejas."
+        ],
+        "de": [
+          "Wir pflegten die Gewächshauspflanzen.",
+          "Die Besatzung prüfte und pflegte die Pflanzschalen."
+        ],
+        "fr": [
+          "Nous avons soigné les cultures de la serre.",
+          "L'équipage a vérifié et entretenu les bacs."
+        ],
+        "hi": [
+          "ग्रीनहाउस की फसलों की देखभाल की।",
+          "दल ने क्यारियां जांचीं और संभालीं।"
+        ],
+        "ja": [
+          "温室の作物を世話した。",
+          "乗員が苗床を点検し、世話した。"
+        ],
+        "uk": [
+          "Ми доглянули посіви в теплиці.",
+          "Екіпаж перевірив і доглянув лотки."
+        ],
+        "zh-HK": [
+          "我們照料了溫室裡的作物。",
+          "成員們檢查並照料了種植槽。"
+        ],
+        "ar": [
+          "اعتنينا بمحاصيل الدفيئة.",
+          "فحص الطاقم أحواض الزراعة واعتنى بها."
+        ]
+      }
+    },
+    "work.research": {
+      "descriptions": {
+        "en": [
+          "We completed today's laboratory research.",
+          "New research results were stored locally."
+        ],
+        "zh-CN": [
+          "我们完成了今日的实验研究。",
+          "新的实验结果已保存在本地。"
+        ],
+        "es": [
+          "Completamos la investigación de hoy.",
+          "Guardamos nuevos resultados locales."
+        ],
+        "de": [
+          "Wir schlossen die heutige Laborforschung ab.",
+          "Neue Ergebnisse wurden lokal gespeichert."
+        ],
+        "fr": [
+          "Nous avons terminé la recherche du jour.",
+          "De nouveaux résultats ont été stockés localement."
+        ],
+        "hi": [
+          "आज की लैब शोध पूरी की।",
+          "नए शोध नतीजे स्थानीय रखे।"
+        ],
+        "ja": [
+          "今日の実験研究を完了した。",
+          "新しい研究成果をローカルに保存した。"
+        ],
+        "uk": [
+          "Ми завершили сьогоднішні дослідження.",
+          "Нові результати збережено локально."
+        ],
+        "zh-HK": [
+          "我們完成了今日的實驗研究。",
+          "新的實驗結果已保存在本機。"
+        ],
+        "ar": [
+          "أكملنا البحث المخبري لليوم.",
+          "حفظنا نتائج بحث جديدة محليا."
+        ]
+      }
+    },
+    "work.transmit": {
+      "descriptions": {
+        "en": [
+          "We sent local research and are awaiting confirmation.",
+          "Research records were queued for Earth to confirm."
+        ],
+        "zh-CN": [
+          "我们发出了本地科研数据，等待地球确认。",
+          "科研记录已发送，正在等待接收确认。"
+        ],
+        "es": [
+          "Enviamos los datos; esperamos confirmación.",
+          "Los registros esperan confirmación de la Tierra."
+        ],
+        "de": [
+          "Wir sendeten lokale Daten und warten auf Bestätigung.",
+          "Forschungsdaten warten auf Erdbestätigung."
+        ],
+        "fr": [
+          "Nous avons envoyé les données et attendons confirmation.",
+          "Les recherches attendent la confirmation terrestre."
+        ],
+        "hi": [
+          "स्थानीय शोध भेजा, पुष्टि की प्रतीक्षा है।",
+          "शोध रिकॉर्ड पृथ्वी की पुष्टि की कतार में हैं।"
+        ],
+        "ja": [
+          "ローカル研究を送り、確認を待っている。",
+          "研究記録を地球の受信確認待ちにした。"
+        ],
+        "uk": [
+          "Ми надіслали локальні дані й чекаємо підтвердження.",
+          "Дослідження очікують підтвердження Землі."
+        ],
+        "zh-HK": [
+          "我們發出了本機科研資料，等待地球確認。",
+          "科研記錄已發送，正在等待接收確認。"
+        ],
+        "ar": [
+          "أرسلنا البحث المحلي وننتظر التأكيد.",
+          "أرسلنا سجلات البحث وننتظر تأكيد الأرض."
+        ]
+      }
+    },
+    "work.clean": {
+      "descriptions": {
+        "en": [
+          "We cleared dust from the solar panels.",
+          "The crew cleaned the solar array."
+        ],
+        "zh-CN": [
+          "我们清除了太阳能板上的积尘。",
+          "成员们完成了太阳能阵列的清洁。"
+        ],
+        "es": [
+          "Quitamos el polvo de los paneles.",
+          "La tripulación limpió el conjunto solar."
+        ],
+        "de": [
+          "Wir entfernten Staub von den Modulen.",
+          "Die Besatzung reinigte die Solaranlage."
+        ],
+        "fr": [
+          "Nous avons retiré la poussière des panneaux.",
+          "L'équipage a nettoyé le réseau solaire."
+        ],
+        "hi": [
+          "सौर पैनलों से धूल हटाई।",
+          "दल ने सौर सरणी साफ की।"
+        ],
+        "ja": [
+          "パネルの粉塵を除去した。",
+          "乗員が太陽光発電設備を掃除した。"
+        ],
+        "uk": [
+          "Ми прибрали пил із панелей.",
+          "Екіпаж очистив сонячну установку."
+        ],
+        "zh-HK": [
+          "我們清除了太陽能板上的積塵。",
+          "成員們完成了太陽能陣列的清潔。"
+        ],
+        "ar": [
+          "أزلنا الغبار عن الألواح الشمسية.",
+          "نظف الطاقم منظومة الألواح الشمسية."
+        ]
+      }
+    },
+    "work.repair": {
+      "descriptions": {
+        "en": [
+          "We repaired the power equipment.",
+          "The crew restored the solar equipment."
+        ],
+        "zh-CN": [
+          "我们维修了供电设备。",
+          "成员们修复了太阳能设备。"
+        ],
+        "es": [
+          "Reparamos el equipo eléctrico.",
+          "La tripulación restauró el equipo solar."
+        ],
+        "de": [
+          "Wir reparierten die Stromgeräte.",
+          "Die Besatzung setzte die Solargeräte instand."
+        ],
+        "fr": [
+          "Nous avons réparé l'équipement électrique.",
+          "L'équipage a rétabli l'équipement solaire."
+        ],
+        "hi": [
+          "ऊर्जा उपकरण सुधारे।",
+          "दल ने सौर उपकरण बहाल किए।"
+        ],
+        "ja": [
+          "電力機器を修理した。",
+          "乗員が太陽光設備を復旧した。"
+        ],
+        "uk": [
+          "Ми полагодили електрообладнання.",
+          "Екіпаж відновив сонячне обладнання."
+        ],
+        "zh-HK": [
+          "我們維修了供電設備。",
+          "成員們修復了太陽能設備。"
+        ],
+        "ar": [
+          "أصلحنا أجهزة الطاقة.",
+          "استعاد الطاقم عمل المعدات الشمسية."
+        ]
+      }
+    },
+    "work.rest": {
+      "descriptions": {
+        "en": [
+          "The crew took time to rest and recover.",
+          "A quiet rest helped the crew recover."
+        ],
+        "zh-CN": [
+          "成员们休息了一段时间，恢复了状态。",
+          "安静的休整帮助成员们恢复了体力。"
+        ],
+        "es": [
+          "La tripulación descansó y se recuperó.",
+          "Un descanso tranquilo ayudó a recuperarse."
+        ],
+        "de": [
+          "Die Besatzung ruhte und erholte sich.",
+          "Eine ruhige Pause half der Erholung."
+        ],
+        "fr": [
+          "L'équipage s'est reposé et a récupéré.",
+          "Un repos calme a aidé la récupération."
+        ],
+        "hi": [
+          "दल ने आराम और रिकवरी की।",
+          "शांत आराम से दल को उबरने में मदद मिली।"
+        ],
+        "ja": [
+          "乗員は休息し回復した。",
+          "穏やかな休息が回復を助けた。"
+        ],
+        "uk": [
+          "Екіпаж відпочив і відновився.",
+          "Спокійний відпочинок допоміг відновленню."
+        ],
+        "zh-HK": [
+          "成員們休息了一段時間，恢復了狀態。",
+          "安靜的休整幫助成員們恢復了體力。"
+        ],
+        "ar": [
+          "أخذ الطاقم وقتا للراحة والتعافي.",
+          "ساعدت استراحة هادئة الطاقم على التعافي."
+        ]
+      }
+    },
+    "sampling.robot": {
+      "descriptions": {
+        "en": [
+          "The robot returned with one sample, consumed by one day of research for 20 data."
+        ],
+        "zh-CN": [
+          "机器人带回了 1 个样本，可消耗一天工作研究，获得 20 点数据。"
+        ],
+        "es": [
+          "El robot trajo una muestra; estudiarla consume un día de trabajo y da 20 datos."
+        ],
+        "de": [
+          "Der Roboter brachte eine Probe; ihre Untersuchung kostet einen Arbeitstag und liefert 20 Daten."
+        ],
+        "fr": [
+          "Le robot a rapporté un échantillon ; l'étudier prend un jour de travail pour 20 données."
+        ],
+        "hi": [
+          "रोबोट एक नमूना लाया; उसके शोध में एक दिन का काम लगेगा और 20 डेटा मिलेंगे।"
+        ],
+        "ja": [
+          "ロボットが試料1個を持ち帰った。作業1日で研究すると試料を消費しデータ20を得る。"
+        ],
+        "uk": [
+          "Робот привіз зразок; дослідження витрачає його й день роботи за 20 даних."
+        ],
+        "zh-HK": [
+          "機器人帶回了 1 個樣本，可消耗一天工作研究，獲得 20 點資料。"
+        ],
+        "ar": [
+          "عاد الروبوت بعينة؛ تستهلك دراستها يوما من العمل وتمنح 20 من البيانات."
+        ]
+      }
+    },
+    "expedition.return": {
+      "descriptions": {
+        "en": [
+          "The returning expedition supplied a new sample for research."
+        ],
+        "zh-CN": [
+          "返回的成员带回了可供研究的新样本。"
+        ],
+        "es": [
+          "La expedición trajo una muestra para investigar."
+        ],
+        "de": [
+          "Die Expedition brachte eine neue Forschungsprobe."
+        ],
+        "fr": [
+          "L'expédition a rapporté un échantillon à étudier."
+        ],
+        "hi": [
+          "लौटी यात्रा शोध का नया नमूना लाई।"
+        ],
+        "ja": [
+          "帰還した探査隊が研究用の試料を持ち帰った。"
+        ],
+        "uk": [
+          "Експедиція привезла новий зразок для дослідження."
+        ],
+        "zh-HK": [
+          "返回的成員帶回了可供研究的新樣本。"
+        ],
+        "ar": [
+          "جلبت الرحلة العائدة عينة جديدة للبحث."
+        ]
+      }
+    },
+    "work.robot": {
+      "descriptions": {
+        "en": [
+          "The robot completed its research task.",
+          "The robot returned with new research data."
+        ],
+        "zh-CN": [
+          "机器人完成了科研任务。",
+          "机器人带回了新的研究数据。"
+        ],
+        "es": [
+          "El robot completó la tarea de investigación.",
+          "El robot trajo nuevos datos."
+        ],
+        "de": [
+          "Der Roboter erledigte den Forschungsauftrag.",
+          "Der Roboter brachte neue Forschungsdaten."
+        ],
+        "fr": [
+          "Le robot a terminé sa recherche.",
+          "Le robot a rapporté de nouvelles données."
+        ],
+        "hi": [
+          "रोबोट ने शोध का काम पूरा किया।",
+          "रोबोट नए शोध डेटा लाया।"
+        ],
+        "ja": [
+          "ロボットが研究作業を完了した。",
+          "ロボットが新しい研究データを持ち帰った。"
+        ],
+        "uk": [
+          "Робот виконав дослідницьке завдання.",
+          "Робот привіз нові дослідницькі дані."
+        ],
+        "zh-HK": [
+          "機器人完成了科研任務。",
+          "機器人帶回了新的研究資料。"
+        ],
+        "ar": [
+          "أكمل الروبوت مهمته البحثية.",
+          "عاد الروبوت ببيانات بحث جديدة."
+        ]
+      }
+    },
+    "work.monitor": {
+      "descriptions": {
+        "en": [
+          "The monitor collected new scientific readings.",
+          "We saved a new set of monitoring data."
+        ],
+        "zh-CN": [
+          "监测仪采集了新的科研读数。",
+          "我们保存了新一组监测数据。"
+        ],
+        "es": [
+          "El monitor recogió nuevas lecturas científicas.",
+          "Guardamos nuevos datos de observación."
+        ],
+        "de": [
+          "Der Monitor sammelte neue Messwerte.",
+          "Wir speicherten neue Überwachungsdaten."
+        ],
+        "fr": [
+          "Le détecteur a recueilli de nouvelles mesures.",
+          "Nous avons enregistré de nouvelles observations."
+        ],
+        "hi": [
+          "मॉनिटर ने नए वैज्ञानिक माप लिए।",
+          "नया निगरानी डेटा रखा।"
+        ],
+        "ja": [
+          "モニターが新しい科学的測定値を収集した。",
+          "新たな観測データを保存した。"
+        ],
+        "uk": [
+          "Монітор зібрав нові наукові показники.",
+          "Ми зберегли нові дані спостережень."
+        ],
+        "zh-HK": [
+          "監測儀採集了新的科研讀數。",
+          "我們保存了新一組監測資料。"
+        ],
+        "ar": [
+          "جمع الكاشف قراءات علمية جديدة.",
+          "حفظنا مجموعة جديدة من بيانات الرصد."
+        ]
+      }
+    }
   },
   "resources": {
-    "energy": {"en": "Power", "zh-CN": "电力"},
-    "food": {"en": "Food", "zh-CN": "食物"},
-    "health": {"en": "Health", "zh-CN": "健康"},
-    "localData": {"en": "Local data", "zh-CN": "本地数据"},
-    "pendingData": {"en": "Awaiting confirmation", "zh-CN": "待确认数据"},
-    "sentData": {"en": "Confirmed data", "zh-CN": "已确认数据"},
-    "samples": {"en": "Samples", "zh-CN": "样本"},
-    "researchUses": {"en": "Research uses", "zh-CN": "研究次数"},
-    "growth": {"en": "Crop growth", "zh-CN": "作物生长进度"},
-    "powerFailures": {"en": "Consecutive support failures", "zh-CN": "连续维生故障"},
-    "generation": {"en": "Daily generation", "zh-CN": "每日发电量"},
-    "systems.spares": {"en": "Spares", "zh-CN": "备件"},
-    "systems.generationCap": {"en": "Generation cap", "zh-CN": "发电上限"},
-    "systems.trackingCap": {"en": "Tracking cap", "zh-CN": "追踪发电上限"},
-    "systems.supportExtra": {"en": "Extra support cost", "zh-CN": "额外维生耗电"},
-    "systems.careCost": {"en": "Crop care cost", "zh-CN": "作物照料耗电"},
-    "systems.harvestFood": {"en": "Harvest yield", "zh-CN": "收获产量"},
-    "systems.labUntil": {"en": "Lab resumes on Sol", "zh-CN": "实验室恢复日期"},
-    "systems.antennaLimit": {"en": "Transmission limit", "zh-CN": "传输上限"}
+    "energy": {
+      "en": "Power",
+      "zh-CN": "电力",
+      "es": "Energía",
+      "de": "Strom",
+      "fr": "Énergie",
+      "hi": "ऊर्जा",
+      "ja": "電力",
+      "uk": "Енергія",
+      "zh-HK": "電力",
+      "ar": "الطاقة"
+    },
+    "food": {
+      "en": "Food",
+      "zh-CN": "食物",
+      "es": "Comida",
+      "de": "Nahrung",
+      "fr": "Vivres",
+      "hi": "भोजन",
+      "ja": "食料",
+      "uk": "Їжа",
+      "zh-HK": "食物",
+      "ar": "الطعام"
+    },
+    "health": {
+      "en": "Health",
+      "zh-CN": "健康",
+      "es": "Salud",
+      "de": "Gesundheit",
+      "fr": "Santé",
+      "hi": "स्वास्थ्य",
+      "ja": "健康",
+      "uk": "Здоров'я",
+      "zh-HK": "健康",
+      "ar": "الصحة"
+    },
+    "localData": {
+      "en": "Local data",
+      "zh-CN": "本地数据",
+      "es": "Datos locales",
+      "de": "Lokale Daten",
+      "fr": "Données locales",
+      "hi": "स्थानीय डेटा",
+      "ja": "ローカルデータ",
+      "uk": "Локальні дані",
+      "zh-HK": "本機資料",
+      "ar": "بيانات محلية"
+    },
+    "pendingData": {
+      "en": "Awaiting confirmation",
+      "zh-CN": "待确认数据",
+      "es": "Esperando confirmación",
+      "de": "Bestätigung ausstehend",
+      "fr": "En attente de confirmation",
+      "hi": "पुष्टि की प्रतीक्षा",
+      "ja": "確認待ち",
+      "uk": "Очікують підтвердження",
+      "zh-HK": "待確認資料",
+      "ar": "بانتظار التأكيد"
+    },
+    "sentData": {
+      "en": "Confirmed data",
+      "zh-CN": "已确认数据",
+      "es": "Datos confirmados",
+      "de": "Bestätigte Daten",
+      "fr": "Données confirmées",
+      "hi": "पुष्ट डेटा",
+      "ja": "確認済みデータ",
+      "uk": "Підтверджені дані",
+      "zh-HK": "已確認資料",
+      "ar": "بيانات مؤكدة"
+    },
+    "samples": {
+      "en": "Samples",
+      "zh-CN": "样本",
+      "es": "Muestras",
+      "de": "Proben",
+      "fr": "Échantillons",
+      "hi": "नमूने",
+      "ja": "試料",
+      "uk": "Зразки",
+      "zh-HK": "樣本",
+      "ar": "العينات"
+    },
+    "researchUses": {
+      "en": "Research uses",
+      "zh-CN": "研究次数",
+      "es": "Estudios",
+      "de": "Untersuchungen",
+      "fr": "Études",
+      "hi": "शोध उपयोग",
+      "ja": "研究回数",
+      "uk": "Дослідження",
+      "zh-HK": "研究次數",
+      "ar": "استخدامات البحث"
+    },
+    "growth": {
+      "en": "Crop growth",
+      "zh-CN": "作物生长进度",
+      "es": "Crecimiento del cultivo",
+      "de": "Pflanzenwachstum",
+      "fr": "Croissance des cultures",
+      "hi": "फसल वृद्धि",
+      "ja": "作物の成長",
+      "uk": "Ріст рослин",
+      "zh-HK": "作物生長進度",
+      "ar": "نمو المحاصيل"
+    },
+    "powerFailures": {
+      "en": "Consecutive support failures",
+      "zh-CN": "连续维生故障",
+      "es": "Fallos consecutivos del soporte vital",
+      "de": "Aufeinanderfolgende Versorgungsausfälle",
+      "fr": "Pannes consécutives de survie",
+      "hi": "लगातार जीवन रक्षक विफलताएं",
+      "ja": "生命維持の連続障害",
+      "uk": "Послідовні відмови життєзабезпечення",
+      "zh-HK": "連續維生故障",
+      "ar": "أعطال دعم الحياة المتتالية"
+    },
+    "generation": {
+      "en": "Daily generation",
+      "zh-CN": "每日发电量",
+      "es": "Generación diaria",
+      "de": "Tägliche Erzeugung",
+      "fr": "Production quotidienne",
+      "hi": "दैनिक उत्पादन",
+      "ja": "一日の発電量",
+      "uk": "Добова генерація",
+      "zh-HK": "每日發電量",
+      "ar": "التوليد اليومي"
+    },
+    "systems.spares": {
+      "en": "Spares",
+      "zh-CN": "备件",
+      "es": "Repuestos",
+      "de": "Ersatzteile",
+      "fr": "Pièces de rechange",
+      "hi": "पुर्जे",
+      "ja": "予備部品",
+      "uk": "Запчастини",
+      "zh-HK": "備件",
+      "ar": "قطع الغيار"
+    },
+    "systems.generationCap": {
+      "en": "Generation cap",
+      "zh-CN": "发电上限",
+      "es": "Límite de generación",
+      "de": "Erzeugungsgrenze",
+      "fr": "Plafond de production",
+      "hi": "उत्पादन सीमा",
+      "ja": "発電上限",
+      "uk": "Ліміт генерації",
+      "zh-HK": "發電上限",
+      "ar": "حد التوليد"
+    },
+    "systems.trackingCap": {
+      "en": "Tracking cap",
+      "zh-CN": "追踪发电上限",
+      "es": "Límite de seguimiento solar",
+      "de": "Nachführungsgrenze",
+      "fr": "Plafond du suivi solaire",
+      "hi": "सौर ट्रैकिंग सीमा",
+      "ja": "追尾発電上限",
+      "uk": "Ліміт стеження за сонцем",
+      "zh-HK": "追蹤發電上限",
+      "ar": "حد التوليد بالتتبع"
+    },
+    "systems.supportExtra": {
+      "en": "Extra support cost",
+      "zh-CN": "额外维生耗电",
+      "es": "Coste extra de soporte vital",
+      "de": "Zusätzliche Versorgungskosten",
+      "fr": "Surcoût de survie",
+      "hi": "अतिरिक्त जीवन रक्षक लागत",
+      "ja": "生命維持の追加費用",
+      "uk": "Додаткові витрати життєзабезпечення",
+      "zh-HK": "額外維生耗電",
+      "ar": "تكلفة دعم الحياة الإضافية"
+    },
+    "systems.careCost": {
+      "en": "Crop care cost",
+      "zh-CN": "作物照料耗电",
+      "es": "Coste de cuidado del cultivo",
+      "de": "Pflanzenpflegekosten",
+      "fr": "Coût des soins des cultures",
+      "hi": "फसल देखभाल लागत",
+      "ja": "作物の世話の費用",
+      "uk": "Витрати догляду за рослинами",
+      "zh-HK": "作物照料耗電",
+      "ar": "تكلفة رعاية المحاصيل"
+    },
+    "systems.harvestFood": {
+      "en": "Harvest yield",
+      "zh-CN": "收获产量",
+      "es": "Rendimiento de la cosecha",
+      "de": "Ernteertrag",
+      "fr": "Rendement de récolte",
+      "hi": "फसल उपज",
+      "ja": "収穫量",
+      "uk": "Урожайність",
+      "zh-HK": "收穫產量",
+      "ar": "كمية الحصاد"
+    },
+    "systems.labUntil": {
+      "en": "Lab resumes on Sol",
+      "zh-CN": "实验室恢复日期",
+      "es": "Laboratorio reabre el Sol",
+      "de": "Labor öffnet an Sol",
+      "fr": "Réouverture au Sol",
+      "hi": "लैब फिर खुलेगी सोल",
+      "ja": "研究室の再開ソル",
+      "uk": "Лабораторія відкриється на сол",
+      "zh-HK": "實驗室恢復日期",
+      "ar": "يوم استئناف المختبر المريخي"
+    },
+    "systems.antennaLimit": {
+      "en": "Transmission limit",
+      "zh-CN": "传输上限",
+      "es": "Límite de transmisión",
+      "de": "Sendelimit",
+      "fr": "Limite de transmission",
+      "hi": "प्रेषण सीमा",
+      "ja": "送信上限",
+      "uk": "Ліміт передавання",
+      "zh-HK": "傳輸上限",
+      "ar": "حد الإرسال"
+    }
   }
 }

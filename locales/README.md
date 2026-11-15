@@ -6,7 +6,15 @@ Default language: `en`. Language selection is saved under `outpost.language` ind
 - `zh-CN.json`: Simplified Chinese strings with the same keys.
 - `languages.json`: language codes and native display names used by Settings.
 
+Additional complete catalogs: `zh-HK.json` (Traditional Chinese, Hong Kong), `es.json` (Spanish), `de.json` (German), `fr.json` (French), `hi.json` (Hindi), `ja.json` (Japanese), `uk.json` (Ukrainian), and `ar.json` (Arabic).
+
+Languages read from right to left declare `"dir":"rtl"` in `languages.json`. Selecting a language updates the document direction; the room artwork keeps its original coordinates. Arabic interface overrides live in `styles/i18n.css`, with isolated resource counters to preserve numeric order.
+
+Arabic copy uses `\u2066` and `\u2069` to isolate Latin names and energy units. Keep these paired controls when editing the enclosed text.
+
 To add a language, copy the English catalog to `<code>.json`, translate its values, and add the code/name to `languages.json`. Missing entries fall back to English.
+
+Also translate activity-log descriptions and resource names in `data/resource_log.json`. Intro lines and credits have optional `translations[code]` entries in `assets/scene/init_game/intro.json` and `assets/menu/credits.json`; their original fields remain the English defaults. Preserve timing values, names, numeric costs and `{days}` placeholders. Animated text uses grapheme clusters so joined letters and vowel signs appear together.
 
 All catalog keys are English semantic identifiers, such as `action.grow.narrative`, `tool.battery.name`, and `event.arrival.text`. Keep the same keys in every language; edit only the translated values when changing wording. Content JSON, game rules, errors, and new narrative summaries reference these keys instead of using Chinese text as identifiers.
 

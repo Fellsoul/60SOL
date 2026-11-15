@@ -22,7 +22,7 @@ function fixture(t,overrides = {}) {
       return {finished,cancel(){clearTimeout(timer);reject(new Error('cancelled'));}};
     }
   });
-  const nodes = Object.fromEntries(['background','rocket','camera','text','announcement','skip'].map(name => [`.intro-${name}`,node(name)]));
+  const nodes = Object.fromEntries(['background','rocket','camera','text','announcement','skip','whiteout','blackout'].map(name => [`.intro-${name}`,node(name)]));
   const root = node('root');root.querySelector = selector => nodes[selector];
   const previous = Object.fromEntries(['document','window','innerWidth','innerHeight'].map(key => [key,Object.getOwnPropertyDescriptor(globalThis,key)]));
   globalThis.document = {querySelector:() => root,body:{classList:classes()}};
@@ -43,27 +43,29 @@ function fixture(t,overrides = {}) {
   return {intro,root,nodes,updates,fades,advance,flush};
 }
 
-test('intro offers skip as playback starts and each completed line holds for three seconds',async t => {
+test('first two lines hold then fade; the third remains visible through the screen transition',async t => {
   const {intro,root,updates,fades,advance} = fixture(t);
   intro.start();
   const started = Date.now();
   let finished = false;const playback = intro.finishSetup().then(() => { finished=true; });
   assert.equal(intro.skipButton.hidden,false);
-  await advance(12000);await playback;
+  await advance(14000);await playback;
   assert.equal(finished,true);
   assert.equal(root.classList.values.has('intro-cruising'),true);
   const fullLines = ['AAA','BBBBBB','CCCCCCCCC'].map(value => updates.find(update => update.name === 'text' && update.value === value));
   assert.ok(fullLines.every(update => update.at >= started));
-  const textFades = fades.filter(fade => fade.name === 'text');
-  assert.equal(textFades.length,3);
-  fullLines.forEach((line,index) => {
+  const textFades = fades.filter(fade => fade.name === 'text' && fade.frames[0].opacity === 1);
+  assert.equal(textFades.length,2);
+  fullLines.slice(0,2).forEach((line,index) => {
     assert.ok(textFades[index].at-line.at >= 3000);
     assert.ok(textFades[index].at-line.at < 3020);
     const lineStart = index ? textFades[index-1].at+400 : started;
     const typingMs = line.at-lineStart;
     assert.equal(typingMs,line.value.length*50,'line length controls typing duration at the configured base pace');
   });
-  assert.equal(intro.text.textContent,'');
+  assert.equal(intro.text.textContent,'CCCCCCCCC');
+  assert.equal(intro.text.style.opacity,'1');
+  assert.equal(intro.blackout.style.opacity,'1');
 });
 
 test('typing reveals one character at a time with varied speed and a pause after punctuation',async t => {
@@ -98,8 +100,8 @@ test('intro waits for the background even when all introduction text has finishe
   intro.start();let finished = false;
   const playback = intro.finishSetup().then(() => { finished=true; });
   await advance(12000);
-  assert.equal(intro.text.textContent,'');assert.equal(finished,false);
-  await advance(8000);await playback;
+  assert.equal(intro.text.textContent,'CCCCCCCCC');assert.equal(finished,false);
+  await advance(11000);await playback;
   assert.equal(finished,true);
 });
 

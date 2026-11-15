@@ -68,6 +68,22 @@ export class GameView {
     clearTimeout(this.noticeTimer); notice.textContent = i18n.t(message); notice.hidden = !message;
     if (message) this.noticeTimer = setTimeout(() => { notice.hidden = true; },8000);
   }
+  updateSceneControls({busy=false}={}) {
+    const hint = document.querySelector('#scene-control-reason');
+    const tasksReason = !this.state ? 'controls.startMission' : this.state.outcome ? 'error.missionFinished' : '';
+    const busyReason = this.endingReady ? 'controls.openJournal' : 'controls.wait';
+    const reasons = ['terminal-toggle','tasks-toggle'].map(id => {
+      const control = document.getElementById(id);
+      const reason = busy ? busyReason : id === 'tasks-toggle' ? tasksReason : '';
+      control.disabled = Boolean(reason);
+      control.title = reason ? i18n.t(reason) : '';
+      if (reason) control.setAttribute('aria-describedby',hint.id);
+      else control.removeAttribute('aria-describedby');
+      return reason;
+    });
+    hint.textContent = i18n.t(reasons.find(Boolean) || '');
+    hint.hidden = !reasons.some(Boolean);
+  }
   async render(state,event,{morning=false,initial=false}={}) {
     this.guide?.hide();
     const ending = Boolean(state?.outcome);
@@ -77,9 +93,9 @@ export class GameView {
     document.body.classList.toggle('mission-ended',ending);
     const veil = document.querySelector('#morning-veil');
     const title = document.querySelector('#sol-title');
-    const toggle = document.querySelector('#terminal-toggle'); toggle.disabled = true;
+    const toggle = document.querySelector('#terminal-toggle');
+    this.updateSceneControls({busy:true});
     toggle.hidden = enteringEnding;
-    document.querySelector('#tasks-toggle').disabled = true;
     if (morning || initial) {
       this.tasks.close();
       await this.terminal.close(); veil.style.pointerEvents = 'auto';
@@ -107,14 +123,14 @@ export class GameView {
         const button = document.querySelector('#ending-continue');
         button.hidden = false; veil.setAttribute('aria-hidden','false');
         this.endingReady = true; button.focus({preventScroll:true});
+        this.updateSceneControls({busy:true});
         return; // Keep THE END visible until an explicit click or keyboard activation.
       }
       if (!this.reducedMotion) await new Promise(resolve => setTimeout(resolve,this.config.blackHoldMs));
       if (state) await this.fade(title,1,0,this.config.titleFadeOutMs ?? 700);
       await Promise.all([this.fade(veil,1,0,this.config.fadeOutMs),this.audio.finish(),this.music?.setMode(this.gameMusicMode,this.reducedMotion?0:this.config.fadeOutMs)]); veil.style.pointerEvents = 'none';
     }
-    toggle.disabled = false;
-    document.querySelector('#tasks-toggle').disabled = !state || ending;
+    this.updateSceneControls();
     this.guide?.render(state);
   }
   async showEndingJournal() {
@@ -123,7 +139,8 @@ export class GameView {
     const veil = document.querySelector('#morning-veil');
     veil.style.opacity = '0'; veil.style.pointerEvents = 'none'; veil.setAttribute('aria-hidden','true');
     document.querySelector('#ending-continue').hidden = true;
-    const toggle = document.querySelector('#terminal-toggle'); toggle.hidden = false; toggle.disabled = false;
+    const toggle = document.querySelector('#terminal-toggle'); toggle.hidden = false;
+    this.updateSceneControls();
     await this.openTerminal();
   }
   async fade(node,from,to,duration) {

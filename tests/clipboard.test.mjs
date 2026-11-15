@@ -47,3 +47,20 @@ test('unfinished tasks expose resource restrictions and reset for the next Sol',
   assert.ok(rows(model).every(task => !task.done));
   assert.ok(rows(model).every(task => task.command === 'choose'));
 });
+
+test('completed event responses say completed even while work assignments remain',() => {
+  const model = game(); model.choose('plan');
+  const tasks = rows(model);
+  const completed = tasks.find(task => task.command === 'choose');
+  assert.equal(completed.done,true);
+  assert.equal(completed.reason,'tasks.checked');
+  assert.equal(tasks.find(task => task.command === 'work' && task.id === 'grow').reason,'');
+});
+
+test('unfinished event responses explain mission end rather than an exhausted work budget',() => {
+  const model = game();
+  const state = model.snapshot; state.phase = 'finished';
+  const tasks = clipboardTasks(state,model.events.get(state.currentEventId));
+  assert.ok(tasks.length);
+  assert.ok(tasks.every(task => task.reason === 'error.missionFinished'));
+});

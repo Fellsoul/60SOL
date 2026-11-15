@@ -21,6 +21,7 @@ export class I18n {
   }
   setLanguage(code) {
     this.language = this.catalogs[code] ? code : 'en'; document.documentElement.lang = this.language;
+    document.documentElement.dir = this.languages?.find(language => language.code === this.language)?.dir ?? 'ltr';
     try { localStorage.setItem('outpost.language',this.language); } catch {}
   }
   t(key) {

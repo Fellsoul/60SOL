@@ -6,12 +6,167 @@
       "text": "14 Sol is a game initiated and developed as part of the 2026 NASA Space Apps Hackathon in Toronto."
     },
     {
-      "heading": "Developers",
+      "heading": "Development Group: H0M0GENIUS",
       "text": "Bryan Shi, CE 3T0\nJsaon Qian, EE 3T0\nAustin Xiong, CE 3T0\n\nStudents at the University of Toronto, Faculty of Applied Sciences and Engineering."
     },
     {
       "heading": "",
       "text": ""
     }
-  ]
+  ],
+  "translations": {
+    "es": {
+      "title": "Créditos",
+      "sections": [
+        {
+          "heading": "",
+          "text": "14 Sol es un juego iniciado y desarrollado para el hackatón NASA Space Apps 2026 de Toronto."
+        },
+        {
+          "heading": "Desarrollo",
+          "text": "Bryan Shi, CE 3T0\nJsaon Qian, EE 3T0\nAustin Xiong, CE 3T0\n\nEstudiantes de la Facultad de Ciencias Aplicadas e Ingeniería de la Universidad de Toronto."
+        },
+        {
+          "heading": "",
+          "text": ""
+        }
+      ]
+    },
+    "de": {
+      "title": "Mitwirkende",
+      "sections": [
+        {
+          "heading": "",
+          "text": "14 Sol entstand im Rahmen des NASA Space Apps Hackathons 2026 in Toronto."
+        },
+        {
+          "heading": "Entwicklung",
+          "text": "Bryan Shi, CE 3T0\nJsaon Qian, EE 3T0\nAustin Xiong, CE 3T0\n\nStudierende der Fakultät für angewandte Wissenschaften und Ingenieurwesen der Universität Toronto."
+        },
+        {
+          "heading": "",
+          "text": ""
+        }
+      ]
+    },
+    "fr": {
+      "title": "Crédits",
+      "sections": [
+        {
+          "heading": "",
+          "text": "14 Sol a été créé et développé lors du hackathon NASA Space Apps 2026 à Toronto."
+        },
+        {
+          "heading": "Développement",
+          "text": "Bryan Shi, CE 3T0\nJsaon Qian, EE 3T0\nAustin Xiong, CE 3T0\n\nÉtudiants de la Faculté des sciences appliquées et du génie de l'Université de Toronto."
+        },
+        {
+          "heading": "",
+          "text": ""
+        }
+      ]
+    },
+    "hi": {
+      "title": "श्रेय",
+      "sections": [
+        {
+          "heading": "",
+          "text": "14 Sol टोरंटो के 2026 NASA Space Apps हैकाथॉन में शुरू और विकसित किया गया खेल है।"
+        },
+        {
+          "heading": "डेवलपर",
+          "text": "Bryan Shi, CE 3T0\nJsaon Qian, EE 3T0\nAustin Xiong, CE 3T0\n\nटोरंटो विश्वविद्यालय के अनुप्रयुक्त विज्ञान और इंजीनियरिंग संकाय के छात्र।"
+        },
+        {
+          "heading": "",
+          "text": ""
+        }
+      ]
+    },
+    "ja": {
+      "title": "クレジット",
+      "sections": [
+        {
+          "heading": "",
+          "text": "14 Solは、トロントの2026 NASA Space Appsハッカソンで企画・開発されたゲームです。"
+        },
+        {
+          "heading": "開発者",
+          "text": "Bryan Shi, CE 3T0\nJsaon Qian, EE 3T0\nAustin Xiong, CE 3T0\n\nトロント大学応用科学・工学部の学生。"
+        },
+        {
+          "heading": "",
+          "text": ""
+        }
+      ]
+    },
+    "uk": {
+      "title": "Автори",
+      "sections": [
+        {
+          "heading": "",
+          "text": "14 Sol започатковано й розроблено в межах хакатону NASA Space Apps 2026 у Торонто."
+        },
+        {
+          "heading": "Розробники",
+          "text": "Bryan Shi, CE 3T0\nJsaon Qian, EE 3T0\nAustin Xiong, CE 3T0\n\nСтуденти факультету прикладних наук та інженерії Університету Торонто."
+        },
+        {
+          "heading": "",
+          "text": ""
+        }
+      ]
+    },
+    "zh-CN": {
+      "title": "制作人员",
+      "sections": [
+        {
+          "heading": "",
+          "text": "14 Sol 是在2026年多伦多 NASA Space Apps 黑客松中发起并开发的游戏。"
+        },
+        {
+          "heading": "开发者",
+          "text": "Bryan Shi, CE 3T0\nJsaon Qian, EE 3T0\nAustin Xiong, CE 3T0\n\n多伦多大学应用科学与工程学院学生。"
+        },
+        {
+          "heading": "",
+          "text": ""
+        }
+      ]
+    },
+    "zh-HK": {
+      "title": "製作人員",
+      "sections": [
+        {
+          "heading": "",
+          "text": "14 Sol 是在2026年多倫多 NASA Space Apps 黑客松中發起並開發的遊戲。"
+        },
+        {
+          "heading": "開發者",
+          "text": "Bryan Shi, CE 3T0\nJsaon Qian, EE 3T0\nAustin Xiong, CE 3T0\n\n多倫多大學應用科學與工程學院學生。"
+        },
+        {
+          "heading": "",
+          "text": ""
+        }
+      ]
+    },
+    "ar": {
+      "title": "فريق العمل",
+      "sections": [
+        {
+          "heading": "",
+          "text": "بدأ تطوير لعبة \u206614 Sol\u2069 ضمن هاكاثون \u2066NASA Space Apps\u2069 لعام 2026 في تورونتو."
+        },
+        {
+          "heading": "المطورون",
+          "text": "Bryan Shi, CE 3T0\nJsaon Qian, EE 3T0\nAustin Xiong, CE 3T0\n\nطلاب كلية العلوم التطبيقية والهندسة بجامعة تورونتو."
+        },
+        {
+          "heading": "",
+          "text": ""
+        }
+      ]
+    }
+  }
 }
