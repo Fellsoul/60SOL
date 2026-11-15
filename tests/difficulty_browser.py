@@ -18,7 +18,7 @@ saved_state = "Object.keys(localStorage).filter(k=>k.includes('.slot.')).map(k=>
 try:
     with sync_playwright() as p:
         browser = p.chromium.launch(channel='msedge', headless=True)
-        for difficulty, generation, energy in [('easy',9,10),('medium',8,9),('hard',4,8)]:
+        for difficulty, generation, energy in [('easy',9,10),('medium',8,9),('hard',6,9)]:
             context = browser.new_context(viewport={'width':1280,'height':900}, reduced_motion='reduce')
             context.route('**/*.png', lambda route: route.fulfill(content_type='image/png',body=pixel))
             context.route('**/api/space-data', lambda route: route.fulfill(status=503,body='Offline test'))
