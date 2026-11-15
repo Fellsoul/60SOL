@@ -162,7 +162,7 @@
   "action.lights_on.summary": "We turned the cabin lights back on. Familiar warmth returned to the room.",
   "error.eventFirst": "Resolve today's event first",
   "error.missionFinished": "The mission has ended",
-  "error.workUsed": "Today's work is already used",
+  "error.workUsed": "No work assignments remain today",
   "error.toolUnavailable": "The required tool is not available",
   "error.powerInsufficient": "Not enough power",
   "error.noLocalData": "No local research is waiting to be sent",
@@ -258,7 +258,7 @@
   "tasks.title": "Task clipboard",
   "tasks.close": "Close task clipboard",
   "tasks.department": "OUTPOST / OPERATIONS",
-  "tasks.intro": "Complete tasks here. Checked tasks are finished; unchecked tasks show what remains. One work assignment per Sol.",
+  "tasks.intro": "Assign work here. Two rested, conscious crew at base allow up to two assignments per Sol; otherwise the limit is one. Event work counts too. You may end the day early.",
   "tasks.footer": "LAST LIGHT OUTPOST · CREW WORK SHEET",
   "tasks.open": "Open task clipboard",
   "tasks.ready": "Your work assignment is ready on the clipboard.",
@@ -643,5 +643,9 @@
   "action.repair_robot.summary": "We repaired the robot with 1 spare part and today’s work, without using power.",
   "error.robotDamaged": "The robot is damaged. Repair it with 1 spare part and one work assignment.",
   "error.robotNotDamaged": "There is no damaged robot to repair.",
-  "intro.skip": "SKIP INTRO"
+  "intro.skip": "SKIP INTRO",
+  "guide.terminal": "Open the terminal for today’s briefing",
+  "guide.notebook": "Open the work notebook to plan today’s work",
+  "tasks.workRemaining": "Work assignments remaining",
+  "error.transmissionFull": "Today’s transmission capacity has been used."
 }

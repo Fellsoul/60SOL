@@ -28,7 +28,7 @@ test('four toolkit events offer manual repairs with matching effects, health cos
 });
 
 test('manual event repairs reject insufficient health, used work, and missing required spares without charging',()=>{
-  for(const id of ['E02','E04','E07','E09'])for(const override of [{health:20},{workId:'standby'}]){
+  for(const id of ['E02','E04','E07','E09'])for(const override of [{health:20},{workId:'standby',workIds:['standby','standby']}]){
     const model=game(id);model.restore({...model.snapshot,...override});const before=model.snapshot;
     assert.throws(()=>model.choose('force_repair'));assert.deepEqual(model.snapshot,before);
   }

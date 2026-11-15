@@ -23,8 +23,8 @@ test('开局先发电再支付生命维持；状态副本不能修改 Model',() 
 test('事件和工作不可重复结算，一次性电池不可重复使用',() => {
   const game = model(); game.choose('grow');
   assert.equal(game.snapshot.growth,1); assert.equal(game.snapshot.energy,6);
-  assert.throws(() => game.choose('grow')); assert.throws(() => game.work('research'));
-  game.useBattery(); assert.equal(game.snapshot.energy,12);
+  assert.throws(() => game.choose('grow'));game.work('research');assert.throws(()=>game.work('standby'));
+  game.useBattery(); assert.equal(game.snapshot.energy,9);
   assert.throws(() => game.useBattery());
 });
 
@@ -201,7 +201,7 @@ test('开关灯不扣即时电力，不改变事件、工作机会或已完成�
   assert.equal(game.snapshot.phase,'work'); assert.equal(game.snapshot.workId,null);
   game.work('research'); game.setLights(true); game.setLights(false);
   assert.equal(game.snapshot.phase,'end'); assert.equal(game.snapshot.workId,'research');
-  assert.equal(game.snapshot.energy,energy-3); assert.throws(() => game.work('grow'));
+  assert.equal(game.snapshot.energy,energy-3);game.work('grow');assert.throws(()=>game.work('standby'));
   const repo = new SaveRepository(memory(),content); const saved = repo.save(game.snapshot);
   assert.deepEqual(repo.load(saved.id).state,game.snapshot);
 });

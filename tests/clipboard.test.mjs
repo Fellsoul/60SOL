@@ -17,7 +17,7 @@ test('event work is offered on the clipboard before making a terminal decision',
   model.choose(task.id);
   assert.equal(rows(model).find(task => task.command === 'choose').done,true);
   const daily = rows(model).filter(task => task.command === 'work');
-  assert.ok(daily.length); assert.ok(daily.every(task => task.reason === 'error.workUsed'));
+  assert.ok(daily.length); assert.equal(daily.find(task=>task.id==='grow').reason,'');
   assert.equal(model.snapshot.sol,1);
 });
 
@@ -30,7 +30,7 @@ test('completed and unfinished tasks coexist after completion and restoring a sa
     const tasks = rows(current);
     assert.equal(tasks.find(task => task.id === 'research').done,true);
     assert.equal(tasks.find(task => task.id === 'grow').done,false);
-    assert.equal(tasks.find(task => task.id === 'grow').reason,'error.workUsed');
+    assert.equal(tasks.find(task => task.id === 'grow').reason,'');
     assert.equal(tasks.filter(task => task.done && task.command === 'work').length,1);
     assert.ok(!tasks.some(task => task.id === 'robot'));
     assert.throws(() => current.work('research'));

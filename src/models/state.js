@@ -10,7 +10,7 @@ export function createState(toolIds, seed = 20261113) {
     localData: 0, sentData: 0, pendingData: 0, growth: 0, powerFailures: 0,
     lifeSupportPaid: false, generation: 0, dusty: false, shielded: false,
     tools: Object.fromEntries(toolIds.map(id => [id, 'ready'])),
-    rng: seed >>> 0, currentEventId: null, choiceId: null, workId: null,
+    rng: seed >>> 0, currentEventId: null, choiceId: null, workId: null, workIds: [],
     eventDone: false,
     visualAction: null,
     samples: [], crew:freshCrew(), expeditionPlan:null, robotSampleSol:null,
@@ -22,6 +22,7 @@ export function createState(toolIds, seed = 20261113) {
     daySummary: [], previousDaySummary: [], summarySol: 0,
     resourceLog: [], previousResourceLog: [],
     missionJournal: [],
+    guide: {terminalSol:0,notebookSol:0},
   };
 }
 
@@ -32,6 +33,8 @@ export function logEntry(state, text) {
 // 存档属于外部输入；版本和关键字段必须通过校验，不能直接合并进初始状态。
 export function validateState(s, eventIds, toolIds) {
   if (!s || s.version !== SAVE_VERSION) return false;
+  if (s.workIds !== undefined && (!Array.isArray(s.workIds) || s.workIds.length>2 || !s.workIds.every(id=>typeof id==='string'&&id.length>0&&id.length<=200) || (s.workIds.length>0&&s.workIds.at(-1)!==s.workId))) return false;
+  if (s.guide !== undefined && (!s.guide || !['terminalSol','notebookSol'].every(key => Number.isInteger(s.guide[key]) && s.guide[key]>=0 && s.guide[key]<=Math.min(s.sol,3)) || s.guide.notebookSol>s.guide.terminalSol)) return false;
   if (s.difficulty !== undefined && !['easy','medium','hard'].includes(s.difficulty)) return false;
   if (s.concurrentEvents !== undefined && (!Array.isArray(s.concurrentEvents) || s.concurrentEvents.length > 6 ||
     new Set(s.concurrentEvents.map(item => item?.id)).size !== s.concurrentEvents.length ||
