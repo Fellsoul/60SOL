@@ -5,6 +5,7 @@ Run the automated suite with `npm test` (Node's built-in test runner; no extra p
 | File | Coverage |
 | --- | --- |
 | `game.test.mjs` | Resource costs, daily settlement, light controls, saves, and migration |
+| `endings.test.mjs` | Four ending outcomes, final-night settlement, early unconscious crew, complete journals, legacy saves, and bilingual reports |
 | `daily-events.test.mjs` | Daily event progression, fallback responses, and a complete successful mission |
 | `dependencies.test.mjs` | Event-specific restrictions, independent work, and avoiding blocked missions |
 | `emergency-clean.test.mjs` | Trigger conditions, health/work costs, declining, and reload protection |

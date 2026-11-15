@@ -24,7 +24,7 @@ test('所有语言使用相同的英文语义 key，译文保持为字符串',()
 
 test('事件、选项、工具、工作和静态界面的翻译引用均可解析',async () => {
   const references = [
-    ...events.flatMap(event => [event.title,event.text,event.summaryLine,...event.choices.flatMap(choice => [choice.label,choice.description,choice.summaryLine])]),
+    ...events.flatMap(event => [event.title,event.text,event.summaryLine,event.endingSummary,...event.choices.flatMap(choice => [choice.label,choice.description,choice.summaryLine])]),
     ...tools.flatMap(tool => [tool.name,tool.description]),
     ...ACTIONS.flatMap(action => [action.label,action.narrative,action.summaryLine]),
     ...LIGHT_ACTIONS.flatMap(action => [action.label,action.narrative,action.summaryLine]),

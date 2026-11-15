@@ -7,6 +7,7 @@ export async function loadContent() {
   }));
   const content = Object.fromEntries(names.map((name,index) => [name,values[index]]));
   for (const event of content.events) {
+    if (!event.endingSummary) throw new Error(`事件 ${event.id} 缺少 endingSummary`);
     if (!event.summaryLine || event.choices.some(choice => !choice.summaryLine)) throw new Error(`事件 ${event.id} 缺少 summaryLine`);
   }
   return content;

@@ -38,6 +38,9 @@ test('all fourteen Sols have a playable daily event, resolved before next Sol',(
     settleExtras(game); game.nextSol();
   }
   assert.equal(seen.length,14); assert.equal(game.snapshot.phase,'finished'); assert.equal(game.snapshot.outcome,'incomplete');
+  assert.equal(game.snapshot.sol,15);
+  assert.deepEqual(game.snapshot.missionJournal.map(day => day.sol),Array.from({length:14},(_,i) => i+1));
+  assert.deepEqual(game.snapshot.missionJournal.map(day => day.events[0].eventId),seen);
 });
 
 test('reload keeps pending event locked; closing panels, battery, lights and forged end phase cannot bypass it',() => {

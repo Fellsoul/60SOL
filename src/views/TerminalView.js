@@ -7,6 +7,7 @@ import { Typewriter } from './Typewriter.js';
 import { i18n } from '../services/I18n.js';
 import { LIMITS } from '../models/state.js';
 import { BatterySlotView } from './BatterySlotView.js';
+import { ENDING_ART } from '../models/EndingRules.js';
 
 function choice(action,id,label,description='',disabled=false) {
   label = i18n.t(label); description = i18n.t(description);
@@ -43,8 +44,9 @@ export class TerminalView {
     if (this.dialog.open) return;
     this.reducedMotion = reducedMotion;
     this.mode = mode;
-    this.isConsole = Boolean(state) && mode === 'game';
+    this.isConsole = Boolean(state) && !state.outcome && mode === 'game';
     this.dialog.classList.toggle('is-console',this.isConsole);
+    this.dialog.classList.toggle('is-report',Boolean(state?.outcome));
     if (mode === 'settings') this.renderSettings(); else this.render(state,event);
     this.dialog.showModal(); document.querySelector('#terminal-toggle').setAttribute('aria-expanded','true');
     document.body.classList.toggle('console-open',this.isConsole);
@@ -52,8 +54,9 @@ export class TerminalView {
     const frames = this.isConsole ? [{transform:'translateY(90%)'},{transform:'translateY(20%)'}] : [{transform:'translateX(-100%)'},{transform:'translateX(0)'}];
     this.animation = this.dialog.animate(frames,{duration:reducedMotion ? 0 : 560,easing:'cubic-bezier(.16,1,.3,1)'});
     document.querySelector('#terminal-close').focus({preventScroll:true});
-    const skip = document.querySelector('#skip-typing'); skip.hidden = reducedMotion;
-    this.writer.play(this.jobs,{reducedMotion,onComplete:() => { skip.hidden = true; }});
+    const instant = reducedMotion || Boolean(state?.outcome);
+    const skip = document.querySelector('#skip-typing'); skip.hidden = instant;
+    this.writer.play(this.jobs,{reducedMotion:instant,onComplete:() => { skip.hidden = true; }});
     // showModal can restore focus/scroll from the loadout form. Reset after it is visible
     // and after the typewriter has changed the content height.
     this.resetScroll();
@@ -72,7 +75,7 @@ export class TerminalView {
     text = i18n.t(text);
     return `<p class="terminal-copy"><span class="sr-only">${escapeHtml(text)}</span><span id="${id}" aria-hidden="true" data-copy="${escapeHtml(text)}"></span>${suffix ? `<span data-copy-after hidden>${suffix}</span>` : ''}</p>`;
   }
-  resourceSummary(entries = []) {
+  resourceSummary(entries = [],prefix = 'resource-copy') {
     const localize = values => values?.[i18n.language] ?? values?.en;
     return entries.map((entry,index) => {
       const variants = localize(this.resourceLog.sources?.[entry.source]?.descriptions);
@@ -96,13 +99,31 @@ export class TerminalView {
         }
         return `<span class="summary-resource-change">${escapeHtml(label)} ${sign}${amount}</span>`;
       }).join(' ');
-      return this.copy(`resource-copy-${index}`,description,` <span class="summary-resource-changes">${changes}</span>`);
+      return this.copy(`${prefix}-${index}`,description,` <span class="summary-resource-changes">${changes}</span>`);
     }).join('');
   }
   resetScroll() {
     document.querySelector('#terminal-scroll').scrollTop = 0;
     this.dialog.querySelector('.terminal-shell').scrollTop = 0;
     this.dialog.scrollTop = 0;
+  }
+  missionSummary(state) {
+    const text = key => resourceText(i18n.t(key));
+    const journal = state.missionJournal ?? (state.summarySol ? [{sol:state.summarySol,
+      summary:state.previousDaySummary, resources:state.previousResourceLog ?? [], events:[]}] : []);
+    const lastSol = Math.min(LIMITS.sols,state.summarySol || state.sol);
+    const days = Array.from({length:lastSol},(_,index) => {
+      const sol = index+1;
+      const day = journal.find(entry => entry.sol === sol);
+      const heading = `<h2>SOL ${String(sol).padStart(2,'0')}</h2>`;
+      if (!day) return `<section class="mission-day" data-sol="${sol}">${heading}<p>${text('ending.missingLog')}</p></section>`;
+      const events = day.events.map(event => `<li><p>${text(event.summaryLine)}</p><p class="mission-choice">${text(event.choiceSummary ?? 'ending.eventUnresolved')}</p></li>`).join('');
+      const choices = new Set(day.events.map(event => event.choiceSummary));
+      const actions = day.summary.filter(line => !choices.has(line)).map(line => `<li>${text(line)}</li>`).join('');
+      const resources = day.resources.length ? `<details class="mission-resources"><summary>${text('ending.resourceDetails')}</summary>${this.resourceSummary(day.resources,`journal-${sol}`)}</details>` : '';
+      return `<section class="mission-day" data-sol="${sol}">${heading}${events ? `<ul class="mission-events">${events}</ul>` : ''}${actions ? `<ul class="mission-actions">${actions}</ul>` : ''}${resources}</section>`;
+    }).join('');
+    return `<h2>${text(`ending.${ENDING_ART[state.outcome]}.name`)}</h2><p>${text(`outcome.${state.outcome}`)}</p>${resourceInventory(state)}<h2>${text('ending.journal')}</h2>${days}`;
   }
   async fadeContentOut(reducedMotion) {
     this.writer.cancel();
@@ -121,20 +142,21 @@ export class TerminalView {
   }
   render(state,event,{autoplay=this.dialog.open}={}) {
     this.writer.cancel();
-    this.batterySlot.render(state);
-    const title = state ? `SOL ${String(state.sol).padStart(2,'0')}` : 'OUTPOST / LINK';
+    this.batterySlot.render(state?.outcome ? null : state);
+    const title = state?.outcome ? i18n.t('ending.title') : state ? `SOL ${String(state.sol).padStart(2,'0')}` : 'OUTPOST / LINK';
     const generation = document.querySelector('#terminal-generation');
-    generation.hidden = !state;
+    generation.hidden = !state || Boolean(state.outcome);
     generation.textContent = state ? `${i18n.t('terminal.generation')} +${state.generation} E` : '';
     generation.title = i18n.t('terminal.generationHint');
     document.querySelector('#terminal-title').setAttribute('aria-label',title);
     document.querySelector('#restart').hidden = !state;
     if (!state) {
       this.content.innerHTML = this.copy('briefing-copy','loadout.intro') + `<form id="loadout-form"><div class="loadout">${this.tools.map(tool => `<label><input type="checkbox" name="tool" value="${escapeHtml(tool.id)}"><span>${escapeHtml(i18n.t(tool.name))}<small>${escapeHtml(i18n.t(tool.description))}</small></span></label>`).join('')}</div><div class="terminal-choices"><button class="terminal-choice" type="submit" disabled>${escapeHtml(i18n.t('loadout.chooseTwo'))}</button></div></form>`;
+    } else if (state.outcome) {
+      this.content.innerHTML = this.missionSummary(state);
     } else {
       const previous = state.previousDaySummary.length ? state.previousDaySummary.map(line => i18n.t(line)).join('\n\n') : 'summary.arrival';
-      let today = event.text;
-      if (state.outcome) today = {success:'outcome.success',incomplete:'outcome.incomplete',unsafe:'outcome.unsafe'}[state.outcome];
+      const today = event.text;
       this.content.innerHTML = `${resourceInventory(state)}<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}<div id="terminal-decisions" class="terminal-choices"></div>`;
       const decisions = this.content.querySelector('#terminal-decisions');
       if (state.tools.monitor === 'ready' && state.sol < LIMITS.sols) {

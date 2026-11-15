@@ -38,6 +38,9 @@ export class SceneView {
       this.layers.push({config,node,key:null,animation:null});
     }
     this.crewStatus.mount();
+    this.ending = document.createElement('div');
+    this.ending.className = 'scene-ending'; this.ending.hidden = true;
+    this.root.append(this.ending);
     if (new URLSearchParams(location.search).has('debug')) {
       this.root.classList.add('debug');
     }
@@ -46,6 +49,20 @@ export class SceneView {
   async render(state,reducedMotion) {
     this.reducedMotion = reducedMotion;
     const generation = ++this.generation;
+    this.root.classList.toggle('is-ending',Boolean(state?.outcome));
+    this.ending.hidden = !state?.outcome;
+    if (state?.outcome) {
+      this.layers.forEach(layer => this.stop(layer));
+      this.crewMotion.stopReaction(); this.crewStatus.render(null);
+      const asset = await this.assets.state(this.layout.endings[state.outcome]);
+      if (generation !== this.generation) return;
+      this.ending.replaceChildren(); this.ending.dataset.outcome = state.outcome;
+      if (asset) {
+        const image = document.createElement('img'); image.src = asset.src; image.alt = ''; image.draggable = false;
+        this.ending.append(image);
+      }
+      return; // Missing ending art stays black; never fall back to the outpost.
+    }
     const appearance = sceneState(state);
     await Promise.all(this.layers.map(async layer => {
       const key = layerState(layer.config,appearance);

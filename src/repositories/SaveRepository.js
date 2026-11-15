@@ -65,7 +65,7 @@ export class SaveRepository {
       if (!validateState(state,this.eventIds,this.toolIds)) throw new Error('存档版本或内容无效');
       const event = this.events.find(item => item.id === state.currentEventId);
       if (state.choiceId !== null && !event.choices.some(choice => choice.id === state.choiceId)) throw new Error('事件选项无效');
-      if ((state.phase === 'event') !== (state.choiceId === null)) throw new Error('阶段不一致');
+      if (state.phase !== 'finished' && (state.phase === 'event') !== (state.choiceId === null)) throw new Error('阶段不一致');
       return { state, savedAt, message:'save.restored' };
     } catch { return { state:null, savedAt:null, message:'save.invalidPreserved' }; }
   }

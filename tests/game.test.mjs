@@ -43,12 +43,13 @@ test('最后一天传输先确认，再检查任务成功',() => {
   assert.throws(() => game.nextSol());
 });
 
-test('零库存不等于当日供给失败，连续供电不足才提前终止',() => {
+test('零库存不等于当日供给失败，连续缺电扣生命值但不单独终止任务',() => {
   const s = model().snapshot; Object.assign(s,{phase:'end',energy:0,food:8});
   finishSol(s); assert.equal(s.health,100); assert.equal(s.outcome,null);
   s.lifeSupportPaid = false; s.food = 10;
   finishSol(s); assert.equal(s.outcome,null); assert.equal(s.powerFailures,1);
-  finishSol(s); assert.equal(s.outcome,'unsafe'); assert.ok(s.food >= 0);
+  finishSol(s); assert.equal(s.outcome,null); assert.equal(s.powerFailures,2); assert.ok(s.health > 0 && s.health < 100);
+  s.health=15; s.food=8; finishSol(s); assert.equal(s.outcome,'unsafe');
 });
 
 test('存档恢复保留卡片、阶段、资源和随机状态；坏存档可降级',() => {

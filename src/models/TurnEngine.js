@@ -4,6 +4,8 @@ import { LIMITS, logEntry } from './state.js';
 import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
 import { advanceExpeditions, recoverCrew, CREW_IDS } from './ExpeditionRules.js';
 import { beginConcurrentEvents } from './ConcurrentEvents.js';
+import { archiveSol } from './MissionJournal.js';
+import { endForCrewFailure } from './EndingRules.js';
 
 export function beginSol(state, events, environment = {}, resourceLog = {}) {
   state.weather = environment.days?.[String(state.sol)] ?? environment.default ?? 'clear';
@@ -30,9 +32,11 @@ export function beginSol(state, events, environment = {}, resourceLog = {}) {
   recordResourceChange(state,expeditionBefore,'expedition.return',resourceLog,'expedition.samplesReturned');
   state.phase = 'event';
   logEntry(state,`晨报：发电 ${state.generation} E，生命维持${state.lifeSupportPaid ? '已支付 '+support+' E' : '供电不足'}，可用 ${state.energy} E。`);
+  endForCrewFailure(state,events);
 }
 
-export function finishSol(state, resourceLog = {}) {
+export function finishSol(state, resourceLog = {}, events) {
+  if (state.outcome || endForCrewFailure(state,events)) return;
   let before = resourceSnapshot(state);
   // 工作已在确认时结算；通信先于最终结局、收获先于食物消耗。
   const lit = state.lightsOn && state.energy > 0;
@@ -65,11 +69,11 @@ export function finishSol(state, resourceLog = {}) {
   if (hungry) state.daySummary.push('summary.foodShortage');
   if (!state.lifeSupportPaid) state.daySummary.push('summary.lifeSupportFailure');
   if (state.weather === 'sandstorm') state.daySummary.push('summary.stormDust');
-  state.previousDaySummary = [...state.daySummary];
-  state.previousResourceLog = structuredClone(state.resourceLog ?? []);
-  state.summarySol = state.sol;
   logEntry(state,`日终：食物 ${state.food} F，人员状态 ${state.health}，已传回数据 ${state.sentData}。`);
-  if (state.health === 0 || state.powerFailures >= 2) state.outcome = 'unsafe';
-  else if (state.sol === LIMITS.sols) state.outcome = state.sentData >= LIMITS.target ? 'success' : 'incomplete';
+  endForCrewFailure(state,events);
+  if (!state.outcome && state.sol === LIMITS.sols) state.outcome = state.sentData >= LIMITS.target ? 'success' : 'incomplete';
   if (state.outcome) state.phase = 'finished';
+  archiveSol(state,events);
+  // SOL 15 is an ending marker: no new weather, generation, events or meals run.
+  if (state.sol === LIMITS.sols) state.sol += 1;
 }

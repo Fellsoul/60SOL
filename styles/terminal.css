@@ -69,4 +69,11 @@ body.console-open #terminal-toggle { visibility: hidden; }
 .loadout small { display: block; font-size: .8rem; color: var(--dim); }
 .loadout label:has(input:checked) { background: #2b3a26; border-color: #a2bb8c; }
 .terminal-note { color: var(--dim); font-size: .95rem; }
+.mission-day { padding:12px 0 22px; border-bottom:1px solid var(--line); }
+.mission-events, .mission-actions { padding-left:1.4em; }
+.mission-events li { margin-bottom:16px; }
+.mission-events p { margin:0; }
+.mission-choice { color:var(--dim); }
+.mission-resources summary { cursor:pointer; padding:10px 0; }
+#terminal.is-report { width:min(850px,calc(100vw - 24px)); }
 @media (max-width: 600px) { #terminal-scroll { padding: 20px; } .terminal-header { padding: 16px 20px; } .terminal-footer { padding: 10px 20px; } }

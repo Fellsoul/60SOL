@@ -9,6 +9,8 @@ import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
 import { freshCrew, expeditionReason, robotSampleReason, collectSample, ROBOT_SAMPLE_ENERGY } from './ExpeditionRules.js';
 import { concurrentEvent, concurrentChoiceReason, syncFatigueEvents } from './ConcurrentEvents.js';
 import { dailyActivitiesComplete } from './DailyWorkRules.js';
+import { ensureMissionJournal } from './MissionJournal.js';
+import { endForCrewFailure } from './EndingRules.js';
 
 export class GameModel {
   #state = null;
@@ -19,7 +21,9 @@ export class GameModel {
     if (this.#state) {
       this.#state.samples ??= []; this.#state.crew ??= freshCrew();
       this.#state.expeditionPlan ??= null; this.#state.robotSampleSol ??= null;
+      ensureMissionJournal(this.#state);
       syncFatigueEvents(this.#state, this.events);
+      endForCrewFailure(this.#state,this.events);
     }
   }
   planExpedition(crewId) {
@@ -158,11 +162,13 @@ export class GameModel {
     logEntry(s,`使用一次性备用电池，实际补充 ${gain} E。`);
   }
   nextSol() {
+    if (this.#state?.outcome) throw new Error('error.missionFinished');
+    if (this.#state && endForCrewFailure(this.#state,this.events)) return;
     if (this.#state?.concurrentEvents?.some(instance => !instance.choiceId)) throw new Error('error.eventUnresolved');
     if (this.#state && !eventResolved(this.#state,this.events.get(this.#state.currentEventId))) throw new Error('error.eventUnresolved');
     if (this.#state?.phase === 'work' && dailyActivitiesComplete(this.#state,this.events.get(this.#state.currentEventId))) this.work('standby');
     if (this.#state?.phase !== 'end') throw new Error('error.finishDayFirst');
-    finishSol(this.#state,this.resourceLog);
+    finishSol(this.#state,this.resourceLog,this.events);
     if (!this.#state.outcome) { this.#state.sol += 1; beginSol(this.#state,this.events,this.environment,this.resourceLog); }
   }
 }

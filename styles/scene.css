@@ -7,7 +7,15 @@
 .scene-dust-motion { width: 100%; height: 100%; transform-origin: center; }
 .scene-dust-track { display: flex; width: 200%; height: 100%; }
 .scene-dust-track img { flex: 0 0 50%; width: 50%; height: 100%; object-fit: fill; }
-#morning-veil { position: fixed; inset: 0; z-index: 120; background: #000; opacity: 1; pointer-events: auto; }
+#morning-veil { position: fixed; inset: 0; z-index: 120; opacity: 1; pointer-events: auto; }
+#morning-black { position:absolute; inset:0; background:#000; }
+#sol-title { position:relative; }
+#ending-continue { position:absolute; inset:0; width:100%; height:100%; background:transparent; border:0; border-radius:0; }
+#ending-continue:focus-visible { outline:2px solid #ebe9de; outline-offset:-12px; }
+.scene-ending { position:absolute; inset:0; background:#000; }
+.scene-ending img { width:100%; height:100%; object-fit:contain; }
+#scene.is-ending > :not(.scene-ending) { display:none; }
+body.mission-ended #tasks-toggle { display:none; }
 #scene.debug { outline: 1px solid #ffcc8c; }
 #scene.debug .scene-layer { outline: 1px dashed #ffd59a66; }
 #scene-coordinate { position: absolute; bottom: 5px; left: 5px; z-index: 100; font: 12px monospace; background: #000c; color: #fff; pointer-events: none; }

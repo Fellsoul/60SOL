@@ -23,6 +23,7 @@ export class GameView {
     this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelector('#reduce-motion').checked = this.reducedMotion;
     this.state = null; this.event = null;
+    document.querySelector('#ending-continue').addEventListener('click',() => { void this.showEndingJournal(); });
     i18n.translate(document.querySelector('#terminal')); i18n.translate(document.querySelector('#app'));
     document.body.classList.toggle('reduced-motion',this.reducedMotion);
     window.addEventListener('pagehide',() => { this.audio.stop();this.music?.stop();this.movement.clear(); });
@@ -45,6 +46,10 @@ export class GameView {
     const veil = document.querySelector('#morning-veil');
     const title = document.querySelector('#sol-title');
     veil.style.opacity = '1'; veil.style.pointerEvents = 'auto';
+    document.querySelector('#morning-black').style.opacity = '1';
+    document.querySelector('#ending-continue').hidden = true;
+    veil.setAttribute('aria-hidden','true');
+    this.endingReady = false;
     title.style.opacity = '0';
   }
   get gameMusicMode() { return this.state?.weather === 'sandstorm' ? 'storm' : 'game'; }
@@ -54,17 +59,26 @@ export class GameView {
     if (message) this.noticeTimer = setTimeout(() => { notice.hidden = true; },8000);
   }
   async render(state,event,{morning=false,initial=false}={}) {
+    const ending = Boolean(state?.outcome);
+    const enteringEnding = ending && (!this.state?.outcome || initial);
+    if (enteringEnding) morning = true;
     this.state = state; this.event = event;
+    document.body.classList.toggle('mission-ended',ending);
     const veil = document.querySelector('#morning-veil');
     const title = document.querySelector('#sol-title');
     const toggle = document.querySelector('#terminal-toggle'); toggle.disabled = true;
+    toggle.hidden = enteringEnding;
     document.querySelector('#tasks-toggle').disabled = true;
     if (morning || initial) {
       this.tasks.close();
       await this.terminal.close(); veil.style.pointerEvents = 'auto';
       // Keep the title invisible throughout both scene fades.
       title.style.opacity = '0';
-      title.textContent = state ? `SOL ${String(state.sol).padStart(3,'0')}` : '';
+      document.querySelector('#morning-black').style.opacity = '1';
+      document.querySelector('#ending-continue').hidden = true;
+      veil.setAttribute('aria-hidden','true');
+      this.endingReady = false;
+      title.textContent = ending ? i18n.t('ending.title') : state ? `SOL ${String(state.sol).padStart(3,'0')}` : '';
       if (!initial) await Promise.all([this.fade(veil,0,1,this.config.fadeInMs),this.music?.setMode('black',this.reducedMotion?0:this.config.fadeInMs)]);
       else { veil.style.opacity = '1';await this.music?.setMode('black'); }
     }
@@ -76,19 +90,36 @@ export class GameView {
     if (morning || initial) {
       // The black layer stays fully opaque while the title animates independently.
       if (state) await this.fade(title,0,1,this.config.titleFadeInMs ?? 700);
+      if (ending) {
+        this.movement.clear();
+        await Promise.all([this.fade(document.querySelector('#morning-black'),1,0,this.config.fadeOutMs),this.audio.finish()]);
+        const button = document.querySelector('#ending-continue');
+        button.hidden = false; veil.setAttribute('aria-hidden','false');
+        this.endingReady = true; button.focus({preventScroll:true});
+        return; // Keep THE END visible until an explicit click or keyboard activation.
+      }
       if (!this.reducedMotion) await new Promise(resolve => setTimeout(resolve,this.config.blackHoldMs));
       if (state) await this.fade(title,1,0,this.config.titleFadeOutMs ?? 700);
       await Promise.all([this.fade(veil,1,0,this.config.fadeOutMs),this.audio.finish(),this.music?.setMode(this.gameMusicMode,this.reducedMotion?0:this.config.fadeOutMs)]); veil.style.pointerEvents = 'none';
     }
     toggle.disabled = false;
-    document.querySelector('#tasks-toggle').disabled = !state;
+    document.querySelector('#tasks-toggle').disabled = !state || ending;
+  }
+  async showEndingJournal() {
+    if (!this.endingReady || !this.state?.outcome) return;
+    this.endingReady = false;
+    const veil = document.querySelector('#morning-veil');
+    veil.style.opacity = '0'; veil.style.pointerEvents = 'none'; veil.setAttribute('aria-hidden','true');
+    document.querySelector('#ending-continue').hidden = true;
+    const toggle = document.querySelector('#terminal-toggle'); toggle.hidden = false; toggle.disabled = false;
+    await this.openTerminal();
   }
   async fade(node,from,to,duration) {
     const animation = node.animate([{opacity:from},{opacity:to}],{duration:this.reducedMotion ? 0 : duration,easing:'ease-in-out',fill:'forwards'});
     await animation.finished; node.style.opacity = to; animation.cancel();
   }
   openTerminal() { this.tasks.close(); return this.terminal.open(this.state,this.event,this.reducedMotion); }
-  async openTasks() { await this.terminal.close(); if (this.state) this.tasks.open(); }
+  async openTasks() { if (this.state?.outcome) return; await this.terminal.close(); if (this.state) this.tasks.open(); }
   async closeTerminal() { await this.terminal.close(); }
   async refreshTerminal(state,event) {
     this.state = state; this.event = event;

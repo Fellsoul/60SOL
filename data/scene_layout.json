@@ -499,5 +499,19 @@
         }
       }
     }
-  ]
+  ],
+  "endings": {
+    "success": {
+      "src": "assets/scene/ends/TGE.png"
+    },
+    "incomplete": {
+      "src": "assets/scene/ends/GE.png"
+    },
+    "sacrifice": {
+      "src": "assets/scene/ends/GEQ.png"
+    },
+    "unsafe": {
+      "src": "assets/scene/ends/BE.png"
+    }
+  }
 }

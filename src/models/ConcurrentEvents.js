@@ -15,7 +15,7 @@ export function concurrentEvent(instance, events) {
   const base = events.get(instance.eventId);
   if (!base) return null;
   if (!instance.crewId) return base;
-  return { ...base, title: 'events.fatigue.title',
+  return { ...base, title: 'events.fatigue.title', endingSummary:'events.fatigue.endingSummary',
     sceneCue: { kind: 'thought', anchor: instance.crewId === 'astronaut-a' ? 'crew-a' : 'crew-b', text: 'events.fatigue.cue' },
     descriptionKey: 'events.fatigue.description',
     choices: [{ id: 'recover', label: 'events.fatigue.recover', description: 'events.fatigue.description',

@@ -22,7 +22,8 @@
         "summaryLine": "event.arrival.choice.plan.summaryLine"
       }
     ],
-    "summaryLine": "event.arrival.summaryLine"
+    "summaryLine": "event.arrival.summaryLine",
+    "endingSummary": "event.arrival.endingSummary"
   },
   {
     "id": "delivery",
@@ -47,7 +48,8 @@
         "summaryLine": "event.delivery.choice.rest.summaryLine"
       }
     ],
-    "summaryLine": "event.delivery.summaryLine"
+    "summaryLine": "event.delivery.summaryLine",
+    "endingSummary": "event.delivery.endingSummary"
   },
   {
     "id": "dust",
@@ -76,7 +78,8 @@
         "summaryLine": "event.dust.choice.defer.summaryLine"
       }
     ],
-    "summaryLine": "event.dust.summaryLine"
+    "summaryLine": "event.dust.summaryLine",
+    "endingSummary": "event.dust.endingSummary"
   },
   {
     "id": "supply",
@@ -103,7 +106,8 @@
         "summaryLine": "event.supply.choice.continue.summaryLine"
       }
     ],
-    "summaryLine": "event.supply.summaryLine"
+    "summaryLine": "event.supply.summaryLine",
+    "endingSummary": "event.supply.endingSummary"
   },
   {
     "id": "routine",
@@ -128,7 +132,8 @@
         "summaryLine": "event.routine.choice.standby.summaryLine"
       }
     ],
-    "summaryLine": "event.routine.summaryLine"
+    "summaryLine": "event.routine.summaryLine",
+    "endingSummary": "event.routine.endingSummary"
   },
   {
     "id": "sandstorm",
@@ -153,7 +158,8 @@
         "energy": 0,
         "action": "lights_on"
       }
-    ]
+    ],
+    "endingSummary": "event.sandstorm.endingSummary"
   },
   {
     "id": "E01",
@@ -338,7 +344,8 @@
       "kind": "sound",
       "anchor": "hatch",
       "text": "scene.cue.E01"
-    }
+    },
+    "endingSummary": "event.E01.endingSummary"
   },
   {
     "id": "E02",
@@ -537,7 +544,8 @@
       "kind": "sound",
       "anchor": "panels",
       "text": "scene.cue.E02"
-    }
+    },
+    "endingSummary": "event.E02.endingSummary"
   },
   {
     "id": "E03",
@@ -693,7 +701,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E03"
-    }
+    },
+    "endingSummary": "event.E03.endingSummary"
   },
   {
     "id": "E04",
@@ -894,7 +903,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E04"
-    }
+    },
+    "endingSummary": "event.E04.endingSummary"
   },
   {
     "id": "E05",
@@ -1052,7 +1062,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E05"
-    }
+    },
+    "endingSummary": "event.E05.endingSummary"
   },
   {
     "id": "E06",
@@ -1214,7 +1225,8 @@
       "kind": "sound",
       "anchor": "antenna",
       "text": "scene.cue.E06"
-    }
+    },
+    "endingSummary": "event.E06.endingSummary"
   },
   {
     "id": "E07",
@@ -1410,7 +1422,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E07"
-    }
+    },
+    "endingSummary": "event.E07.endingSummary"
   },
   {
     "id": "E08",
@@ -1600,7 +1613,8 @@
       "kind": "sound",
       "anchor": "vent",
       "text": "scene.cue.E08"
-    }
+    },
+    "endingSummary": "event.E08.endingSummary"
   },
   {
     "id": "E09",
@@ -1801,7 +1815,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E09"
-    }
+    },
+    "endingSummary": "event.E09.endingSummary"
   },
   {
     "id": "E10",
@@ -2033,7 +2048,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E10"
-    }
+    },
+    "endingSummary": "event.E10.endingSummary"
   },
   {
     "id": "E11",
@@ -2244,7 +2260,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E11"
-    }
+    },
+    "endingSummary": "event.E11.endingSummary"
   },
   {
     "id": "E12",
@@ -2421,7 +2438,8 @@
       "kind": "speech",
       "anchor": "terminal",
       "text": "scene.cue.E12"
-    }
+    },
+    "endingSummary": "event.E12.endingSummary"
   },
   {
     "id": "E13",
@@ -2580,7 +2598,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E13"
-    }
+    },
+    "endingSummary": "event.E13.endingSummary"
   },
   {
     "id": "E14",
@@ -2767,7 +2786,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E14"
-    }
+    },
+    "endingSummary": "event.E14.endingSummary"
   },
   {
     "id": "E15",
@@ -2950,7 +2970,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E15"
-    }
+    },
+    "endingSummary": "event.E15.endingSummary"
   },
   {
     "id": "E16",
@@ -3139,7 +3160,8 @@
       "kind": "speech",
       "anchor": "terminal",
       "text": "scene.cue.E16"
-    }
+    },
+    "endingSummary": "event.E16.endingSummary"
   },
   {
     "id": "E17",
@@ -3317,7 +3339,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E17"
-    }
+    },
+    "endingSummary": "event.E17.endingSummary"
   },
   {
     "id": "E18",
@@ -3445,7 +3468,8 @@
       "kind": "sound",
       "anchor": "panels",
       "text": "scene.cue.E18"
-    }
+    },
+    "endingSummary": "event.E18.endingSummary"
   },
   {
     "id": "E19",
@@ -3628,7 +3652,8 @@
       "kind": "sound",
       "anchor": "terminal",
       "text": "scene.cue.E19"
-    }
+    },
+    "endingSummary": "event.E19.endingSummary"
   },
   {
     "id": "E20",
@@ -3836,7 +3861,8 @@
       "kind": "speech",
       "anchor": "crew",
       "text": "scene.cue.E20"
-    }
+    },
+    "endingSummary": "event.E20.endingSummary"
   },
   {
     "id": "emergency_clean",
@@ -3867,6 +3893,7 @@
         "energy": 0,
         "work": false
       }
-    ]
+    ],
+    "endingSummary": "event.emergency_clean.endingSummary"
   }
 ]
