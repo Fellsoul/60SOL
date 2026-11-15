@@ -34,13 +34,13 @@ test('every available event response records exactly its numeric effects',() => 
 });
 test('harvest, backup battery and day-end costs keep their actual capped values',() => {
   const model=game(),state=model.snapshot;
-  Object.assign(state,{currentEventId:'arrival',phase:'work',choiceId:'plan',eventDone:true,growth:2,food:30,health:100});
+  Object.assign(state,{currentEventId:'arrival',phase:'work',choiceId:'plan',eventDone:true,growth:2,food:126,health:100});
   model.restore(state); model.work('grow'); model.useBattery();
   assert.equal(model.snapshot.resourceLog.find(entry=>entry.source==='work.grow').changes.food,2);
   assert.equal(model.snapshot.resourceLog.find(entry=>entry.source==='battery').changes.energy,6);
   model.nextSol();
   const log=model.snapshot.previousResourceLog;
-  assert.equal(log.find(entry=>entry.source==='meals').changes.food,-2);
+  assert.equal(log.find(entry=>entry.source==='meals').changes.food,-8);
   assert.equal(log.find(entry=>entry.source==='lighting').changes.energy,-1);
   assert.notDeepEqual(model.snapshot.resourceLog,log);
 });

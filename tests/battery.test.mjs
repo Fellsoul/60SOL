@@ -28,9 +28,9 @@ test('legacy energy migrates without rewriting stored data; invalid/new over-cap
   let raw;
   const repo = new SaveRepository({getItem:() => raw},{events,tools});
   for (const version of [1,2]) {
-    raw=JSON.stringify({...game.snapshot,version,energy:20}); const before=raw;
+    raw=JSON.stringify({...game.snapshot,version,energy:20,food:20,dailySystems:{...game.snapshot.dailySystems,harvestFood:8}}); const before=raw;
     const loaded=repo.load().state;
-    assert.equal(loaded.energy,12); assert.equal(loaded.version,4); assert.equal(raw,before);
+    assert.equal(loaded.energy,12); assert.equal(loaded.version,5); assert.equal(raw,before);
   }
   for (const [version,energy] of [[2,21],[2,-1],[2,12.5],[3,13]]) {
     raw=JSON.stringify({...game.snapshot,version,energy}); assert.equal(repo.load().state,null);

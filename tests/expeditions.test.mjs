@@ -86,9 +86,9 @@ test('departure storms cancel the plan and robot work; capacity filled in transi
 });
 
 test('v3 migration keeps resources without inventing samples; malformed new crew inventories are rejected',()=>{
-  const repo=repository(),model=game(),legacy=model.snapshot;legacy.version=3;legacy.localData=24;
+  const repo=repository(),model=game(),legacy=model.snapshot;legacy.version=3;legacy.food=20;legacy.dailySystems.harvestFood=8;legacy.localData=24;
   for(const key of ['samples','crew','expeditionPlan','robotSampleSol'])delete legacy[key];
-  const saved=repo.save(legacy),loaded=repo.load(saved.id).state;assert.equal(loaded.version,4);assert.equal(loaded.localData,24);assert.deepEqual(loaded.samples,[]);
+  const saved=repo.save(legacy),loaded=repo.load(saved.id).state;assert.equal(loaded.version,5);assert.equal(loaded.localData,24);assert.deepEqual(loaded.samples,[]);
   for(const update of [{samples:[2,2,2,2]},{samples:[0]},{robotSampleSol:2},{crew:{}},{expeditionPlan:{crewId:'stranger',departSol:2}}]) {const invalid=repo.save({...model.snapshot,...update});assert.equal(repo.load(invalid.id).state,null);}
   const late=model.snapshot;late.sol=13;model.restore(late);assert.throws(()=>model.planExpedition('astronaut-a'),{message:'error.expeditionTooLate'});
 });

@@ -31,8 +31,8 @@ test('事件和工作不可重复结算，一次性电池不可重复使用',() 
 test('三次照料的收获先于当天食物消耗',() => {
   const game = model(); const state = game.snapshot;
   Object.assign(state,{phase:'work',choiceId:'plan',eventDone:true,growth:2,food:0}); game.restore(state);
-  game.work('grow'); assert.equal(game.snapshot.food,8);
-  game.nextSol(); assert.equal(game.snapshot.food,6); assert.equal(game.snapshot.health,100);
+  game.work('grow'); assert.equal(game.snapshot.food,32);
+  game.nextSol(); assert.equal(game.snapshot.food,24); assert.equal(game.snapshot.health,100);
 });
 
 test('最后一天传输先确认，再检查任务成功',() => {
@@ -44,7 +44,7 @@ test('最后一天传输先确认，再检查任务成功',() => {
 });
 
 test('零库存不等于当日供给失败，连续供电不足才提前终止',() => {
-  const s = model().snapshot; Object.assign(s,{phase:'end',energy:0,food:2});
+  const s = model().snapshot; Object.assign(s,{phase:'end',energy:0,food:8});
   finishSol(s); assert.equal(s.health,100); assert.equal(s.outcome,null);
   s.lifeSupportPaid = false; s.food = 10;
   finishSol(s); assert.equal(s.outcome,null); assert.equal(s.powerFailures,1);
@@ -117,11 +117,11 @@ test('天气、灯光、植物和消耗工具投影为图片状态，不依赖�
 
 test('旧存档升级，不凭空编造昨日简报',() => {
   const storage = memory(); const repo = new SaveRepository(storage,content);
-  const old = model().snapshot; old.version = 1;
+  const old = model().snapshot; old.version = 1; old.food=20; old.dailySystems.harvestFood=8;
   for (const key of ['weather','lightsOn','plantStage','daySummary','previousDaySummary','summarySol']) delete old[key];
   storage.setItem(repo.key,JSON.stringify(old));
   const restored = repo.load().state;
-  assert.equal(restored.version,4); assert.deepEqual(restored.previousDaySummary,[]);
+  assert.equal(restored.version,5); assert.deepEqual(restored.previousDaySummary,[]);
   assert.equal(repo.save(restored,repo.key).ok,true);
   assert.deepEqual(repo.load(repo.key).state,restored); assert.equal(repo.list().saves.length,1);
 });

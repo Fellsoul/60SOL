@@ -5,8 +5,9 @@ import { escapeHtml } from './dom.js';
 import { CREW_IDS, expeditionReason, robotSampleReason, researchUses, ROBOT_SAMPLE_ENERGY } from '../models/ExpeditionRules.js';
 import { crewHead, crewStatuses } from './CrewStatus.js';
 import { concurrentEvent, concurrentChoiceReason } from '../models/ConcurrentEvents.js';
+import { resourceText, resourceInventory } from './ResourceIcons.js';
 
-const text = key => escapeHtml(i18n.t(key));
+const text = key => resourceText(i18n.t(key));
 // Match the room portraits: astronaut B (glasses) sits left, astronaut A sits right.
 const crewDisplayOrder = ['astronaut-b', 'astronaut-a'];
 const batteryIcon = '<img class="task-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">';
@@ -88,7 +89,7 @@ export class TaskView {
     const completed = tasks.some(task => task.done);
     const note = !eventResolved(state,event) ? 'tasks.eventFirst' : state.phase === 'finished' ? 'tasks.finished' : state.workId ? (state.workId.startsWith('event:') ? 'tasks.eventWork' : 'tasks.checked') : 'tasks.choose';
     const eventCopy = event?.choices.length ? `<section class="clipboard-event${eventResolved(state,event) ? ' is-resolved' : ''}"><h2>${text(event.title)}</h2>${event.sceneCue ? '' : `<p>${text(event.text)}</p>`}</section>` : '';
-    this.content.innerHTML = `${this.sampling(state,event)}${this.concurrentTasks(state)}${eventCopy}<div class="task-list">${tasks.map(task => {
+    this.content.innerHTML = `${resourceInventory(state)}${this.sampling(state,event)}${this.concurrentTasks(state)}${eventCopy}<div class="task-list">${tasks.map(task => {
       const {done,reason} = task;
       return `<button class="task-row ${done ? 'is-complete' : ''}" data-action="${task.command}" data-id="${escapeHtml(task.id)}" ${done || reason ? 'disabled' : ''}><span class="task-checkbox" aria-hidden="true">${done ? '✓' : ''}</span><span class="task-details"><strong>${text(task.label)}</strong><small>${text(done ? 'tasks.checked' : reason || task.description)}</small><span class="task-cost">${energyCost(task.energy)}<span> · ${text(task.work === false ? 'tasks.noWork' : 'tasks.work')}</span></span></span></button>`;
     }).join('')}</div><p class="clipboard-note" role="status">${text(note)}</p>`;

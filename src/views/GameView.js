@@ -1,4 +1,5 @@
 import { SceneEventView } from './SceneEventView.js';
+import { MovementView } from './MovementView.js';
 import { SceneView } from './SceneView.js';
 import { TaskView } from './TaskView.js';
 import { TerminalView } from './TerminalView.js';
@@ -13,19 +14,23 @@ export class GameView {
     this.terminal = new TerminalView(content.tools,content.events,content.resource_log);
     this.tasks = new TaskView();
     this.tasks.events = content.events;
-    this.events = content.events;
+    this.movement = new MovementView(content.movement,this.scene);
     this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelector('#reduce-motion').checked = this.reducedMotion;
     this.state = null; this.event = null;
     i18n.translate(document.querySelector('#terminal')); i18n.translate(document.querySelector('#app'));
     document.body.classList.toggle('reduced-motion',this.reducedMotion);
-    window.addEventListener('pagehide',() => this.audio.stop());
+    window.addEventListener('pagehide',() => { this.audio.stop();this.movement.clear(); });
+    window.addEventListener('pageshow',event => {
+      if (!event.persisted) return;
+      if (document.querySelector('#main-menu').hidden) this.movement.restore(this.lastVisualAction);
+      else this.movement.clear();
+    });
   }
   async mount() {
     await this.scene.mount();
     this.tasks.mount();
     this.sceneEvent = new SceneEventView(this.scene.root);
-    this.sceneEvent.events = this.events;
   }
   coverScene() {
     const veil = document.querySelector('#morning-veil');
@@ -56,7 +61,6 @@ export class GameView {
     await this.scene.render(state,this.reducedMotion);
     this.terminal.render(state,event);
     this.tasks.render(state,event);
-    this.sceneEvent?.render(state,event,{reset:initial});
     if (morning || initial) {
       // The black layer stays fully opaque while the title animates independently.
       if (state) await this.fade(title,0,1,this.config.titleFadeInMs ?? 700);
@@ -79,7 +83,6 @@ export class GameView {
     await this.terminal.fadeContentOut(this.reducedMotion);
     await this.scene.render(state,this.reducedMotion);
     this.tasks.render(state,event);
-    this.sceneEvent?.render(state,event);
     this.terminal.render(state,event,{autoplay:false});
     this.terminal.typeContent(this.reducedMotion);
   }

@@ -2,7 +2,7 @@ import { spaceHeating } from './SpaceData.js';
 import { dailyState } from './DailyEventRules.js';
 import { LIMITS, logEntry } from './state.js';
 import { resourceSnapshot, recordResourceChange } from './ResourceLog.js';
-import { advanceExpeditions, recoverCrew } from './ExpeditionRules.js';
+import { advanceExpeditions, recoverCrew, CREW_IDS } from './ExpeditionRules.js';
 import { beginConcurrentEvents } from './ConcurrentEvents.js';
 
 export function beginSol(state, events, environment = {}, resourceLog = {}) {
@@ -48,9 +48,10 @@ export function finishSol(state, resourceLog = {}) {
   state.sentData += state.pendingData;
   state.pendingData = 0;
   recordResourceChange(state,before,'transmissionConfirmed',resourceLog,'summary.transmissionConfirmed');
-  const hungry = state.food < 2;
+  const meals = CREW_IDS.length * 4;
+  const hungry = state.food < meals;
   before = resourceSnapshot(state);
-  state.food = Math.max(0,state.food-2);
+  state.food = Math.max(0,state.food-meals);
   recordResourceChange(state,before,'meals',resourceLog);
   before = resourceSnapshot(state);
   if (hungry) { state.health = Math.max(0,state.health-12); logEntry(state,'食物不足，人员状态 −12。'); }

@@ -1,3 +1,4 @@
+import { resourceText } from './ResourceIcons.js';
 import { eventResolved } from '../models/DailyEventRules.js';
 import { i18n } from '../services/I18n.js';
 import { concurrentEvent } from '../models/ConcurrentEvents.js';
@@ -80,7 +81,7 @@ export class SceneEventView {
     this.node.hidden = true;
     activeDescriptions.get(this.root)?.fadeDescription();
     this.clearDescription();
-    this.description.textContent = i18n.t(this.descriptionKey ?? `scene.description.${this.eventID}`);
+    this.description.innerHTML = resourceText(i18n.t(this.descriptionKey ?? `scene.description.${this.eventID}`));
     this.description.hidden = false;
     activeDescriptions.set(this.root, this);
     // Keep the lower-center panel visible for 3 seconds, then fade for 400 ms.
@@ -141,7 +142,7 @@ export class SceneEventView {
     const anchor = event.descriptionKey ? cue.anchor : eventAnchors[event.id] ?? cue.anchor;
     this.node.dataset.anchor = anchor;
     this.anchor = anchors[anchor] ?? anchors['crew-b'];
-    this.node.textContent = i18n.t(cue.text);
+    this.node.innerHTML = resourceText(i18n.t(cue.text));
     this.node.setAttribute('aria-label', `${i18n.t(cue.text)}. ${i18n.t('scene.cue.review')}`);
     this.node.title = i18n.t('scene.cue.review');
     this.position();

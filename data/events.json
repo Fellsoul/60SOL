@@ -1618,7 +1618,7 @@
           {
             "op": "set",
             "key": "harvestFood",
-            "value": 8
+            "value": 32
           }
         ],
         "tool": "toolkit",
@@ -1634,7 +1634,7 @@
           {
             "op": "set",
             "key": "harvestFood",
-            "value": 6
+            "value": 24
           }
         ],
         "label": "event.E09.daily.isolate.label",
@@ -2051,7 +2051,7 @@
           {
             "op": "add",
             "resource": "food",
-            "amount": 8
+            "amount": 32
           },
           {
             "op": "cropReset"
@@ -2069,7 +2069,7 @@
           {
             "op": "add",
             "resource": "food",
-            "amount": 4
+            "amount": 16
           },
           {
             "op": "add",

@@ -46,8 +46,21 @@ export class SaveRepository {
         state.version = 3;
       }
       if (state?.version === 3) {
-        state.version = SAVE_VERSION;
+        state.version = 4;
         state.samples = []; state.crew = freshCrew(); state.expeditionPlan = null; state.robotSampleSol = null;
+      }
+      if (state?.version === 4) {
+        if (!Number.isInteger(state.food) || state.food < 0 || state.food > 32 ||
+          (state.dailySystems && (!Number.isInteger(state.dailySystems.harvestFood) || state.dailySystems.harvestFood < 0 || state.dailySystems.harvestFood > 8))) throw new Error('Invalid legacy food');
+        state.food *= 4;
+        if (state.dailySystems) state.dailySystems.harvestFood *= 4;
+        for (const entries of [state.resourceLog,state.previousResourceLog]) {
+          if (!Array.isArray(entries)) continue;
+          for (const entry of entries) for (const field of ['food','systems.harvestFood']) {
+            if (typeof entry?.changes?.[field] === 'number') entry.changes[field] *= 4;
+          }
+        }
+        state.version = SAVE_VERSION;
       }
       if (!validateState(state,this.eventIds,this.toolIds)) throw new Error('存档版本或内容无效');
       const event = this.events.find(item => item.id === state.currentEventId);

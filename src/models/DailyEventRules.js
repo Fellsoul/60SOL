@@ -1,7 +1,7 @@
 import { outsideBlocked, spaceEnergyCost } from './SpaceData.js';
 import { LIMITS } from './state.js';
 
-export const DAILY_DEFAULTS = Object.freeze({spares:2,generationCap:6,trackingCap:6,supportExtra:0,careCost:3,harvestFood:8,labUntil:0,greenhouseDisabled:false,antennaLimit:30});
+export const DAILY_DEFAULTS = Object.freeze({spares:2,generationCap:6,trackingCap:6,supportExtra:0,careCost:3,harvestFood:32,labUntil:0,greenhouseDisabled:false,antennaLimit:30});
 export function dailyState(state) { return state.dailySystems ??= {...DAILY_DEFAULTS}; }
 export function eventResolved(state,event) {
   return state.eventDone !== false && Boolean(state.choiceId && event?.choices.some(choice => choice.id === state.choiceId));

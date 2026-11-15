@@ -1,3 +1,4 @@
+import { resourceAmount, resourceText, resourceInventory } from './ResourceIcons.js';
 import { choiceReason, eventResolved, emergencyCleanAvailable } from '../models/DailyEventRules.js';
 import { escapeHtml } from './dom.js';
 import { LIGHT_ACTIONS } from '../models/ActionRules.js';
@@ -8,7 +9,7 @@ import { BatterySlotView } from './BatterySlotView.js';
 
 function choice(action,id,label,description='',disabled=false) {
   label = i18n.t(label); description = i18n.t(description);
-  return `<button class="terminal-choice" data-action="${action}" data-id="${escapeHtml(id)}" ${disabled ? 'disabled' : ''}><span>${escapeHtml(label)}</span>${description ? `<small>${escapeHtml(description)}</small>` : ''}</button>`;
+  return `<button class="terminal-choice" data-action="${action}" data-id="${escapeHtml(id)}" ${disabled ? 'disabled' : ''}><span>${resourceText(label)}</span>${description ? `<small>${resourceText(description)}</small>` : ''}</button>`;
 }
 
 export class TerminalView {
@@ -80,6 +81,7 @@ export class TerminalView {
         const sign = delta > 0 ? '+' : '−';
         const amount = Math.abs(delta);
         const accessible = escapeHtml(`${label} ${sign}${amount}`);
+        if (['food','localData','pendingData','sentData'].includes(resource)) return `<span class="summary-resource-change"><span>${sign}</span>${resourceAmount(resource,amount)}</span>`;
         return resource === 'energy'
           ? `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}</span>${'<img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">'.repeat(amount)}</span>`
           : `<span class="summary-resource-change">${escapeHtml(label)} ${sign}${amount}</span>`;
@@ -123,7 +125,7 @@ export class TerminalView {
       const previous = state.previousDaySummary.length ? state.previousDaySummary.map(line => i18n.t(line)).join('\n\n') : 'summary.arrival';
       let today = event.text;
       if (state.outcome) today = {success:'outcome.success',incomplete:'outcome.incomplete',unsafe:'outcome.unsafe'}[state.outcome];
-      this.content.innerHTML = `<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}<div id="terminal-decisions" class="terminal-choices"></div>`;
+      this.content.innerHTML = `${resourceInventory(state)}<h2>${state.summarySol ? `SOL ${String(state.summarySol).padStart(2,'0')} / ${i18n.t('terminal.log')}` : i18n.t('terminal.arrivalLog')}</h2>${this.copy('summary-copy',previous)}${this.resourceSummary(state.previousResourceLog)}<h2>${escapeHtml(i18n.t(state.outcome ? 'terminal.missionComplete' : event.title))}</h2>${this.copy('event-copy',today)}<div id="terminal-decisions" class="terminal-choices"></div>`;
       const decisions = this.content.querySelector('#terminal-decisions');
       if (state.phase === 'event') {
         decisions.innerHTML = event.choices.filter(item => !item.work).map(item => choice('choose',item.id,item.label,choiceReason(state,item) || item.description,Boolean(choiceReason(state,item)))).join('');
@@ -136,14 +138,14 @@ export class TerminalView {
       }
       if (eventResolved(state,event)) {
         const result=event.choices.find(choice => choice.id === state.choiceId);
-        decisions.insertAdjacentHTML('afterbegin',`<p class="terminal-note" role="status">${escapeHtml(i18n.t(result.summaryLine))}</p>`);
+        decisions.insertAdjacentHTML('afterbegin',`<p class="terminal-note" role="status">${resourceText(i18n.t(result.summaryLine))}</p>`);
       }
       const emergency = this.events.find(item => item.id === 'emergency_clean');
       if (emergency && state.history.emergency_clean === state.sol) {
         const response = emergency.choices.find(item => state.daySummary.includes(item.summaryLine));
-        if (response) decisions.insertAdjacentHTML('beforeend',`<section class="emergency-event"><h2>${escapeHtml(i18n.t(emergency.title))}</h2><p role="status">${escapeHtml(i18n.t(response.summaryLine))}</p></section>`);
+        if (response) decisions.insertAdjacentHTML('beforeend',`<section class="emergency-event"><h2>${escapeHtml(i18n.t(emergency.title))}</h2><p role="status">${resourceText(i18n.t(response.summaryLine))}</p></section>`);
       } else if (emergency && emergencyCleanAvailable(state,event)) {
-        decisions.insertAdjacentHTML('beforeend',`<section class="emergency-event"><h2>${escapeHtml(i18n.t(emergency.title))}</h2><p>${escapeHtml(i18n.t(emergency.text))}</p>${emergency.choices.map(item => {
+        decisions.insertAdjacentHTML('beforeend',`<section class="emergency-event"><h2>${escapeHtml(i18n.t(emergency.title))}</h2><p>${resourceText(i18n.t(emergency.text))}</p>${emergency.choices.map(item => {
           const reason = choiceReason(state,item);
           return choice('emergency_clean',item.id,item.label,reason || item.description,Boolean(reason));
         }).join('')}</section>`);

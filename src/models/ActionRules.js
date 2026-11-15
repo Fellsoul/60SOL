@@ -18,7 +18,7 @@ const NARRATIVES = {
   lights_on: ['action.lights_on.narrative','action.lights_on.summary'],
 };
 export const ACTIONS = Object.freeze([
-  { id:'grow', label:'action.grow.label', energy:3, description:'照料 +1；累计 3 次获得 8 F。', facility:'greenhouse' },
+  { id:'grow', label:'action.grow.label', energy:3, description:'照料 +1；累计 3 次获得 32 F。', facility:'greenhouse' },
   { id:'research', label:'action.research.label', energy:3, description:'消耗一次样本研究次数；本地科研数据 +12。', facility:'cabin' },
   { id:'transmit', label:'action.transmit.label', energy:2, description:'最多发送 30 点；日终确认计入目标。', facility:'antenna' },
   { id:'clean', label:'action.clean.label', energy:2, description:'清除积尘，次日起恢复 6 E 发电。', facility:'solar' },
