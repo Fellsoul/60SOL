@@ -14,7 +14,7 @@ function fixture() {
     addEventListener(name,fn){this.listeners[name]=fn;}
     end(){this.paused=true;this.listeners.ended();}
   }
-  const music=new BackgroundMusic({volume:.6,music:{menu:'menu.mp3',game:['14Sol.mp3','3Souols.mp3'],gapMs:2000,fadeMs:0}}, {
+  const music=new BackgroundMusic({volume:.6,music:{menu:'menu.mp3',game:['14Sol.mp3','3Souols.mp3'],storm:'sandwanton.mp3',gapMs:2000,fadeMs:0}}, {
     audioFactory:()=>new Audio(),now:()=>time,schedule:(fn,ms)=>{timers.set(++id,{fn,at:time+ms});return id;},cancel:id=>timers.delete(id),
     frame:fn=>{timers.set(++id,{fn,at:time+10});return id;},cancelFrame:id=>timers.delete(id)
   });
@@ -39,4 +39,14 @@ test('rapid mode changes cancel stale fade callbacks and volume changes take eff
   const {music,advance}=fixture();await music.setMode('game');const fade=music.setMode('black',100);advance(20);
   await music.setMode('game',0);advance(200);await fade;assert.equal(music.game.paused,false);assert.equal(music.game.volume,.6);
   music.setVolume(.2);advance(150);assert.equal(music.game.volume,.2);music.dispose();assert.equal(music.game.paused,true);
+});
+test('storm and clear music preserve independent positions across blackouts and menu visits',async()=>{
+  const {music,advance}=fixture();await music.setMode('game');music.game.currentTime=42;
+  await music.setMode('black');await music.setMode('storm');music.storm.currentTime=17;
+  assert.equal(music.game.paused,true);assert.equal(music.storm.loop,true);
+  await music.setMode('black');await music.setMode('storm');assert.equal(music.storm.currentTime,17);assert.equal(music.storm.loads,1);
+  await music.setMode('menu');assert.equal(music.storm.paused,true);
+  await music.setMode('game');assert.equal(music.game.currentTime,42);
+  music.game.end();advance(500);await music.setMode('storm');advance(5000);
+  await music.setMode('game');advance(1499);assert.equal(music.game.src,'14Sol.mp3');advance(1);assert.equal(music.game.src,'3Souols.mp3');
 });

@@ -3,10 +3,13 @@ export class BackgroundMusic {
   constructor(config,{audioFactory=()=>new Audio(),now=()=>performance.now(),schedule=(fn,ms)=>setTimeout(fn,ms),cancel=id=>clearTimeout(id),frame=fn=>requestAnimationFrame(fn),cancelFrame=id=>cancelAnimationFrame(id)}={}) {
     this.config=config;this.now=now;this.schedule=schedule;this.cancel=cancel;this.frame=frame;this.cancelFrame=cancelFrame;
     this.mode='black';this.index=0;this.gapRemaining=null;this.gapTimer=null;this.epoch=0;
-    this.menu=audioFactory();this.game=audioFactory();
+    this.menu=audioFactory();this.game=audioFactory();this.storm=audioFactory();
     this.menu.src=config.music.menu;this.menu.loop=true;
     this.game.src=config.music.game[0];this.game.loop=false;
-    for(const audio of [this.menu,this.game]) { audio.preload='auto';audio.volume=0; }
+    if(config.music.storm)this.storm.src=config.music.storm;
+    this.storm.loop=true;
+    this.channels=[this.menu,this.game,this.storm];
+    for(const audio of this.channels) { audio.preload='auto';audio.volume=0; }
     this.game.addEventListener('ended',()=>this.ended());
     this.retry=()=>this.resume();
     document.addEventListener('pointerdown',this.retry);
@@ -51,30 +54,32 @@ export class BackgroundMusic {
   }
   resume() {
     if(this.mode==='menu' && this.menu.paused)void this.play(this.menu);
+    if(this.mode==='storm' && this.storm.paused)void this.play(this.storm);
     if(this.mode==='game') {
       if(this.gapRemaining!==null)this.startGap();
       else if(this.game.paused)void this.play(this.game);
     }
   }
   async setMode(mode,duration=this.config.music.fadeMs ?? 1200) {
+    if(mode==='storm'&&!this.config.music.storm)mode='game';
     if(this.mode===mode) {this.resume();return;}
     this.mode=mode;const epoch=++this.epoch;
     if(mode!=='game')this.freezeGap();
-    const selected=mode==='menu'?this.menu:mode==='game'?this.game:null;
+    const selected=mode==='menu'?this.menu:mode==='game'?this.game:mode==='storm'?this.storm:null;
     this.resume();
-    await Promise.all([this.menu,this.game].map(async audio=>{
+    await Promise.all(this.channels.map(async audio=>{
       await this.ramp(audio,audio===selected?this.config.volume:0,duration);
       if(epoch===this.epoch && audio!==selected)audio.pause();
     }));
   }
   setVolume(value) {
     this.config.volume=value;
-    const selected=this.mode==='menu'?this.menu:this.mode==='game'?this.game:null;
+    const selected=this.mode==='menu'?this.menu:this.mode==='game'?this.game:this.mode==='storm'?this.storm:null;
     if(selected)void this.ramp(selected,value,150);
   }
   stop() {
     this.epoch++;this.mode='black';this.freezeGap();
-    for(const audio of [this.menu,this.game]) {audio.cancelMusicRamp?.();audio.pause();audio.volume=0;}
+    for(const audio of this.channels) {audio.cancelMusicRamp?.();audio.pause();audio.volume=0;}
   }
   dispose() {this.stop();document.removeEventListener('pointerdown',this.retry);document.removeEventListener('keydown',this.retry);}
 }

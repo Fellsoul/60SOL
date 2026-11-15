@@ -28,7 +28,7 @@ export class GameView {
     window.addEventListener('pagehide',() => { this.audio.stop();this.music?.stop();this.movement.clear(); });
     window.addEventListener('pageshow',event => {
       if (!event.persisted) return;
-      void this.music?.setMode(document.querySelector('#main-menu').hidden ? 'game' : 'menu');
+      void this.music?.setMode(document.querySelector('#main-menu').hidden ? this.gameMusicMode : 'menu');
       if (document.querySelector('#main-menu').hidden) this.movement.restore(this.lastVisualAction);
       else this.movement.clear();
     });
@@ -47,6 +47,7 @@ export class GameView {
     veil.style.opacity = '1'; veil.style.pointerEvents = 'auto';
     title.style.opacity = '0';
   }
+  get gameMusicMode() { return this.state?.weather === 'sandstorm' ? 'storm' : 'game'; }
   notify(message) {
     const notice = document.querySelector('#notice');
     clearTimeout(this.noticeTimer); notice.textContent = i18n.t(message); notice.hidden = !message;
@@ -77,7 +78,7 @@ export class GameView {
       if (state) await this.fade(title,0,1,this.config.titleFadeInMs ?? 700);
       if (!this.reducedMotion) await new Promise(resolve => setTimeout(resolve,this.config.blackHoldMs));
       if (state) await this.fade(title,1,0,this.config.titleFadeOutMs ?? 700);
-      await Promise.all([this.fade(veil,1,0,this.config.fadeOutMs),this.audio.finish(),this.music?.setMode('game',this.reducedMotion?0:this.config.fadeOutMs)]); veil.style.pointerEvents = 'none';
+      await Promise.all([this.fade(veil,1,0,this.config.fadeOutMs),this.audio.finish(),this.music?.setMode(this.gameMusicMode,this.reducedMotion?0:this.config.fadeOutMs)]); veil.style.pointerEvents = 'none';
     }
     toggle.disabled = false;
     document.querySelector('#tasks-toggle').disabled = !state;

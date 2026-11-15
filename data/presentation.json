@@ -10,6 +10,7 @@
   "music": {
     "menu": "assets/music/NASA LLO.mp3",
     "game": ["assets/music/14Sol.mp3", "assets/music/3Souols.mp3"],
+    "storm": "assets/music/sandwanton.mp3",
     "gapMs": 2000,
     "fadeMs": 1200
   },
