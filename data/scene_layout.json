@@ -503,16 +503,16 @@
   ],
   "endings": {
     "success": {
-      "src": "assets/scene/ends/TGE.png"
+      "src": "assets/scene/ends/TGE.jpg"
     },
     "incomplete": {
-      "src": "assets/scene/ends/GE.png"
+      "src": "assets/scene/ends/GE.jpg"
     },
     "sacrifice": {
-      "src": "assets/scene/ends/GEQ.png"
+      "src": "assets/scene/ends/GEQ.jpg"
     },
     "unsafe": {
-      "src": "assets/scene/ends/BE.png"
+      "src": "assets/scene/ends/BE.jpg"
     }
   }
 }
