@@ -14,6 +14,7 @@ export class GameController {
     await this.commit(()=>this.model.start(ids,snapshot),{morning:true,initial:true});
   }
   showMenu() {
+    void this.view.music?.setMode('menu');
     this.view.stopActivity?.();
     const result = this.repository.list();
     this.view.menu.show(result.saves.some(save => save.state));
@@ -79,6 +80,7 @@ export class GameController {
         i18n.translate(document.querySelector('#terminal'));
       } else if (event.target.id === 'audio-volume') {
         this.view.config.volume = Number(event.target.value); this.view.terminal.volume = this.view.config.volume;
+        this.view.music?.setVolume(this.view.config.volume);
       } else this.view.terminal.updateSelection();
     });
     document.querySelector('#terminal-content').addEventListener('submit',event => {

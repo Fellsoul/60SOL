@@ -7,6 +7,12 @@
   "audioFadeInMs": 1200,
   "audioFadeOutMs": 1800,
   "volume": 0.65,
+  "music": {
+    "menu": "assets/music/NASA LLO.mp3",
+    "game": ["assets/music/14Sol.mp3", "assets/music/3Souols.mp3"],
+    "gapMs": 2000,
+    "fadeMs": 1200
+  },
   "ambient": "assets/audio/transition/ambient.mp3",
   "recaps": {},
   "menu": {

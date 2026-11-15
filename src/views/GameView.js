@@ -6,11 +6,13 @@ import { TaskView } from './TaskView.js';
 import { TerminalView } from './TerminalView.js';
 import { MenuView } from './MenuView.js';
 import { TransitionAudio } from './TransitionAudio.js';
+import { BackgroundMusic } from './BackgroundMusic.js';
 import { i18n } from '../services/I18n.js';
 
 export class GameView {
   constructor(content) {
     this.config = content.presentation; this.menu = new MenuView(this.config.menu); this.audio = new TransitionAudio(this.config);
+    this.music = this.config.music ? new BackgroundMusic(this.config) : null;
     this.scene = new SceneView(document.querySelector('#scene'),content.scene_layout);
     this.terminal = new TerminalView(content.tools,content.events,content.resource_log);
     this.terminal.environment = content.environment;
@@ -23,9 +25,10 @@ export class GameView {
     this.state = null; this.event = null;
     i18n.translate(document.querySelector('#terminal')); i18n.translate(document.querySelector('#app'));
     document.body.classList.toggle('reduced-motion',this.reducedMotion);
-    window.addEventListener('pagehide',() => { this.audio.stop();this.movement.clear(); });
+    window.addEventListener('pagehide',() => { this.audio.stop();this.music?.stop();this.movement.clear(); });
     window.addEventListener('pageshow',event => {
       if (!event.persisted) return;
+      void this.music?.setMode(document.querySelector('#main-menu').hidden ? 'game' : 'menu');
       if (document.querySelector('#main-menu').hidden) this.movement.restore(this.lastVisualAction);
       else this.movement.clear();
     });
@@ -38,6 +41,7 @@ export class GameView {
     this.sceneEvent.events = this.events;
   }
   coverScene() {
+    void this.music?.setMode('black');
     const veil = document.querySelector('#morning-veil');
     const title = document.querySelector('#sol-title');
     veil.style.opacity = '1'; veil.style.pointerEvents = 'auto';
@@ -60,8 +64,8 @@ export class GameView {
       // Keep the title invisible throughout both scene fades.
       title.style.opacity = '0';
       title.textContent = state ? `SOL ${String(state.sol).padStart(3,'0')}` : '';
-      if (!initial) await this.fade(veil,0,1,this.config.fadeInMs);
-      else veil.style.opacity = '1';
+      if (!initial) await Promise.all([this.fade(veil,0,1,this.config.fadeInMs),this.music?.setMode('black',this.reducedMotion?0:this.config.fadeInMs)]);
+      else { veil.style.opacity = '1';await this.music?.setMode('black'); }
     }
     await this.scene.render(state,this.reducedMotion);
     this.terminal.render(state,event);
@@ -73,7 +77,7 @@ export class GameView {
       if (state) await this.fade(title,0,1,this.config.titleFadeInMs ?? 700);
       if (!this.reducedMotion) await new Promise(resolve => setTimeout(resolve,this.config.blackHoldMs));
       if (state) await this.fade(title,1,0,this.config.titleFadeOutMs ?? 700);
-      await Promise.all([this.fade(veil,1,0,this.config.fadeOutMs),this.audio.finish()]); veil.style.pointerEvents = 'none';
+      await Promise.all([this.fade(veil,1,0,this.config.fadeOutMs),this.audio.finish(),this.music?.setMode('game',this.reducedMotion?0:this.config.fadeOutMs)]); veil.style.pointerEvents = 'none';
     }
     toggle.disabled = false;
     document.querySelector('#tasks-toggle').disabled = !state;
