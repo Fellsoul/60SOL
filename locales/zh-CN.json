@@ -642,5 +642,7 @@
   "action.repair_robot.narrative": "消耗 1 个备用零件并占用当天工作，修复损坏的机器人。不耗电、不需要工具箱；每天仍最多采集一次。",
   "action.repair_robot.summary": "我们用 1 个备用零件和当天工作修好了机器人，未消耗电力。",
   "error.robotDamaged": "机器人已损坏，需要用 1 个备用零件和一次工作修理。",
-  "error.robotNotDamaged": "没有需要修理的损坏机器人。"
+  "error.robotNotDamaged": "没有需要修理的损坏机器人。",
+  "guide.terminal": "打开终端查看今日简报",
+  "guide.notebook": "打开工作记录本安排今日工作"
 }

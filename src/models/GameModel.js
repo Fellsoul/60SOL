@@ -16,6 +16,14 @@ export class GameModel {
   #state = null;
   constructor({ events, tools, environment = {}, resource_log = {} }) { this.events = new EventEngine(events); this.tools = tools; this.environment = environment; this.resourceLog = resource_log; }
   get snapshot() { return this.#state ? structuredClone(this.#state) : null; }
+  markGuideOpened(panel) {
+    const s=this.#state;
+    if (!s || s.outcome || s.sol>3) return false;
+    s.guide ??= {terminalSol:0,notebookSol:0};
+    if (panel==='terminal' && s.guide.terminalSol!==s.sol) { s.guide.terminalSol=s.sol; return true; }
+    if (panel==='notebook' && s.guide.terminalSol===s.sol && s.guide.notebookSol!==s.sol) { s.guide.notebookSol=s.sol; return true; }
+    return false;
+  }
   restore(state) {
     this.#state = structuredClone(state);
     if (this.#state) {

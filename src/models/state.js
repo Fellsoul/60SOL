@@ -22,6 +22,7 @@ export function createState(toolIds, seed = 20261113) {
     daySummary: [], previousDaySummary: [], summarySol: 0,
     resourceLog: [], previousResourceLog: [],
     missionJournal: [],
+    guide: {terminalSol:0,notebookSol:0},
   };
 }
 
@@ -32,6 +33,7 @@ export function logEntry(state, text) {
 // 存档属于外部输入；版本和关键字段必须通过校验，不能直接合并进初始状态。
 export function validateState(s, eventIds, toolIds) {
   if (!s || s.version !== SAVE_VERSION) return false;
+  if (s.guide !== undefined && (!s.guide || !['terminalSol','notebookSol'].every(key => Number.isInteger(s.guide[key]) && s.guide[key]>=0 && s.guide[key]<=Math.min(s.sol,3)) || s.guide.notebookSol>s.guide.terminalSol)) return false;
   if (s.difficulty !== undefined && !['easy','medium','hard'].includes(s.difficulty)) return false;
   if (s.concurrentEvents !== undefined && (!Array.isArray(s.concurrentEvents) || s.concurrentEvents.length > 6 ||
     new Set(s.concurrentEvents.map(item => item?.id)).size !== s.concurrentEvents.length ||

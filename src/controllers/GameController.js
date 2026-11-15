@@ -49,6 +49,18 @@ export class GameController {
     if (this.busy || !state || state.phase === 'finished' || (!state.lightsOn && state.energy === 0)) return;
     await this.commit(() => this.model.setLights(!state.lightsOn),{keepTerminal:true});
   }
+  async openGuidedPanel(panel) {
+    if (this.busy) return;
+    if (panel==='terminal') await this.view.openTerminal();
+    else await this.view.openTasks();
+    if (this.model.markGuideOpened(panel)) {
+      const state=this.model.snapshot;
+      const result=this.repository.save(state,this.activeSaveId);
+      if (result.ok) this.activeSaveId=result.id;
+      else this.view.notify(result.message);
+      this.view.guide?.render(state);
+    }
+  }
   async start() {
     this.showMenu();
     document.querySelector('#main-menu').addEventListener('click',event => {
@@ -79,9 +91,9 @@ export class GameController {
       if (button.hasAttribute('data-save-delete')) { this.deleteSave(button.dataset.saveDelete,button.dataset.saveLabel); return; }
       this.loadSave(button.dataset.saveId);
     });
-    document.querySelector('#tasks-toggle').addEventListener('click',() => { if (!this.busy) void this.view.openTasks(); });
+    document.querySelector('#tasks-toggle').addEventListener('click',() => { void this.openGuidedPanel('notebook'); });
     document.querySelector('#tasks-close').addEventListener('click',() => this.view.tasks.close());
-    document.querySelector('#terminal-toggle').addEventListener('click',() => { if (!this.busy) void this.view.openTerminal(); });
+    document.querySelector('#terminal-toggle').addEventListener('click',() => { void this.openGuidedPanel('terminal'); });
     document.querySelector('#terminal-close').addEventListener('click',() => { void this.view.closeTerminal(); });
     document.querySelector('#skip-typing').addEventListener('click',() => this.view.terminal.writer.skip());
     document.querySelector('#terminal-content').addEventListener('change',event => {

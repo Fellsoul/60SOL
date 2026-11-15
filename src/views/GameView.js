@@ -8,6 +8,7 @@ import { MenuView } from './MenuView.js';
 import { TransitionAudio } from './TransitionAudio.js';
 import { BackgroundMusic } from './BackgroundMusic.js';
 import { i18n } from '../services/I18n.js';
+import { DailyGuide } from './DailyGuide.js';
 
 export class GameView {
   constructor(content) {
@@ -37,11 +38,13 @@ export class GameView {
   async mount() {
     await this.scene.mount();
     this.tasks.mount();
+    this.guide = new DailyGuide();
     this.sceneEvent = new SceneEventView(this.scene.root);
     this.sceneTools = new SceneToolsView(this.scene.root);
     this.sceneEvent.events = this.events;
   }
   coverScene() {
+    this.guide?.hide();
     void this.music?.setMode('black');
     const veil = document.querySelector('#morning-veil');
     const title = document.querySelector('#sol-title');
@@ -59,6 +62,7 @@ export class GameView {
     if (message) this.noticeTimer = setTimeout(() => { notice.hidden = true; },8000);
   }
   async render(state,event,{morning=false,initial=false}={}) {
+    this.guide?.hide();
     const ending = Boolean(state?.outcome);
     const enteringEnding = ending && (!this.state?.outcome || initial);
     if (enteringEnding) morning = true;
@@ -104,6 +108,7 @@ export class GameView {
     }
     toggle.disabled = false;
     document.querySelector('#tasks-toggle').disabled = !state || ending;
+    this.guide?.render(state);
   }
   async showEndingJournal() {
     if (!this.endingReady || !this.state?.outcome) return;

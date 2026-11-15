@@ -17,6 +17,7 @@ Run the automated suite with `npm test` (Node's built-in test runner; no extra p
 | `bubble-layout.test.mjs` | Shared-anchor avoidance, scene bounds, and crowded-screen queuing |
 | `typewriter.test.mjs` | Per-line resource reveal, atomic inline icons, skip, cancellation, and reduced motion |
 | `clipboard.test.mjs` | Available and completed tasks across turns and reloads |
+| `daily-guide.test.mjs` | Three-day terminal/notebook guidance, persisted progress, legacy saves, and no gameplay cost |
 | `controller.test.mjs` | Light switching saves progress and keeps the terminal open |
 | `i18n.test.mjs` | Catalog consistency, content references, fallbacks, and old narrative text |
 
