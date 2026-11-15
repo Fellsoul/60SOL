@@ -42,8 +42,14 @@ export function adaptREMS(raw) {
   requireField(raw,bounded(raw.value,-150,50)&&Number.isInteger(raw.sol)&&raw.sol>=0,'REJECT_RANGE');
   return observation('rems-report',raw,{observationID:`rems-sol-${raw.sol}`,sourceRecordID:`REMS/Sol-${raw.sol}/NASA-mission-report`,organization:'NASA / Curiosity REMS',dataset:'REMS value reported by NASA mission blog',dataClass:'measured-report',parameter:raw.parameter,value:raw.value,unit:'degC',target:raw.target,observedAtUTC:raw.observedAtUTC,timePrecision:'day',timeMeaning:'report-date; exact observation UTC not supplied',missionSol:raw.sol,url:raw.url,qualityFlags:['reported-measurement','rover-site-only','not-an-outpost-forecast']});
 }
-export function mapping(observations) {
+export function mapping(observations, partial = false) {
   const solar=observations.find(o=>o.sourceID==='donki'),light=observations.find(o=>o.sourceID==='horizons'),temp=observations.find(o=>o.sourceID==='rems-report');
+  if (partial) {
+    requireField(null,light,'REJECT_SCHEMA');
+    return {version:'space-v2',advisory:solar?.value ?? 'unknown',advisorySols:solar ? [3,8] : [],
+      heating:temp ? (temp.value<=-20?'cold':'milder') : 'unknown',heatingExtra:temp?.value<=-20?1:0,
+      heatingSols:temp ? [4,9] : [],replySols:Math.max(1,Math.min(2,Math.ceil(2*light.value/30)))};
+  }
   requireField(null,solar&&light&&temp,'REJECT_SCHEMA');
   return {version:RULE_VERSION,advisory:solar.value,advisorySols:[3,8],heating:temp.value<=-20?'cold':'milder',heatingExtra:temp.value<=-20?1:0,heatingSols:[4,9],replySols:Math.max(1,Math.min(2,Math.ceil(2*light.value/30)))};
 }
@@ -53,21 +59,33 @@ export function buildSnapshot(raw,{mode='historical',caseID='case-mars-impact',c
   const core={schemaVersion:1,caseID,mode,createdAtUTC,seed:20261113,observations,rules:mapping(observations)};
   return {...core,snapshotID:checksum(core).slice(0,24),checksum:checksum(core)};
 }
+// A current light-time calculation remains useful without inventing current weather.
+export function buildLiveSnapshot(raw,{createdAtUTC=new Date().toISOString()}={}) {
+  requireField(null,raw?.schemaVersion===2 && utc(createdAtUTC),'REJECT_SCHEMA');
+  const observations=[...(raw.donki ? [adaptDONKI(raw.donki)] : []),adaptHorizons(raw.horizons),
+    ...(raw.rems ? [adaptREMS(raw.rems)] : [])].map(record=>({...record,fetchedAtUTC:createdAtUTC}));
+  const core={schemaVersion:2,caseID:'current',mode:'current',createdAtUTC,seed:20261113,observations,rules:mapping(observations,true)};
+  return {...core,snapshotID:checksum(core).slice(0,24),checksum:checksum(core)};
+}
 export function snapshotFresh(snapshot,now=Date.now()) {
   const maxHours={donki:72,horizons:36,'rems-report':24*30};
   return snapshot.observations.every(o=>{const age=now-Date.parse(o.observedAtUTC);return age>=-300000&&age<=maxHours[o.sourceID]*3600000;});
 }
 export function validSnapshot(snapshot) {
   try {
-    if(!snapshot||snapshot.schemaVersion!==1||!['current','cached','historical'].includes(snapshot.mode)||!utc(snapshot.createdAtUTC)||snapshot.seed!==20261113)return false;
-    if(typeof snapshot.caseID!=='string'||snapshot.caseID.length>100||!Array.isArray(snapshot.observations)||snapshot.observations.length!==3)return false;
-    const [solar,light,temp]=snapshot.observations;
-    if(solar.sourceID!=='donki'||light.sourceID!=='horizons'||temp.sourceID!=='rems-report')return false;
-    if(solar.target!=='Mars'||solar.unit!=='tier'||!['caution','restricted'].includes(solar.value))return false;
+    if(!snapshot||![1,2].includes(snapshot.schemaVersion)||!['current','cached','historical'].includes(snapshot.mode)||!utc(snapshot.createdAtUTC)||snapshot.seed!==20261113)return false;
+    const partial=snapshot.schemaVersion===2;
+    if(typeof snapshot.caseID!=='string'||snapshot.caseID.length>100||!Array.isArray(snapshot.observations)||snapshot.observations.length<1||snapshot.observations.length>3)return false;
+    const ids=snapshot.observations.map(o=>o.sourceID);
+    if(new Set(ids).size!==ids.length||ids.some(id=>!['donki','horizons','rems-report'].includes(id)))return false;
+    if(!partial&&ids.join(',')!=='donki,horizons,rems-report')return false;
+    const solar=snapshot.observations.find(o=>o.sourceID==='donki'),light=snapshot.observations.find(o=>o.sourceID==='horizons'),temp=snapshot.observations.find(o=>o.sourceID==='rems-report');
+    if(solar&&(solar.target!=='Mars'||solar.unit!=='tier'||!['caution','restricted'].includes(solar.value)))return false;
+    if(!light)return false;
     if(light.target!=='Mars to Earth geocentre'||light.unit!=='min'||!bounded(light.value,2,30))return false;
-    if(temp.target!=='Mars / Gale crater'||temp.unit!=='degC'||!bounded(temp.value,-150,50))return false;
+    if(temp&&(temp.target!=='Mars / Gale crater'||temp.unit!=='degC'||!bounded(temp.value,-150,50)))return false;
     if(!snapshot.observations.every(o=>utc(o.observedAtUTC)&&utc(o.fetchedAtUTC)&&sourceURL(o.url)&&typeof o.rawChecksum==='string'&&/^[0-9a-f]{64}$/.test(o.rawChecksum)&&typeof o.sourceRecordID==='string'&&o.sourceRecordID.length<200&&o.parserVersion===1&&[o.observationID,o.organization,o.dataset,o.dataClass,o.parameter].every(value=>typeof value==='string'&&value.length>0&&value.length<200)&&Array.isArray(o.qualityFlags)&&o.qualityFlags.length<20&&o.qualityFlags.every(flag=>typeof flag==='string'&&flag.length<100)))return false;
-    if(JSON.stringify(snapshot.rules)!==JSON.stringify(mapping(snapshot.observations)))return false;
+    if(JSON.stringify(snapshot.rules)!==JSON.stringify(mapping(snapshot.observations,partial)))return false;
     const {snapshotID,checksum:hash,...core}=snapshot;
     return checksum(core)===hash&&snapshotID===hash.slice(0,24);
   } catch {return false;}

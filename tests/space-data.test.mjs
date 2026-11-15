@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { checksum, sha256 } from '../src/services/DataChecksum.js';
-import { adaptDONKI, adaptHorizons, adaptREMS, buildSnapshot, validSnapshot, snapshotFresh, sourceURL } from '../src/models/SpaceData.js';
+import { adaptDONKI, adaptHorizons, adaptREMS, buildSnapshot, buildLiveSnapshot, validSnapshot, snapshotFresh, sourceURL } from '../src/models/SpaceData.js';
 import { SpaceSnapshotService } from '../src/services/SpaceSnapshotService.js';
 import { GameModel } from '../src/models/GameModel.js';
 import { SaveRepository } from '../src/repositories/SaveRepository.js';
@@ -78,10 +78,10 @@ test('heating and guidance mappings affect actual morning demand and due-day ava
   game.choose('ask');assert.equal(game.snapshot.dailySystems.labUntil,9);assert.equal(game.snapshot.spaceTrace.at(-1).snapshotID,first().snapshotID);
 });
 
-test('source outage falls back to a dated historical case with no missing-value zeros',async () => {
+test('source outage uses ordinary gameplay instead of silently starting a hazardous historical case',async () => {
   const service=new SpaceSnapshotService(config,memory(),{...transport,fetcher:async()=>{throw Error('offline');}});
-  const snapshot=await service.select('current');assert.equal(snapshot.mode,'historical');assert.equal(validSnapshot(snapshot),true);
-  assert.equal(snapshot.observations[1].value,15.84235931);
+  const snapshot=await service.select('current');assert.equal(snapshot,null);
+  assert.equal((await service.select('case-mars-impact')).mode,'historical');
 });
 
 test('fresh current data can be cached; later outage uses cache without replacing an active mission',async () => {
@@ -92,14 +92,14 @@ test('fresh current data can be cached; later outage uses cache without replacin
   assert.equal(current.mode,'current');assert.deepEqual(cached.observations,current.observations);
 });
 
-test('timeout, stale cache, bad content type and oversize data all reach historical replay',async () => {
+test('timeout, stale cache, bad content type and oversize data all use ordinary gameplay',async () => {
   let timeout;
   const stalled=new SpaceSnapshotService(config,memory(),{now,fetcher:()=>new Promise(()=>{}),schedule:fn=>{timeout=fn;return 1;},cancel:()=>{}});
-  const waiting=stalled.select('current');timeout();assert.equal((await waiting).mode,'historical');
+  const waiting=stalled.select('current');timeout();assert.equal(await waiting,null);
   const cache=memory();cache.setItem('outpost.space-data.v1',JSON.stringify(first()));
   for(const fetcher of [async()=>response({},'text/html'),async()=>response({x:'x'.repeat(140000)}),async()=>response({})]) {
     const service=new SpaceSnapshotService(config,cache,{...transport,fetcher});
-    assert.equal((await service.select('current')).mode,'historical');
+    assert.equal(await service.select('current'),null);
   }
 });
 
@@ -108,4 +108,23 @@ test('two historical cases start with identical resources and seed but different
   for(const key of ['energy','food','health','rng','sol'])assert.equal(a.snapshot[key],b.snapshot[key]);
   assert.notEqual(a.snapshot.missionSnapshot.rules.advisory,b.snapshot.missionSnapshot.rules.advisory);
   const html=spaceEvidence(a.snapshot);assert.ok(html.includes('Historical replay'));assert.ok(html.includes('15.842'));assert.ok(html.includes('In this simulation'));
+});
+
+
+test('partial current input uses real light time without inventing a solar restriction or temperature',async()=>{
+  const pack={schemaVersion:2,horizons:raw.horizons};
+  const service=new SpaceSnapshotService(config,memory(),{...transport,fetcher:async()=>response(pack)});
+  const snapshot=await service.select('current');
+  assert.equal(snapshot.schemaVersion,2);assert.equal(snapshot.mode,'current');assert.ok(validSnapshot(snapshot));
+  assert.equal(snapshot.observations.length,1);assert.equal(snapshot.rules.advisory,'unknown');
+  assert.deepEqual(snapshot.rules.advisorySols,[]);assert.equal(snapshot.rules.heatingExtra,0);
+  assert.equal(snapshot.rules.replySols,2);
+  const game=new GameModel({events,tools});game.start(['toolkit','battery'],snapshot);
+  const state=game.snapshot;Object.assign(state,{sol:3,dusty:true});game.restore(state);
+  assert.notEqual(unavailableReason(game.snapshot,ACTIONS.find(a=>a.id==='clean'),game.events.get(state.currentEventId)),'dependency.spaceAdvisory');
+  game.choose('abandon');game.work('standby');
+  const repo=new SaveRepository(memory(),{events,tools});const saved=repo.save(game.snapshot);
+  assert.deepEqual(repo.load(saved.id).state,game.snapshot);
+  const altered=structuredClone(snapshot);altered.rules.advisory='restricted';assert.equal(validSnapshot(altered),false);
+  assert.throws(()=>buildLiveSnapshot({schemaVersion:2}));
 });

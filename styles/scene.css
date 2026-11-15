@@ -38,6 +38,7 @@ body.reduced-motion #terminal-toggle { transition: none; }
 .crew-hotspot:focus-visible { outline:2px solid #d3e6ce; outline-offset:3px; }
 .crew-status-panel { position:absolute; top:20%; width:max-content; max-width:clamp(78px,17vw,180px); padding:10px 12px; border:1px solid #a6baaa66; border-radius:12px; background:#17241ff2; color:#e7ecdf; box-shadow:0 8px 32px #0007; pointer-events:none; opacity:0; visibility:hidden; font-size:clamp(.7rem,1vw,.88rem); line-height:1.5; }
 .crew-inspector.astronaut-a .crew-status-panel { left:calc(100% + 12px); }
+.crew-status-panel > span { display:block; }
 .crew-inspector.astronaut-b .crew-status-panel { right:calc(100% + 12px); }
 .crew-inspector:is(:hover,:focus-within) .crew-status-panel { opacity:1; visibility:visible; }
 

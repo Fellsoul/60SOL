@@ -1,12 +1,12 @@
-import { buildSnapshot, validSnapshot, snapshotFresh } from '../models/SpaceData.js';
+import { buildSnapshot, buildLiveSnapshot, validSnapshot, snapshotFresh } from '../models/SpaceData.js';
 import { checksum } from './DataChecksum.js';
 
 export class SpaceSnapshotService {
   constructor(config, storage = null, {
     fetcher = (...args) => fetch(...args),
     now = () => Date.now(),
-    schedule = setTimeout,
-    cancel = clearTimeout
+    schedule = (...args) => setTimeout(...args),
+    cancel = id => clearTimeout(id)
   } = {}) {
     this.config = config;
     this.storage = storage;
@@ -43,7 +43,7 @@ export class SpaceSnapshotService {
     let timer;
     try {
       const task = (async () => {
-        const response = await this.fetcher('/api/space-data', {
+        const response = await this.fetcher(this.config.currentEndpoint ?? '/api/space-data', {
           signal: controller.signal,
           credentials: 'same-origin',
           redirect: 'error'
@@ -69,7 +69,8 @@ export class SpaceSnapshotService {
         body += decoder.decode();
         if (controller.signal.aborted) throw new Error('UNAVAILABLE');
 
-        const snapshot = buildSnapshot(JSON.parse(body), {
+        const raw = JSON.parse(body);
+        const snapshot = (raw.schemaVersion === 2 ? buildLiveSnapshot : buildSnapshot)(raw, {
           mode: 'current',
           caseID: 'current',
           createdAtUTC: new Date(this.now()).toISOString()
@@ -86,7 +87,7 @@ export class SpaceSnapshotService {
         timer = this.schedule(() => {
           controller.abort();
           reject(new Error('UNAVAILABLE'));
-        }, 3000);
+        }, 8000);
       });
       return await Promise.race([task, timeout]);
     } catch (error) {
@@ -99,7 +100,7 @@ export class SpaceSnapshotService {
       } catch {
         // Unreadable caches fall through to the bundled historical case.
       }
-      return this.historical();
+      return null; // Offline is ordinary gameplay, never an unrequested hazardous replay.
     } finally {
       if (timer !== undefined) this.cancel(timer);
       controller.abort();

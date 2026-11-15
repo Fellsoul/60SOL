@@ -76,7 +76,7 @@ export function validateState(s, eventIds, toolIds) {
   if (!Object.entries(ranges).every(([key,[min,max]]) => Number.isInteger(s[key]) && s[key] >= min && s[key] <= max)) return false;
   if (s.sol > LIMITS.sols && s.phase !== 'finished') return false;
   if (s.missionSnapshot != null && !validSnapshot(s.missionSnapshot)) return false;
-  if (s.spaceTrace !== undefined && (!Array.isArray(s.spaceTrace) || s.spaceTrace.length>100 || !s.spaceTrace.every(entry=>Number.isInteger(entry.sol)&&entry.sol>=1&&entry.sol<=14&&entry.snapshotID===s.missionSnapshot?.snapshotID&&entry.ruleVersion==='space-v1'&&typeof entry.choice==='string'&&entry.choice.length<=100&&Number.isInteger(entry.costE)&&entry.costE>=0&&entry.costE<=20))) return false;
+  if (s.spaceTrace !== undefined && (!Array.isArray(s.spaceTrace) || s.spaceTrace.length>100 || !s.spaceTrace.every(entry=>Number.isInteger(entry.sol)&&entry.sol>=1&&entry.sol<=14&&entry.snapshotID===s.missionSnapshot?.snapshotID&&['space-v1','space-v2'].includes(entry.ruleVersion)&&typeof entry.choice==='string'&&entry.choice.length<=100&&Number.isInteger(entry.costE)&&entry.costE>=0&&entry.costE<=20))) return false;
   if (s.visualAction != null && (!validVisualAction(s.visualAction) || s.visualAction.sol>s.sol)) return false;
   if (s.eventDone !== undefined && (typeof s.eventDone !== 'boolean' || (s.eventDone !== (s.choiceId !== null)))) return false;
   if (s.dailySystems !== undefined) {

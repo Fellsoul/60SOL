@@ -9,6 +9,7 @@ Run the automated suite with `npm test` (Node's built-in test runner; no extra p
 | `daily-events.test.mjs` | Daily event progression, fallback responses, and a complete successful mission |
 | `dependencies.test.mjs` | Event-specific restrictions, independent work, and avoiding blocked missions |
 | `emergency-clean.test.mjs` | Trigger conditions, health/work costs, declining, and reload protection |
+| `manual-repair.test.mjs` | Health-based toolkit alternatives, repair effects, spare costs, work limits, and save persistence |
 | `expeditions.test.mjs` | Sample capacity and study uses, robot collection, crew trips, lighting-based fatigue, and save migration |
 | `resources.test.mjs` | Drumstick multipliers, research icons, bilingual prompts, daily rations, and legacy food migration |
 | `resource-log.test.mjs` | Actual resource deltas, caps, and persisted summaries |
@@ -18,6 +19,8 @@ Run the automated suite with `npm test` (Node's built-in test runner; no extra p
 | `clipboard.test.mjs` | Available and completed tasks across turns and reloads |
 | `controller.test.mjs` | Light switching saves progress and keeps the terminal open |
 | `i18n.test.mjs` | Catalog consistency, content references, fallbacks, and old narrative text |
+
+Run the local data-server cache/outage tests with `python3 -m unittest discover -s tests -p '*_test.py'`.
 
 Optional browser checks require Python Playwright and Microsoft Edge:
 

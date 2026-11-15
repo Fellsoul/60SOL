@@ -387,6 +387,25 @@
         "label": "event.E02.daily.lock.label",
         "description": "event.E02.daily.lock.description",
         "summaryLine": "event.E02.daily.lock.summaryLine"
+      },
+      {
+        "id": "force_repair",
+        "energy": 0,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "trackingCap",
+            "value": 6
+          }
+        ],
+        "costQ": 1,
+        "outside": true,
+        "label": "event.E02.daily.force_repair.label",
+        "description": "event.E02.daily.force_repair.description",
+        "summaryLine": "event.E02.daily.force_repair.summaryLine",
+        "costH": 20,
+        "allowStorm": true
       }
     ],
     "cds": {
@@ -538,7 +557,8 @@
     "dailySol": 8,
     "dailyRequires": {},
     "workResolutions": {
-      "repair": "repair"
+      "repair": "repair",
+      "force_repair": "force_repair"
     },
     "sceneCue": {
       "kind": "sound",
@@ -742,6 +762,22 @@
         "label": "event.E04.daily.manual.label",
         "description": "event.E04.daily.manual.description",
         "summaryLine": "event.E04.daily.manual.summaryLine"
+      },
+      {
+        "id": "force_repair",
+        "energy": 0,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "careCost",
+            "value": 3
+          }
+        ],
+        "label": "event.E04.daily.force_repair.label",
+        "description": "event.E04.daily.force_repair.description",
+        "summaryLine": "event.E04.daily.force_repair.summaryLine",
+        "costH": 20
       }
     ],
     "cds": {
@@ -1259,14 +1295,30 @@
         "work": false,
         "dailyEffects": [
           {
-            "op": "set",
-            "key": "labUntil",
-            "value": 15
+            "op": "labPause",
+            "days": 2
           }
         ],
         "label": "event.E07.daily.close.label",
         "description": "event.E07.daily.close.description",
         "summaryLine": "event.E07.daily.close.summaryLine"
+      },
+      {
+        "id": "force_repair",
+        "energy": 0,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "labUntil",
+            "value": 0
+          }
+        ],
+        "costQ": 1,
+        "label": "event.E07.daily.force_repair.label",
+        "description": "event.E07.daily.force_repair.description",
+        "summaryLine": "event.E07.daily.force_repair.summaryLine",
+        "costH": 20
       }
     ],
     "cds": {
@@ -1654,6 +1706,22 @@
         "label": "event.E09.daily.isolate.label",
         "description": "event.E09.daily.isolate.description",
         "summaryLine": "event.E09.daily.isolate.summaryLine"
+      },
+      {
+        "id": "force_repair",
+        "energy": 0,
+        "work": true,
+        "dailyEffects": [
+          {
+            "op": "set",
+            "key": "harvestFood",
+            "value": 32
+          }
+        ],
+        "label": "event.E09.daily.force_repair.label",
+        "description": "event.E09.daily.force_repair.description",
+        "summaryLine": "event.E09.daily.force_repair.summaryLine",
+        "costH": 20
       }
     ],
     "cds": {
@@ -3645,7 +3713,8 @@
       "robot",
       "monitor",
       "shield",
-      "standby"
+      "standby",
+      "force_repair"
     ],
     "blockReason": "dependency.shelter",
     "sceneCue": {

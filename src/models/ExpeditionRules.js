@@ -9,7 +9,7 @@ export const crewAway = (state,id) => {
   return Boolean(crew?.returnSol && state.sol >= crew.departSol && state.sol < crew.returnSol);
 };
 export const crewFatigued = (state,id) => (state.crew?.[id]?.fatigue ?? 0) > 0;
-export const crewUnconscious = (state,id) => (state.crew?.[id]?.comaDays ?? 0) > 0;
+export const crewUnconscious = (state,id) => state.health <= 0 || (state.crew?.[id]?.comaDays ?? 0) > 0;
 export const researchUses = state => (state.samples ?? []).length;
 export function collectSample(state) {
   if (state.samples.length >= SAMPLE_CAPACITY) return false;
@@ -72,7 +72,7 @@ export function recoverCrew(state,lit,fed=true) {
   for (const id of CREW_IDS) {
     const crew=state.crew[id];
     if (crewUnconscious(state,id)) {
-      if (!crewAway(state,id) && fed) crew.comaDays -= 1;
+      if (state.health > 0 && !crewAway(state,id) && fed) crew.comaDays -= 1;
       continue;
     }
     if (!crewAway(state,id) && crew.fatigue > 0) {

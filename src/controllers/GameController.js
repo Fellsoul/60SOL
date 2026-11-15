@@ -12,6 +12,8 @@ export class GameController {
     this.activeSaveId=null;
     this.view.coverScene();
     await this.commit(()=>this.model.start(ids,snapshot),{morning:true,initial:true});
+    if (this.snapshots && !snapshot) this.view.notify('space.offline');
+    else if (snapshot?.schemaVersion === 2) this.view.notify('space.partialCurrent');
   }
   showMenu() {
     void this.view.music?.setMode('menu');

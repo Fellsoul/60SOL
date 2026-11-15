@@ -10,6 +10,7 @@ const NARRATIVES = {
   transmit: ['action.transmit.narrative','action.transmit.summary'],
   clean: ['action.clean.narrative','action.clean.summary'],
   repair: ['action.repair.narrative','action.repair.summary'],
+  force_repair: ['action.force_repair.narrative','action.force_repair.summary'],
   rest: ['action.rest.narrative','action.rest.summary'],
   monitor: ['action.monitor.narrative','action.monitor.summary'],
   shield: ['action.shield.narrative','action.shield.summary'],
@@ -23,6 +24,7 @@ export const ACTIONS = Object.freeze([
   { id:'transmit', label:'action.transmit.label', energy:2, description:'最多发送 30 点；日终确认计入目标。', facility:'antenna' },
   { id:'clean', label:'action.clean.label', energy:2, description:'清除积尘，次日起恢复 6 E 发电。', facility:'solar' },
   { id:'repair', label:'action.repair.label', energy:2, description:'本骨架支持维修积尘面板；需要工具箱。', facility:'solar', tool:'toolkit' },
+  { id:'force_repair', label:'action.force_repair.label', energy:0, costH:20, facility:'solar' },
   { id:'rest', label:'action.rest.label', energy:1, description:'人员状态 +8，上限 100。', facility:'cabin' },
   { id:'shield', label:'action.shield.label', energy:0, description:'消耗加固包和今日工作；永久保留屏蔽状态。', tool:'shield' },
   { id:'standby', label:'action.standby.label', energy:0, description:'保留电力；日终仍消耗食物。' },
@@ -36,10 +38,11 @@ export const LIGHT_ACTIONS = Object.freeze([
 export function workEnergy(state,action) { return spaceEnergyCost(state,action.id==='grow' ? dailyState(state).careCost : action.energy,['clean','repair'].includes(action.id)); }
 
 export function unavailableReason(state, action, event = null) {
-  if (outsideBlocked(state) && ['clean','repair'].includes(action.id)) return 'dependency.spaceAdvisory';
+  if (outsideBlocked(state) && ['clean','repair','force_repair'].includes(action.id)) return 'dependency.spaceAdvisory';
   if (state.phase === 'finished') return 'error.missionFinished';
   if (state.workId || !['event','work'].includes(state.phase)) return 'error.workUsed';
   if (action.tool && state.tools[action.tool] !== 'ready') return 'error.toolUnavailable';
+  if (state.health <= (action.costH ?? 0)) return 'error.conditionInsufficient';
   if (state.phase === 'event') {
     if (event?.blockedWork?.includes(action.id)) return event.blockReason;
     const response = event?.choices.find(choice => choice.id === event.workResolutions?.[action.id]);
@@ -53,7 +56,7 @@ export function unavailableReason(state, action, event = null) {
   if (action.id === 'research' && !state.samples?.length) return 'error.noSamples';
   if (action.id === 'transmit' && systems.antennaLimit === 0) return 'error.facilityUnavailable';
   if (action.id === 'transmit' && state.localData === 0) return 'error.noLocalData';
-  if (['clean','repair'].includes(action.id) && !state.dusty && systems.generationCap === 6 && (action.id !== 'repair' || systems.trackingCap === 6)) return 'error.panelsClean';
+  if (['clean','repair','force_repair'].includes(action.id) && !state.dusty && systems.generationCap === 6 && (action.id === 'clean' || systems.trackingCap === 6)) return 'error.panelsClean';
   if (state.weather === 'sandstorm' && ['clean','repair','robot'].includes(action.id)) return 'error.stormOutside';
   return '';
 }
@@ -73,6 +76,7 @@ const effects = {
   transmit(s) { const amount = Math.min(dailyState(s).antennaLimit,s.localData); s.localData -= amount; s.pendingData += amount; },
   clean(s) { s.dusty = false; dailyState(s).generationCap=6; },
   repair(s) { s.dusty = false; dailyState(s).generationCap=6; dailyState(s).trackingCap=6; },
+  force_repair(s) { effects.repair(s); },
   dust(s) { s.dusty = true; },
   rest(s) { s.health = Math.min(LIMITS.health,s.health+8); },
   shield(s) { s.shielded = true; s.tools.shield = 'consumed'; },
