@@ -67,12 +67,12 @@ test('积尘影响后续发电；恢复不会重算今日发电',() => {
   const game = model(); const s = game.snapshot;
   Object.assign(s,{sol:3,currentEventId:'dust'}); game.restore(s);
   game.choose('defer'); game.work('standby'); game.nextSol();
-  assert.equal(game.snapshot.generation,3);
+  assert.equal(game.snapshot.generation,4);
   const nextEvent = game.events.get(game.snapshot.currentEventId);
   game.choose(nextEvent.choices.find(choice => !choice.work).id);
   const energy = game.snapshot.energy; game.work('clean');
   assert.equal(game.snapshot.energy,energy-2); assert.equal(game.snapshot.dusty,false);
-  game.nextSol(); assert.equal(game.snapshot.generation,6);
+  game.nextSol(); assert.equal(game.snapshot.generation,8);
 });
 
 test('没有可用工具不能采样，资源不足不能执行工作',() => {
@@ -244,7 +244,7 @@ test('读档不重复结算照明，结束当天才扣费，任务结束后不�
   const game=model(); game.choose('grow'); const repo=new SaveRepository(memory(),content);
   const saved=repo.save(game.snapshot); const restored=new GameModel(content); restored.restore(repo.load(saved.id).state);
   assert.equal(restored.snapshot.energy,game.snapshot.energy);
-  restored.nextSol(); assert.equal(restored.snapshot.energy,game.snapshot.energy-1+6-3);
+  restored.nextSol(); assert.equal(restored.snapshot.energy,Math.min(12,game.snapshot.energy-1+8)-3);
   assert.equal(restored.snapshot.previousResourceLog.filter(entry => entry.source==='lighting' && entry.changes.energy===-1).length,1);
   assert.ok(!restored.snapshot.previousDaySummary.includes('summary.lightingCost'));
   const finished=restored.snapshot; Object.assign(finished,{phase:'finished',outcome:'success'}); restored.restore(finished);

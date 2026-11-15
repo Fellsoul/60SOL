@@ -11,7 +11,8 @@ export class GameController {
     this.busy=false;
     this.activeSaveId=null;
     this.view.coverScene();
-    await this.commit(()=>this.model.start(ids,snapshot),{morning:true,initial:true});
+    const difficulty = this.pendingDifficulty ?? this.model.snapshot?.difficulty ?? 'medium';
+    await this.commit(()=>this.model.start(ids,snapshot,difficulty),{morning:true,initial:true});
     if (this.snapshots && !snapshot) this.view.notify('space.offline');
     else if (snapshot?.schemaVersion === 2) this.view.notify('space.partialCurrent');
   }
@@ -29,6 +30,7 @@ export class GameController {
   loadSave(id) {
     const loaded = this.repository.load(id);
     if (!loaded.state) { this.showSaves('save.unavailable'); return; }
+    this.pendingDifficulty = loaded.state.difficulty ?? 'medium';
     // Cover the scene before closing the menu so a saved scene can never flash onscreen.
     this.view.coverScene();
     void this.commit(() => { this.model.restore(loaded.state); this.activeSaveId = id; },{morning:true,initial:true,save:false});
@@ -54,7 +56,7 @@ export class GameController {
       if (this.busy || !command) return;
       if (command === 'settings') { void this.view.terminal.open(null,null,this.view.reducedMotion,'settings'); return; }
       if (command === 'new') {
-        this.activeSaveId = null; this.model.restore(null); void this.view.terminal.open(null,null,this.view.reducedMotion); return;
+        this.view.menu.showDifficulty(); return;
       }
       if (command === 'load') { this.showSaves(); return; }
       if (command === 'continue') {
@@ -62,6 +64,14 @@ export class GameController {
         if (!latest) { this.showMenu(); this.view.notify(i18n.t('save.unavailable')); return; }
         this.loadSave(latest.id);
       }
+    });
+    document.querySelector('#difficulty-picker').addEventListener('click',event => {
+      const difficulty = event.target.closest('[data-difficulty]')?.dataset.difficulty;
+      if (this.busy || !['easy','medium','hard'].includes(difficulty)) return;
+      this.pendingDifficulty = difficulty;
+      this.view.menu.difficultyDialog.close();
+      this.activeSaveId = null; this.model.restore(null);
+      void this.view.terminal.open(null,null,this.view.reducedMotion);
     });
     document.querySelector('#save-list').addEventListener('click',event => {
       const button = event.target.closest('button[data-save-id],button[data-save-delete]');

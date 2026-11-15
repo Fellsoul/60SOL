@@ -128,7 +128,8 @@
           "src": "assets/scene/exterior/right/clear.png"
         },
         "sandstorm": {
-          "src": "assets/scene/exterior/right/sandstorm.png"
+          "src": "assets/scene/exterior/right/sandstorm.png",
+          "offset": { "x": 0, "y": 34 }
         }
       }
     },

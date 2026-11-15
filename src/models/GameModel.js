@@ -19,6 +19,7 @@ export class GameModel {
   restore(state) {
     this.#state = structuredClone(state);
     if (this.#state) {
+      this.#state.difficulty ??= 'medium';
       this.#state.samples ??= []; this.#state.crew ??= freshCrew();
       this.#state.expeditionPlan ??= null; this.#state.robotSampleSol ??= null;
       ensureMissionJournal(this.#state);
@@ -47,10 +48,12 @@ export class GameModel {
     recordResourceChange(s,before,'sampling.robot',this.resourceLog,'action.robot.summary');
     s.daySummary.push('action.robot.summary');
   }
-  start(toolIds,snapshot=null) {
+  start(toolIds,snapshot=null,difficulty='medium') {
+    if (!['easy','medium','hard'].includes(difficulty)) throw new Error('Invalid difficulty');
     if(snapshot!==null&&!validSnapshot(snapshot))throw new Error('Invalid mission snapshot');
     if (toolIds.length !== 2 || new Set(toolIds).size !== 2 || !toolIds.every(id => this.tools.some(tool => tool.id === id))) throw new Error('error.chooseTwoTools');
     this.#state = createState(toolIds,snapshot?.seed);
+    this.#state.difficulty = difficulty;
     this.#state.missionSnapshot=structuredClone(snapshot);
     beginSol(this.#state,this.events,this.environment,this.resourceLog);
   }

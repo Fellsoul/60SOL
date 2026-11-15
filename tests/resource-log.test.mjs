@@ -19,20 +19,20 @@ test('morning records actual capped charging and the full life-support cost',() 
   const model = game();
   assert.equal(model.snapshot.resourceLog.find(entry => entry.source === 'generation').changes.energy,2);
   assert.equal(model.snapshot.resourceLog.find(entry => entry.source === 'lifeSupport').changes.energy,-3);
-  assert.equal(model.snapshot.resourceLog.find(entry => entry.source === 'generation').generated,6);
+  assert.equal(model.snapshot.resourceLog.find(entry => entry.source === 'generation').generated,8);
 });
 test('power summaries distinguish gross generation from capped charging and use one battery per quantity',()=>{
   const model=game(),entries=model.snapshot.resourceLog;
   const html=summary(entries.filter(entry=>entry.source==='generation'));
-  assert.ok(html.includes('Generated +6'));assert.ok(html.includes('Stored +2'));
-  assert.ok(html.includes('× 6'));assert.ok(html.includes('× 2'));
+  assert.ok(html.includes('Generated +8'));assert.ok(html.includes('Stored +2'));
+  assert.ok(html.includes('× 8'));assert.ok(html.includes('× 2'));
   assert.equal((html.match(/assets\/ui\/battery.png/g)??[]).length,2);
   const support=summary(entries.filter(entry=>entry.source==='lifeSupport'));
   assert.ok(support.includes('× 3'));assert.equal((support.match(/assets\/ui\/battery.png/g)??[]).length,1);
-  const full=model.snapshot;full.energy=12;full.generation=6;
+  const full=model.snapshot;full.energy=12;full.generation=8;
   beginSol(full,model.events,{},content.resource_log);
   const generation=full.resourceLog.find(entry=>entry.source==='generation');
-  assert.equal(generation.generated,6);assert.equal(generation.changes.energy,undefined);
+  assert.equal(generation.generated,8);assert.equal(generation.changes.energy,undefined);
   assert.ok(summary([generation]).includes('Stored +0'));
   const legacy=summary([{source:'generation',variant:0,fallback:'',changes:{energy:2,generation:3}}]);
   assert.ok(legacy.includes('Stored +2'));assert.ok(!legacy.includes('Generated'));

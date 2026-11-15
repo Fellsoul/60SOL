@@ -6,7 +6,7 @@ export const LIMITS = Object.freeze({ energy: 12, food: 128, health: 100, sols: 
 
 export function createState(toolIds, seed = 20261113) {
   return {
-    version: SAVE_VERSION, sol: 1, phase: 'morning', energy: 10, food: 80, health: 100,
+    version: SAVE_VERSION, difficulty:'medium', sol: 1, phase: 'morning', energy: 10, food: 80, health: 100,
     localData: 0, sentData: 0, pendingData: 0, growth: 0, powerFailures: 0,
     lifeSupportPaid: false, generation: 0, dusty: false, shielded: false,
     tools: Object.fromEntries(toolIds.map(id => [id, 'ready'])),
@@ -32,6 +32,7 @@ export function logEntry(state, text) {
 // 存档属于外部输入；版本和关键字段必须通过校验，不能直接合并进初始状态。
 export function validateState(s, eventIds, toolIds) {
   if (!s || s.version !== SAVE_VERSION) return false;
+  if (s.difficulty !== undefined && !['easy','medium','hard'].includes(s.difficulty)) return false;
   if (s.concurrentEvents !== undefined && (!Array.isArray(s.concurrentEvents) || s.concurrentEvents.length > 6 ||
     new Set(s.concurrentEvents.map(item => item?.id)).size !== s.concurrentEvents.length ||
     !s.concurrentEvents.every(item => item && typeof item.id === 'string' && item.id.length <= 80 &&
@@ -65,14 +66,14 @@ export function validateState(s, eventIds, toolIds) {
     if (entries === undefined) continue; // Older v3 saves have narrative summaries only.
     if (!Array.isArray(entries) || entries.length > 50 || !entries.every(entry => entry &&
       typeof entry.source === 'string' && entry.source.length <= 200 &&
-      (entry.generated === undefined || (entry.source === 'generation' && Number.isInteger(entry.generated) && entry.generated >= 0 && entry.generated <= 6)) &&
+      (entry.generated === undefined || (entry.source === 'generation' && Number.isInteger(entry.generated) && entry.generated >= 0 && entry.generated <= 9)) &&
       Number.isInteger(entry.variant) && entry.variant >= 0 && entry.variant < 100 &&
       typeof entry.fallback === 'string' && entry.fallback.length <= 2000 &&
       entry.changes && typeof entry.changes === 'object' && !Array.isArray(entry.changes) &&
       Object.keys(entry.changes).length <= 20 && Object.entries(entry.changes).every(([key,value]) =>
         /^[a-zA-Z]+(?:\.[a-zA-Z]+)?$/.test(key) && Number.isInteger(value) && Math.abs(value) <= 10000))) return false;
   }
-  const ranges = { sol: [1,15], energy: [0,LIMITS.energy], food: [0,LIMITS.food], health: [0,100], localData: [0,10000], sentData: [0,10000], pendingData: [0,30], growth: [0,2], powerFailures: [0,14], generation: [0,6], rng: [0,4294967295] };
+  const ranges = { sol: [1,15], energy: [0,LIMITS.energy], food: [0,LIMITS.food], health: [0,100], localData: [0,10000], sentData: [0,10000], pendingData: [0,30], growth: [0,2], powerFailures: [0,14], generation: [0,9], rng: [0,4294967295] };
   if (!Object.entries(ranges).every(([key,[min,max]]) => Number.isInteger(s[key]) && s[key] >= min && s[key] <= max)) return false;
   if (s.sol > LIMITS.sols && s.phase !== 'finished') return false;
   if (s.missionSnapshot != null && !validSnapshot(s.missionSnapshot)) return false;

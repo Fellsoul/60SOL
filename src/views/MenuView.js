@@ -4,6 +4,8 @@ export class MenuView {
     this.root = document.querySelector('#main-menu');
     this.saveDialog = document.querySelector('#save-picker');
     this.saveMessage = document.querySelector('#save-picker-message');
+    this.difficultyDialog = document.querySelector('#difficulty-picker');
+    document.querySelector('#difficulty-close').addEventListener('click',() => this.difficultyDialog.close());
     document.querySelector('#save-picker-close').addEventListener('click',() => this.closeSaves());
     for (const name of ['space','mars','meteors']) {
       const img = this.root.querySelector(`[data-menu-layer=${name}]`);
@@ -24,6 +26,11 @@ export class MenuView {
     const veil = document.querySelector('#morning-veil'); veil.style.opacity = '0'; veil.style.pointerEvents = 'none';
     this.root.querySelector('[data-menu=continue]').hidden = !hasSave;
     this.root.querySelectorAll('[data-menu]').forEach(button => { button.textContent = i18n.t(`menu.${button.dataset.menu}`); });
+  }
+  showDifficulty() {
+    i18n.translate(this.difficultyDialog);
+    if (!this.difficultyDialog.open) this.difficultyDialog.showModal();
+    this.difficultyDialog.querySelector('#difficulty-close').focus();
   }
   showSaves(saves,message = '') {
     const deleting = document.activeElement?.hasAttribute('data-save-delete');
