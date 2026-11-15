@@ -77,17 +77,22 @@ export class TerminalView {
     return entries.map((entry,index) => {
       const variants = localize(this.resourceLog.sources?.[entry.source]?.descriptions);
       const description = variants?.[entry.variant % variants.length] ?? i18n.t(entry.fallback || entry.source);
-      const changes = Object.entries(entry.changes).map(([resource,delta]) => {
-        const label = localize(this.resourceLog.resources?.[resource]) ?? resource;
-        const sign = delta > 0 ? '+' : '−';
+      // A change in the daily generation rate is not electricity produced.
+      // Older saves only retained actual charging, so do not invent their gross output.
+      const deltas = entry.source === 'generation'
+        ? {...(entry.generated !== undefined ? {generation:entry.generated} : {}),energy:entry.changes.energy ?? 0}
+        : entry.changes;
+      const changes = Object.entries(deltas).map(([resource,delta]) => {
+        const solar = entry.source === 'generation';
+        const label = solar ? i18n.t(resource === 'generation' ? 'resources.generatedPower' : 'resources.storedPower') : localize(this.resourceLog.resources?.[resource]) ?? resource;
+        const sign = delta >= 0 ? '+' : '−';
         const amount = Math.abs(delta);
         const accessible = escapeHtml(`${label} ${sign}${amount}`);
         if (['food','localData','pendingData','sentData'].includes(resource)) return `<span class="summary-resource-change"><span>${sign}</span>${resourceAmount(resource,amount)}</span>`;
-        if (resource === 'energy') {
+        if (resource === 'energy' || (solar && resource === 'generation')) {
           const battery = '<img class="summary-battery-icon" src="assets/ui/battery.png" alt="" aria-hidden="true">';
-          const icons = amount > 4 ? `${battery}<span aria-hidden="true">× ${amount}</span>`
-            : amount > 0 ? battery.repeat(amount) : '<span aria-hidden="true">0</span>';
-          return `<span class="summary-resource-change" role="img" aria-label="${accessible}"><span aria-hidden="true">${sign}</span>${icons}</span>`;
+          const icons = `${battery}<span aria-hidden="true">× ${amount}</span>`;
+          return `<span class="summary-resource-change" role="img" aria-label="${accessible}">${solar ? `<span aria-hidden="true">${escapeHtml(label)}</span>` : ''}<span aria-hidden="true">${sign}</span>${icons}</span>`;
         }
         return `<span class="summary-resource-change">${escapeHtml(label)} ${sign}${amount}</span>`;
       }).join(' ');

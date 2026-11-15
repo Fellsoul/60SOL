@@ -6,13 +6,36 @@ import { finishSol } from '../src/models/TurnEngine.js';
 import { resourceSnapshot } from '../src/models/ResourceLog.js';
 import { SaveRepository } from '../src/repositories/SaveRepository.js';
 import { choiceReason } from '../src/models/DailyEventRules.js';
+import { beginSol } from '../src/models/TurnEngine.js';
+import { TerminalView } from '../src/views/TerminalView.js';
+import { i18n } from '../src/services/I18n.js';
 const read = async name => JSON.parse(await readFile(new URL(`../data/${name}.json`,import.meta.url),'utf8'));
 const content = {events:await read('events'),tools:await read('tools'),resource_log:await read('resource_log')};
 function game() { const model = new GameModel(content); model.start(['toolkit','battery']); return model; }
+const catalogs=Object.fromEntries(await Promise.all(['en','zh-CN'].map(async lang=>[lang,JSON.parse(await readFile(new URL(`../locales/${lang}.json`,import.meta.url),'utf8'))])));
+i18n.setCatalogs(catalogs);
+const summary=entries=>TerminalView.prototype.resourceSummary.call({resourceLog:content.resource_log,copy:TerminalView.prototype.copy},entries);
 test('morning records actual capped charging and the full life-support cost',() => {
   const model = game();
   assert.equal(model.snapshot.resourceLog.find(entry => entry.source === 'generation').changes.energy,2);
   assert.equal(model.snapshot.resourceLog.find(entry => entry.source === 'lifeSupport').changes.energy,-3);
+  assert.equal(model.snapshot.resourceLog.find(entry => entry.source === 'generation').generated,6);
+});
+test('power summaries distinguish gross generation from capped charging and use one battery per quantity',()=>{
+  const model=game(),entries=model.snapshot.resourceLog;
+  const html=summary(entries.filter(entry=>entry.source==='generation'));
+  assert.ok(html.includes('Generated +6'));assert.ok(html.includes('Stored +2'));
+  assert.ok(html.includes('× 6'));assert.ok(html.includes('× 2'));
+  assert.equal((html.match(/assets\/ui\/battery.png/g)??[]).length,2);
+  const support=summary(entries.filter(entry=>entry.source==='lifeSupport'));
+  assert.ok(support.includes('× 3'));assert.equal((support.match(/assets\/ui\/battery.png/g)??[]).length,1);
+  const full=model.snapshot;full.energy=12;full.generation=6;
+  beginSol(full,model.events,{},content.resource_log);
+  const generation=full.resourceLog.find(entry=>entry.source==='generation');
+  assert.equal(generation.generated,6);assert.equal(generation.changes.energy,undefined);
+  assert.ok(summary([generation]).includes('Stored +0'));
+  const legacy=summary([{source:'generation',variant:0,fallback:'',changes:{energy:2,generation:3}}]);
+  assert.ok(legacy.includes('Stored +2'));assert.ok(!legacy.includes('Generated'));
 });
 test('every available event response records exactly its numeric effects',() => {
   let checked=0;

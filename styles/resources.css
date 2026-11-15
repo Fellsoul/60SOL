@@ -1,15 +1,10 @@
 .resource-icon { position:relative; overflow:hidden; display:inline-block; width:12px; height:18px; object-fit:contain; flex:none; vertical-align:middle; }
 .resource-amount { display:inline-flex; flex-wrap:wrap; align-items:center; gap:3px; max-width:100%; vertical-align:middle; }
-.resource-label { display:inline-flex; vertical-align:middle; }
-.resource-quarter { position:relative; display:inline-block; width:12px; height:18px; flex:none; }
-.resource-quarter .resource-icon { position:absolute; inset:0; }
 .resource-dim { opacity:.6; }
-.resource-filled { clip-path:inset(0 calc(100% - var(--resource-fill)) 0 0); }
 .resource-inventory { display:flex; flex-wrap:wrap; align-items:center; gap:10px 20px; margin:14px 0; padding:12px 0; border-block:1px solid currentColor; }
 .resource-inventory > span { display:inline-flex; max-width:100%; }
 
-/* Crop transparent canvas margins in CSS so quarters divide the painted icon itself. */
+/* Crop transparent canvas margins in CSS so food and research artwork fill the shared icon size. */
 .resource-art { position:absolute; max-width:none; object-fit:fill; }
 .resource-icon--drumstick .resource-art { width:213.6286%; height:108.7598%; left:-56.5588%; top:-4.3365%; }
 .resource-icon--flask .resource-art { width:130.9028%; height:106.59%; left:-16.6667%; top:-4.5211%; }
-.resource-quarter .resource-dim { clip-path:inset(0 0 0 var(--resource-fill)); }

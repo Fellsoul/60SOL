@@ -9,7 +9,7 @@ Run the automated suite with `npm test` (Node's built-in test runner; no extra p
 | `dependencies.test.mjs` | Event-specific restrictions, independent work, and avoiding blocked missions |
 | `emergency-clean.test.mjs` | Trigger conditions, health/work costs, declining, and reload protection |
 | `expeditions.test.mjs` | Sample capacity and study uses, robot collection, crew trips, lighting-based fatigue, and save migration |
-| `resources.test.mjs` | Quarter drumsticks, research icons, bilingual prompts, daily rations, and legacy food migration |
+| `resources.test.mjs` | Drumstick multipliers, research icons, bilingual prompts, daily rations, and legacy food migration |
 | `resource-log.test.mjs` | Actual resource deltas, caps, and persisted summaries |
 | `battery.test.mjs` | Battery capacity, lamp states, and legacy energy limits |
 | `clipboard.test.mjs` | Available and completed tasks across turns and reloads |

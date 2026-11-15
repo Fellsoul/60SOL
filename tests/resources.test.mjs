@@ -11,14 +11,18 @@ const content={events:await read('../data/events.json'),tools:await read('../dat
 i18n.setCatalogs({en:await read('../locales/en.json'),'zh-CN':await read('../locales/zh-CN.json')});
 const game=()=>{const model=new GameModel(content);model.start(['toolkit','battery']);return model;};
 
-test('drumsticks represent four food, with the remainder filled in quarter steps; flasks represent single research points',()=>{
-  for(let food=1;food<=12;food++) {
-    const html=resourceAmount('food',food),fraction=food%4;
-    assert.equal((html.match(/resource-quarter/g)??[]).length,fraction?1:0);
-    if(fraction)assert.ok(html.includes(`--resource-fill:${fraction*25}%`));
+test('one drumstick uses a multiplier in four-food units; one flask uses a multiplier in single research points',()=>{
+  for(const food of [0,1,2,3,4,7,8,12,80,128]) {
+    const html=resourceAmount('food',food);
+    assert.equal((html.match(/assets\/ui\/drumstick.png/g)??[]).length,1);
+    assert.ok(html.includes(`× ${food/4}</span>`));
     assert.ok(html.includes(`data-amount="${food}"`));
   }
-  assert.equal((resourceAmount('localData',12).match(/assets\/ui\/flask.png/g)??[]).length,12);
+  for(const resource of ['localData','pendingData','sentData']) for(const points of [0,1,6,12,60,10000]) {
+    const html=resourceAmount(resource,points);
+    assert.equal((html.match(/assets\/ui\/flask.png/g)??[]).length,1);
+    assert.ok(html.includes(`× ${points}</span>`));
+  }
   assert.ok(resourceAmount('food',0).includes('resource-dim'));
   assert.ok(resourceAmount('localData',10000).length<1000);
   assert.ok(resourceAmount('food',1e50).length<1000);
@@ -26,7 +30,10 @@ test('drumsticks represent four food, with the remainder filled in quarter steps
 
 test('resource prompts render bilingual numeric units as icons, escaping unrelated saved text',()=>{
   for(const text of ['Gain 3 food and 6 local data.','获得 3 食物和 6 点本地科研数据。','+3 F, +6 D']) {
-    const html=resourceText(text);assert.ok(html.includes('--resource-fill:75%'));assert.ok(html.includes('data-amount="6"'));assert.ok(html.includes('flask.png'));
+    const html=resourceText(text);assert.ok(html.includes('× 0.75</span>'));assert.ok(html.includes('data-amount="6"'));assert.ok(html.includes('flask.png'));
+  }
+  for(const narrative of ['成员们从库存中取用了今日的食物。','我们将研究记录发送给地球。','The crew used food from storage for their daily meals.','Research uses left: 2']) {
+    assert.equal(resourceText(narrative),narrative);
   }
   assert.ok(resourceText('<script>alert(1)</script>').startsWith('&lt;script&gt;'));
   assert.ok(!resourceText('研究次数 2，SOL 14').includes('flask.png'));

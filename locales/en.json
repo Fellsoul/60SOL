@@ -560,5 +560,7 @@
   "tools.scene.toolkit": "View repair tasks",
   "tools.scene.robot": "Collect a sample · 4 E · no crew fatigue or daily work used",
   "tools.scene.battery": "Connect once · up to +6 E",
-  "tools.chargeAdded": "Battery connected:"
+  "tools.chargeAdded": "Battery connected:",
+  "resources.generatedPower": "Generated",
+  "resources.storedPower": "Stored"
 }
