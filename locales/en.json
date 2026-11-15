@@ -12,6 +12,7 @@
   "menu.continue": "Continue",
   "menu.load": "Load Save",
   "menu.settings": "Settings",
+  "menu.credits": "Credits",
   "save.choose": "Choose a local save to load. Most recent saves appear first.",
   "save.back": "Back",
   "save.empty": "No local saves yet. Start a new game to create one.",

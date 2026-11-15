@@ -67,7 +67,7 @@ export class GameController {
     document.querySelector('#main-menu').addEventListener('click',event => {
       const command = event.target.closest('[data-menu]')?.dataset.menu;
       if (this.busy || !command) return;
-      if (command === 'settings') { void this.view.terminal.open(null,null,this.view.reducedMotion,'settings'); return; }
+      if (command === 'settings' || command === 'credits') { void this.view.terminal.open(null,null,this.view.reducedMotion,command); return; }
       if (command === 'new') {
         this.view.menu.showDifficulty(); return;
       }

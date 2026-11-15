@@ -12,6 +12,7 @@
   "menu.continue": "继续",
   "menu.load": "读取存档",
   "menu.settings": "设置",
+  "menu.credits": "制作人员",
   "save.choose": "选择要加载的本地存档，最近保存的存档排在前面。",
   "save.back": "返回",
   "save.empty": "还没有本地存档，开始新游戏后会自动创建。",

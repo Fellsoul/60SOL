@@ -9,3 +9,23 @@
 难度卡片使用 `easy.png`、`normal.png`、`hardpng.png`（困难图片当前的实际文件名），路径在 `index.html`。默认模糊，悬浮或键盘聚焦后清晰，并在下方显示说明；触屏直接显示说明。
 
 说明文字可直接修改 `locales/zh-CN.json`（中文）或 `locales/en.json`（英文）中的 `difficulty.easy.description`、`difficulty.medium.description`、`difficulty.hard.description`。Normal 对应存档中的 `medium`，只改显示名称，不改变难度规则。
+
+## Credits text
+
+Edit `assets/menu/credits.json` to change the Credits page. `title` is the page title;
+`sections` is an ordered list of heading/text pairs. Add, remove, or reorder entries
+to change the number and order of sections; no code changes are needed.
+
+```json
+{
+  "title": "Credits",
+  "sections": [
+    { "heading": "Heading 1", "text": "Text 1" },
+    { "heading": "Another heading", "text": "First line\nSecond line" }
+  ]
+}
+```
+
+Use `\n` inside text for line breaks. A section may omit `heading` or `text`.
+All values are plain text, displayed as written in every language. Save the file
+and reload the game to see edits. Long credits scroll inside the terminal panel.

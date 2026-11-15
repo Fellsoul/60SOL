@@ -43,12 +43,15 @@ export class TerminalView {
   }
   async open(state,event,reducedMotion,mode='game') {
     if (this.dialog.open) return;
+    this.returnFocus = document.activeElement;
     this.reducedMotion = reducedMotion;
     this.mode = mode;
     this.isConsole = Boolean(state) && !state.outcome && mode === 'game';
     this.dialog.classList.toggle('is-console',this.isConsole);
     this.dialog.classList.toggle('is-report',Boolean(state?.outcome));
-    if (mode === 'settings') this.renderSettings(); else this.render(state,event);
+    if (mode === 'settings') this.renderSettings();
+    else if (mode === 'credits') this.renderCredits();
+    else this.render(state,event);
     this.dialog.showModal(); document.querySelector('#terminal-toggle').setAttribute('aria-expanded','true');
     document.body.classList.toggle('console-open',this.isConsole);
     this.animation?.cancel();
@@ -70,7 +73,9 @@ export class TerminalView {
     try { await this.animation.finished; } catch { return; }
     this.dialog.close(); document.querySelector('#terminal-toggle').setAttribute('aria-expanded','false');
     document.body.classList.remove('console-open');
-    document.querySelector('#terminal-toggle').focus({preventScroll:true});
+    const returnFocus = this.returnFocus?.isConnected && !this.returnFocus.closest('[hidden]')
+      ? this.returnFocus : document.querySelector('#terminal-toggle');
+    returnFocus.focus({preventScroll:true});
   }
   copy(id,text,suffix = '') {
     text = i18n.t(text);
@@ -197,6 +202,20 @@ export class TerminalView {
     form.querySelectorAll('input:not(:checked)').forEach(input => { input.disabled = count === 2; });
   }
   setReducedMotion(value) { this.reducedMotion = value; if (value) this.writer.skip(); }
+  renderCredits() {
+    this.writer.cancel();
+    const {title,sections} = this.credits;
+    const heading = document.querySelector('#terminal-title');
+    heading.textContent = title;
+    heading.setAttribute('aria-label',title);
+    document.querySelector('#terminal-generation').hidden = true;
+    document.querySelector('#restart').hidden = true;
+    this.content.innerHTML = sections.map(({heading,text}) =>
+      `${heading ? `<h2>${escapeHtml(heading)}</h2>` : ''}${text ? `<p class="terminal-copy">${escapeHtml(text)}</p>` : ''}`
+    ).join('');
+    this.jobs = [];
+    this.resetScroll();
+  }
   renderSettings() {
     this.writer.cancel();
     document.querySelector('#terminal-generation').hidden = true;

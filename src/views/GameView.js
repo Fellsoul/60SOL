@@ -19,6 +19,7 @@ export class GameView {
     this.scene = new SceneView(document.querySelector('#scene'),content.scene_layout);
     this.terminal = new TerminalView(content.tools,content.events,content.resource_log);
     this.terminal.environment = content.environment;
+    this.terminal.credits = content.credits;
     this.tasks = new TaskView();
     this.tasks.events = content.events;
     this.events = content.events;

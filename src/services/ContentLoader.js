@@ -1,7 +1,8 @@
 export async function loadContent() {
-  const names = ['events','tools','scene_layout','environment','presentation','resource_log','movement','space_data','intro'];
+  const names = ['events','tools','scene_layout','environment','presentation','resource_log','movement','space_data','intro','credits'];
   const values = await Promise.all(names.map(async name => {
-    const path = name === 'intro' ? '../../assets/scene/init_game/intro.json' : `../../data/${name}.json`;
+    const path = name === 'intro' ? '../../assets/scene/init_game/intro.json'
+      : name === 'credits' ? '../../assets/menu/credits.json' : `../../data/${name}.json`;
     const response = await fetch(new URL(path,import.meta.url));
     if (!response.ok) throw new Error(`无法加载 ${name}.json（${response.status}）`);
     return response.json();
