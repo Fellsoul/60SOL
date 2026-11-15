@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="styles/resources.css">
   <link rel="stylesheet" href="styles/movement.css">
   <link rel="stylesheet" href="styles/space-data.css">
+  <link rel="stylesheet" href="styles/intro.css">
   <script type="module" src="src/app.js"></script>
 </head>
 <body>
@@ -27,6 +28,15 @@
         <button data-menu="load"></button>
         <button data-menu="settings"></button>
       </nav>
+    </section>
+    <section id="launch-intro" aria-label="Rocket launch introduction" hidden>
+      <img class="intro-background" alt="" draggable="false">
+      <div class="intro-stars" aria-hidden="true"></div>
+      <img class="intro-rocket" alt="" draggable="false">
+      <img class="intro-camera" alt="Launch camera" draggable="false">
+      <p class="intro-text" aria-hidden="true"></p>
+      <p class="intro-announcement sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+      <button class="intro-skip" type="button" hidden>SKIP INTRO</button>
     </section>
     <div id="scene-viewport"><div id="scene" data-i18n-aria-label="scene.interior" aria-label="Mars outpost interior"></div></div>
     <button id="terminal-toggle" data-i18n-aria-label="terminal.open" aria-label="Open terminal" aria-haspopup="dialog" aria-controls="terminal" aria-expanded="false" disabled>

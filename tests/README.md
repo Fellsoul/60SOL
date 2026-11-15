@@ -18,6 +18,7 @@ Run the automated suite with `npm test` (Node's built-in test runner; no extra p
 | `typewriter.test.mjs` | Per-line resource reveal, atomic inline icons, skip, cancellation, and reduced motion |
 | `clipboard.test.mjs` | Available and completed tasks across turns and reloads |
 | `controller.test.mjs` | Light switching saves progress and keeps the terminal open |
+| `launch-intro.test.mjs` | Setup gating, natural typing and pauses, three-second holds, background completion, skip, cancellation, replay, and reduced motion |
 | `i18n.test.mjs` | Catalog consistency, content references, fallbacks, and old narrative text |
 
 Run the local data-server cache/outage tests with `python3 -m unittest discover -s tests -p '*_test.py'`.

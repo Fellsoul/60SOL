@@ -7,12 +7,14 @@ import { TerminalView } from './TerminalView.js';
 import { MenuView } from './MenuView.js';
 import { TransitionAudio } from './TransitionAudio.js';
 import { BackgroundMusic } from './BackgroundMusic.js';
+import { LaunchIntroView } from './LaunchIntroView.js';
 import { i18n } from '../services/I18n.js';
 
 export class GameView {
   constructor(content) {
     this.config = content.presentation; this.menu = new MenuView(this.config.menu); this.audio = new TransitionAudio(this.config);
     this.music = this.config.music ? new BackgroundMusic(this.config) : null;
+    this.intro = new LaunchIntroView(content.intro);
     this.scene = new SceneView(document.querySelector('#scene'),content.scene_layout);
     this.terminal = new TerminalView(content.tools,content.events,content.resource_log);
     this.terminal.environment = content.environment;
@@ -40,6 +42,10 @@ export class GameView {
     this.sceneEvent = new SceneEventView(this.scene.root);
     this.sceneTools = new SceneToolsView(this.scene.root);
     this.sceneEvent.events = this.events;
+  }
+  startIntro() {
+    this.menu.root.hidden = true;
+    this.intro.start(this.reducedMotion);
   }
   coverScene() {
     void this.music?.setMode('black');
@@ -134,6 +140,7 @@ export class GameView {
   async reduceMotion(value) {
     document.body.classList.toggle('reduced-motion',value);
     this.reducedMotion = value; this.terminal.setReducedMotion(value);
+    this.intro.setReducedMotion(value);
     await this.scene.render(this.state,value);
   }
   startTransitionAudio(previousState) {

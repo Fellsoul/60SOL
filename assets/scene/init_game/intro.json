@@ -1,0 +1,14 @@
+{
+  "lines": [
+    "As Earth becomes hotter due to global warming, humanity seeks solutions on Mars.",
+    "As the commander, your task is to send samples from Mars back to Earth within 14 Sols.",
+    "2 ASTRONAUTS. LIMITED RESOURCES. HAPHAZARD EVENTS."
+  ],
+  "scrollMs": 11000,
+  "typingCharMs": 50,
+  "typingVariation": 0.35,
+  "typingPauseChance": 0.06,
+  "typingPauseMs": 120,
+  "lineHoldMs": 2000,
+  "lineFadeMs": 1000
+}

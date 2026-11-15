@@ -2,7 +2,7 @@ import { i18n } from '../services/I18n.js';
 import { eventResolved } from '../models/DailyEventRules.js';
 export class GameController {
   constructor(model,view,repository,snapshots=null) { this.snapshots=snapshots; this.model = model; this.view = view; this.repository = repository; this.busy = false; this.activeSaveId = null; }
-  async startMission(ids,mode='current') {
+  async startMission(ids,mode='current',{intro=false}={}) {
     if(this.busy)return;
     this.busy=true;
     let snapshot;
@@ -12,11 +12,12 @@ export class GameController {
     this.activeSaveId=null;
     this.view.coverScene();
     const difficulty = this.pendingDifficulty ?? this.model.snapshot?.difficulty ?? 'medium';
-    await this.commit(()=>this.model.start(ids,snapshot,difficulty),{morning:true,initial:true});
+    await this.commit(()=>this.model.start(ids,snapshot,difficulty),{morning:true,initial:true,intro});
     if (this.snapshots && !snapshot) this.view.notify('space.offline');
     else if (snapshot?.schemaVersion === 2) this.view.notify('space.partialCurrent');
   }
   showMenu() {
+    this.view.intro?.stop();
     void this.view.music?.setMode('menu');
     this.view.stopActivity?.();
     const result = this.repository.list();
@@ -100,7 +101,7 @@ export class GameController {
       event.preventDefault();
       const ids = new FormData(event.target).getAll('tool');
       const mode=event.target.querySelector('[name=snapshot]')?.value ?? 'current';
-      void this.startMission(ids,mode);
+      void this.startMission(ids,mode,{intro:true});
     });
     document.querySelector('#tasks-content').addEventListener('click',event => {
       const target = event.target.closest('button[data-action]');
@@ -147,7 +148,7 @@ export class GameController {
     const state = this.model.snapshot;
     return this.view.render(state,state ? this.model.events.get(state.currentEventId) : null,options);
   }
-  async commit(command,{morning=false,initial=false,save=true,keepTasksOpen=false,keepTerminal=false}={}) {
+  async commit(command,{morning=false,initial=false,save=true,keepTasksOpen=false,keepTerminal=false,intro=false}={}) {
     if (this.busy) return;
     this.busy = true; const before = this.model.snapshot;
     try {
@@ -168,10 +169,16 @@ export class GameController {
       this.view.menu.closeSaves();
       if (!keepTasksOpen) this.view.tasks.close();
       await this.view.closeTerminal();
+      if (intro) {
+        this.view.startIntro();
+        await this.view.intro.finishSetup();
+        this.view.intro.stop();
+      }
       this.view.menu.hide();
       await this.render({morning,initial});
       if (!result.ok) this.view.notify(result.message);
     } catch (error) {
+      this.view.intro?.stop();
       this.view.notify(`画面更新失败，任务决定已保留：${error.message}`);
       document.querySelector('#morning-veil').style.pointerEvents = 'none';
       document.querySelector('#morning-veil').style.opacity = '0';
