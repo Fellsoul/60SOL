@@ -1,0 +1,356 @@
+{
+  "inspectedImages": 82,
+  "editedImages": [
+    {
+      "path": "assets/menu/robot.png",
+      "output": "assets/menu/robot.png",
+      "regions": [
+        [
+          187,
+          99,
+          226,
+          141
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 894,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "afe07ddfe8000ec7ae6efea3cd11e4bb6d509703af185ea10cdb55ba5ac80d58"
+    },
+    {
+      "path": "assets/menu/toolkit.png",
+      "output": "assets/menu/toolkit.png",
+      "regions": [
+        [
+          147,
+          94,
+          189,
+          133
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 980,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "1123f9f771c0a2b6313bdbcb09d1d8653780eb4b8a050066e00be2f1c5c2fe07"
+    },
+    {
+      "path": "assets/scene/crew/active/action-atlas-v1.png",
+      "output": "assets/scene/crew/active/action-atlas-v1.png",
+      "regions": [
+        [
+          259,
+          153,
+          295,
+          191
+        ],
+        [
+          874,
+          155,
+          902,
+          192,
+          "side"
+        ],
+        [
+          298,
+          891,
+          326,
+          926,
+          "kneel"
+        ],
+        [
+          866,
+          772,
+          907,
+          812
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 2168,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "5f01b56a1507f14a74377375348899e2ed4c9c97483d7fa6daf29e3898d602ef"
+    },
+    {
+      "path": "assets/scene/crew/astronaut_a/seated.png",
+      "output": "assets/scene/crew/astronaut_a/seated.png",
+      "regions": [
+        [
+          950,
+          514,
+          992,
+          551
+        ],
+        [
+          1063,
+          525,
+          1087,
+          541,
+          "letters"
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 1016,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "a9bb133dcc25b93ac5765925db9f2de718c5420bdfb74d94dc7c56aef8aa88d0"
+    },
+    {
+      "path": "assets/scene/crew/astronaut_a/sleep.png",
+      "output": "assets/scene/crew/astronaut_a/sleep.png",
+      "regions": [
+        [
+          958,
+          524,
+          998,
+          559
+        ],
+        [
+          1073,
+          549,
+          1096,
+          563,
+          "letters"
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 1011,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "4d8b05d01b49b1b756e1e96e9a39a5e26c9c246a23136e0297529f6801b487c6"
+    },
+    {
+      "path": "assets/scene/crew/astronaut_a/tired.png",
+      "output": "assets/scene/crew/astronaut_a/tired.png",
+      "regions": [
+        [
+          959,
+          562,
+          1001,
+          597
+        ],
+        [
+          1075,
+          561,
+          1098,
+          574,
+          "letters"
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 996,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "1d327ae86c3ff5cb5936a7f8d3db3030da5421552199a264dbac533f8a2abf39"
+    },
+    {
+      "path": "assets/scene/crew/astronaut_b/seated.png",
+      "output": "assets/scene/crew/astronaut_b/seated.png",
+      "regions": [
+        [
+          609,
+          509,
+          652,
+          545
+        ],
+        [
+          560,
+          531,
+          592,
+          547,
+          "letters"
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 1266,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "1375715c2e5bf67ae3af09b4bbcb5e8e5bd425f9e69deeb241e01025ac16ca84"
+    },
+    {
+      "path": "assets/scene/crew/astronaut_b/sleep.png",
+      "output": "assets/scene/crew/astronaut_b/sleep.png",
+      "regions": [
+        [
+          623,
+          551,
+          665,
+          587
+        ],
+        [
+          573,
+          574,
+          605,
+          591,
+          "letters"
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 1293,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "e6d452bcd234da3cacdc2aa89a581e1808e2392cc17a598be90cbb4a824187d4"
+    },
+    {
+      "path": "assets/scene/crew/astronaut_b/tired.png",
+      "output": "assets/scene/crew/astronaut_b/tired.png",
+      "regions": [
+        [
+          613,
+          540,
+          655,
+          575
+        ],
+        [
+          552,
+          536,
+          578,
+          550,
+          "letters"
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 1226,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "fcd79d0b476bf8771377db08ea92949e5cfd0300496f51dde34e726e15d7dafd"
+    },
+    {
+      "path": "assets/scene/tools/robot/ready.png",
+      "output": "assets/scene/tools/robot/ready.png",
+      "regions": [
+        [
+          244,
+          806,
+          283,
+          848
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 894,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "b32a65e65cd857d7b212c202bfdfd07a83a63e6ca443d9e6ac6b6aa309e07123"
+    },
+    {
+      "path": "assets/scene/tools/toolkit/ready.png",
+      "output": "assets/scene/tools/toolkit/ready.png",
+      "regions": [
+        [
+          876,
+          738,
+          905,
+          767
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 467,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "4858b1284ddda7234314e61963e6a5a63bde85309bfc095e66624b2cfb817b21"
+    },
+    {
+      "path": "assets/scene/init_game/Animation/NASA Atlas V Fairing Clamshell-4.png",
+      "output": "assets/scene/init_game/Animation/NASA Atlas V Fairing Clamshell-4.png",
+      "regions": [
+        [
+          245,
+          617,
+          512,
+          901,
+          "grain"
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 47376,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "3ca6aee9780458edc854f2c01f977353465dd38c94dd2aa3a0fff644719b2b2c"
+    },
+    {
+      "path": "assets/scene/init_game/Animation/exec-182d3f3a-5fdc-44c9-802a-95a6942e5ce2.png",
+      "output": "assets/scene/init_game/Animation/exec-182d3f3a-5fdc-44c9-802a-95a6942e5ce2.png",
+      "regions": [
+        [
+          245,
+          617,
+          512,
+          901,
+          "grain"
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 47376,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "3ca6aee9780458edc854f2c01f977353465dd38c94dd2aa3a0fff644719b2b2c"
+    },
+    {
+      "path": "assets/scene/ends/GE.jpg",
+      "output": "assets/scene/ends/GE.png",
+      "regions": [
+        [
+          1067,
+          410,
+          1238,
+          582,
+          "hatch"
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 19087,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "a976929e26680c7f0a88588eb791f5faa63475f836eb4ee7a52f01ffa2be2c2e"
+    },
+    {
+      "path": "assets/scene/ends/TGE.jpg",
+      "output": "assets/scene/ends/TGE.png",
+      "regions": [
+        [
+          1067,
+          410,
+          1238,
+          582
+        ],
+        [
+          1757,
+          1063,
+          1823,
+          1118
+        ],
+        [
+          1868,
+          957,
+          1925,
+          991,
+          "white"
+        ]
+      ],
+      "frames": 1,
+      "changedPixels": 21912,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "sha256Before": "6df8198aeaa41e070e3662eab6dc64f859d0c44920d6bce593bc3665c8451ab6"
+    },
+    {
+      "path": "assets/scene/init_game/rocket_launch.gif",
+      "output": "assets/scene/init_game/rocket_launch.gif",
+      "frames": 60,
+      "changedPixels": 55883,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "timingUnchanged": true
+    },
+    {
+      "path": "assets/scene/init_game/camera_pip.gif",
+      "output": "assets/scene/init_game/camera_pip.gif",
+      "frames": 100,
+      "changedPixels": 73911,
+      "outsideMaskUnchanged": true,
+      "alphaUnchanged": true,
+      "timingUnchanged": true
+    }
+  ]
+}
